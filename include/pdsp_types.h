@@ -2,16 +2,17 @@
  *
  * @brief Power electronics digital signal processing types.
  * @details Some parts of this library are taken fom the TI C2000 Ware libarary.
- * 
+ *
  * @author Falk Kyburz
  */
 
 #ifndef PDSP_TYPES_H
 #define PDSP_TYPES_H
 
-
 #define PDSP_TRUE 1
 #define PDSP_FALSE 0
+#define PDSP_ON 1
+#define PDSP_OFF 0
 
 /* Defines for math constants */
 #define PDSP_PI (3.14159265358f)
@@ -64,6 +65,15 @@ typedef struct pdsp_raw_param_tag
     pdsp_f32_t f32_offset;
 } pdsp_raw_param_t;
 
+/** Override parameter struct. */
+typedef struct pdsp_override_tag
+{
+    /** Override disable. Normally 0.0f, set to 1.0f to override. */
+    pdsp_u32_t u32_enable;
+    /** Override value. */
+    pdsp_f32_t f32_value;
+} pdsp_override_t;
+
 /** Raw signal processing parameter struct. */
 typedef struct pdsp_raw_tag
 {
@@ -88,7 +98,9 @@ typedef struct pdsp_raw_tag
 } pdsp_signal_t;
 
 /** Simple averaging state memory. */
-typedef pdsp_f32_t pdsp_avg_param_t;
+typedef pdsp_f32_t pdsp_expavg_param_t;
+/** Simple averaging state memory. */
+typedef pdsp_f32_t pdsp_expavg_t;
 
 /** DF22 filter parameter struct. */
 typedef struct pdsp_df22_param_tag
@@ -120,9 +132,9 @@ typedef struct pdsp_df11_param_tag
 typedef struct pdsp_df22_tag
 {
     /** df22 filter x0 state variable */
-    pdsp_f32_t f32_x0;
-    /** df22 filter x1 state variable */
     pdsp_f32_t f32_x1;
+    /** df22 filter x1 state variable */
+    pdsp_f32_t f32_x2;
 } pdsp_df22_t;
 
 /** Median memory struct. */
@@ -132,6 +144,8 @@ typedef struct pdsp_med3_tag
     pdsp_f32_t f32_x0;
     /**  */
     pdsp_f32_t f32_x1;
+        /**  */
+    pdsp_f32_t f32_x2;
 } pdsp_med3_t;
 
 /** Rolling average state memory struct. */
@@ -180,7 +194,7 @@ typedef struct pdsp_pi_param_tag
 typedef struct pdsp_pi_tag
 {
     /**  */
-    pdsp_f32_t f32_active;
+    pdsp_u32_t u32_active;
     /**  */
     pdsp_u32_t u32_idx;
     /**  */
@@ -204,7 +218,7 @@ typedef struct pdsp_setp_param_tag
 typedef struct pdsp_setp_tag
 {
     /**  */
-    pdsp_f32_t f32_value;
+    pdsp_f32_t f32_x1;
     /**  */
     pdsp_f32_t f32_destination;
 } pdsp_setp_t;
@@ -347,94 +361,94 @@ typedef struct pdsp_dpll_1ph_sogi_tag
 typedef struct pdsp_dpll_1ph_sogi_fll_tag
 {
     /** AC input data buffer */
-    pdsp_f32_t u[3]; 
+    pdsp_f32_t u[3];
     /** Orthogonal signal generator data buffer */
-    pdsp_f32_t osg_u[3]; 
+    pdsp_f32_t osg_u[3];
     /** Orthogonal signal generator quadrature data buffer */
-    pdsp_f32_t osg_qu[3]; 
+    pdsp_f32_t osg_qu[3];
     /** Q-axis component */
-    pdsp_f32_t u_Q[2]; 
+    pdsp_f32_t u_Q[2];
     /** D-axis component */
-    pdsp_f32_t u_D[2]; 
+    pdsp_f32_t u_D[2];
     /** Loop filter data storage */
-    pdsp_f32_t ylf[2]; 
+    pdsp_f32_t ylf[2];
     /** Output frequency of PLL(Hz) */
-    pdsp_f32_t fo; 
+    pdsp_f32_t fo;
     /** Nominal frequency (Hz) */
-    pdsp_f32_t fn; 
+    pdsp_f32_t fn;
     /** Center (Nominal) frequency in radians */
-    pdsp_f32_t wc; 
+    pdsp_f32_t wc;
     /** Angle output (0-2*pi) */
-    pdsp_f32_t theta; 
+    pdsp_f32_t theta;
     /** Cosine value of the PLL angle */
-    pdsp_f32_t cosine; 
+    pdsp_f32_t cosine;
     /** Sine value of the PLL angle */
-    pdsp_f32_t sine; 
+    pdsp_f32_t sine;
     /** Inverse of the ISR rate at which module is called */
-    pdsp_f32_t delta_t; 
+    pdsp_f32_t delta_t;
     /** FLL parameter */
-    pdsp_f32_t ef2; 
+    pdsp_f32_t ef2;
     /** FLL data storage */
-    pdsp_f32_t x3[2]; 
+    pdsp_f32_t x3[2];
     /** Output frequency of PLL(radians) */
-    pdsp_f32_t w_dash; 
+    pdsp_f32_t w_dash;
     /** Gamma parameter for FLL */
-    pdsp_f32_t gamma; 
+    pdsp_f32_t gamma;
     /** K parameter for FLL */
-    pdsp_f32_t k; 
+    pdsp_f32_t k;
     /** Orthogonal signal generator coefficient */
-    pdsp_osg_param_t osg_coeff; 
+    pdsp_osg_param_t osg_coeff;
     /** Loop filter coeffcient structure */
-    pdsp_df11_param_t lpf_coeff; 
+    pdsp_df11_param_t lpf_coeff;
 } pdsp_dpll_1ph_sogi_fll_t;
 
 /** Three phase ddsrf dpll structure. */
 typedef struct pdsp_dpll_3ph_ddsrf_tag
 {
     /** Positive Rotating reference Frame D-axis value */
-    pdsp_f32_t d_p_decoupl; 
+    pdsp_f32_t d_p_decoupl;
     /** Negative Rotating reference Frame D-axis value */
-    pdsp_f32_t d_n_decoupl; 
+    pdsp_f32_t d_n_decoupl;
     /** Positive Rotating reference Frame Q-axis value */
-    pdsp_f32_t q_p_decoupl; 
+    pdsp_f32_t q_p_decoupl;
     /** Negative Rotating reference Frame Q-axis value */
-    pdsp_f32_t q_n_decoupl; 
+    pdsp_f32_t q_n_decoupl;
     /** Cos of twice the grid frequency angle */
-    pdsp_f32_t cos_2theta; 
+    pdsp_f32_t cos_2theta;
     /** Sin of twice the grid frequency angle */
-    pdsp_f32_t sin_2theta; 
+    pdsp_f32_t sin_2theta;
     /** Used to store history for filtering the decoupled D and Q axis components */
-    pdsp_f32_t y[2]; 
+    pdsp_f32_t y[2];
     /** Used to store history for filtering the decoupled D and Q axis components */
-    pdsp_f32_t x[2]; 
+    pdsp_f32_t x[2];
     /** Used to store history for filtering the decoupled D and Q axis components */
-    pdsp_f32_t w[2]; 
+    pdsp_f32_t w[2];
     /** Used to store history for filtering the decoupled D and Q axis components */
-    pdsp_f32_t z[2]; 
+    pdsp_f32_t z[2];
     /** Lpf coefficient */
-    pdsp_f32_t k1; 
+    pdsp_f32_t k1;
     /** Lpf coefficient */
-    pdsp_f32_t k2; 
+    pdsp_f32_t k2;
     /** Decoupled positive sequence D-axis component filtered */
-    pdsp_f32_t d_p_decoupl_lpf; 
+    pdsp_f32_t d_p_decoupl_lpf;
     /** Decoupled negative sequence D-axis component filtered */
-    pdsp_f32_t d_n_decoupl_lpf; 
+    pdsp_f32_t d_n_decoupl_lpf;
     /** Decoupled positive sequence Q-axis component filtered */
-    pdsp_f32_t q_p_decoupl_lpf; 
+    pdsp_f32_t q_p_decoupl_lpf;
     /** Decoupled negative sequence Q-axis component filtered */
-    pdsp_f32_t q_n_decoupl_lpf; 
+    pdsp_f32_t q_n_decoupl_lpf;
     /**  */
     pdsp_f32_t v_q[2];
     /** Grid phase angle */
-    pdsp_f32_t theta[2]; 
+    pdsp_f32_t theta[2];
     /** Internal Data Buffer for Loop Filter output */
-    pdsp_f32_t ylf[2]; 
+    pdsp_f32_t ylf[2];
     /** Instantaneous Grid Frequency in Hz */
-    pdsp_f32_t fo; 
+    pdsp_f32_t fo;
     /** Nominal Grid Frequency in Hz */
-    pdsp_f32_t fn; 
+    pdsp_f32_t fn;
     /** 1/Frequency of calling the PLL routine */
-    pdsp_f32_t delta_t; 
+    pdsp_f32_t delta_t;
     /**  */
     pdsp_df11_param_t lpf_coeff;
 } pdsp_dpll_3ph_ddsrf_t;
@@ -443,19 +457,19 @@ typedef struct pdsp_dpll_3ph_ddsrf_tag
 typedef struct pdsp_dpll_3ph_srf_tag
 {
     /** Rotating reference frame Q-axis value */
-    pdsp_f32_t v_q[2]; 
+    pdsp_f32_t v_q[2];
     /**  Data buffer for loop filter output */
     pdsp_f32_t ylf[2];
     /** Output frequency of PLL */
-    pdsp_f32_t fo; 
+    pdsp_f32_t fo;
     /** Nominal frequency */
-    pdsp_f32_t fn; 
+    pdsp_f32_t fn;
     /** Grid phase angle */
-    pdsp_f32_t theta[2]; 
+    pdsp_f32_t theta[2];
     /** Inverse of the ISR rate at which module is called */
-    pdsp_f32_t delta_t; 
+    pdsp_f32_t delta_t;
     /** Loop filter coefficients */
-    pdsp_df11_param_t lpf_coeff; 
+    pdsp_df11_param_t lpf_coeff;
 } pdsp_dpll_3ph_srf_t;
 
 #endif /* PDSP_TYPES_H */
