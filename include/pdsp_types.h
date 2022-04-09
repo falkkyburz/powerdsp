@@ -75,12 +75,8 @@ typedef struct pdsp_override_tag
 } pdsp_override_t;
 
 /** Raw signal processing parameter struct. */
-typedef struct pdsp_raw_tag
+typedef struct pdsp_signal_tag
 {
-    /** Signal enable. Set to 1.0f, or 0.0 to use override. */
-    pdsp_f32_t f32_enable;
-    /** Signal override value. */
-    pdsp_f32_t f32_ovr;
     /** Signal actual / current value. */
     pdsp_f32_t f32_act;
     /** Signal average value. */
@@ -229,9 +225,9 @@ typedef struct pdsp_saw_param_tag
     /**  */
     pdsp_f32_t f32_step;
     /**  */
-    pdsp_f32_t f32_amplitde;
+    pdsp_f32_t f32_out_low;
     /**  */
-    pdsp_f32_t f32_phase;
+    pdsp_f32_t f32_out_high;
 } pdsp_saw_param_t;
 
 /** Sine generator memory struct */
@@ -240,6 +236,19 @@ typedef struct pdsp_saw_tag
     /**  */
     pdsp_f32_t f32_x0;
 } pdsp_saw_t;
+
+/** Software frequency response analyzer parameters. */
+typedef struct pdsp_sfra_tag
+{
+    /* Under construction */
+    pdsp_saw_param_t s_saw_param;
+    pdsp_saw_t s_saw;
+    pdsp_f32_t f32_sum_sin;
+    pdsp_f32_t f32_sum_cos;
+    pdsp_f32_t f32_sum_num;
+    pdsp_f32_t f32_result_re;
+    pdsp_f32_t f32_result_im;
+} pdsp_sfra_t;
 
 /** abc-dq transform structure */
 typedef struct pdsp_abc_dq_tag

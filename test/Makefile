@@ -13,6 +13,7 @@ $(TARGET): $(OBJ)
 
 clean:
 	del $(TARGET).exe
+	del $(TARGET).csv
 	del $(OBJ)
 
 run: $(TARGET)
