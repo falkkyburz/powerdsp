@@ -30,7 +30,9 @@ static inline pdsp_f32_t pdsp_raw_run(
     const pdsp_override_t *ps_ovr,
     pdsp_f32_t f32_raw)
 {
-    pdsp_u32_t ret[2] = {((f32_raw * ps_param->f32_gain) + ps_param->f32_offset), ps_ovr->f32_value};
+    pdsp_f32_t ret[2] = {
+        ((f32_raw * ps_param->f32_gain) + ps_param->f32_offset),
+        ps_ovr->f32_value};
     return ret[ps_ovr->u32_enable];
 }
 
@@ -88,6 +90,39 @@ static inline pdsp_f32_t pdsp_med3_run(
 }
 
 /**
+ * @brief Calculate rolling sum.
+ * @param ps_state Filter state memory struct.
+ * @param af32_history Rolling sum history array.
+ * @param u32_size History size.
+ * @param f32_state Rolling sum state memory.
+ * @param f32_in Rolling sum input signal.
+ * @returns pdsp_f32_t Filter ouptut.
+ */
+static inline pdsp_f32_t pdsp_rolling_sum_run(
+    pdsp_rolling_sum_t *ps_state,
+    pdsp_f32_t af32_history[],
+    pdsp_u32_t u32_size,
+    pdsp_f32_t f32_in)
+{
+    pdsp_u32_t u32_tail = 0U;
+    pdsp_f32_t f32_out = 0.0f;
+    /* Place new scaled value to head position. */
+    af32_history[ps_state->u32_head] = f32_in / (pdsp_f32_t)u32_size;
+    /* Add the head value to the sum of squares state variable. */
+    ps_state->f32_sum += af32_history[ps_state->u32_head];
+    /* Calculate square root for the output */
+    f32_out = ps_state->f32_sum;
+    /* compute the new tail index by using bitmask */
+    // tail = (r->rms_head + 1U) & (size_pow2 - 1U)
+    u32_tail = (ps_state->u32_head < (u32_size - 1U)) ? (ps_state->u32_head + 1U) : (0U);
+    /* Set the head to tail for the next iteration. */
+    ps_state->u32_head = u32_tail;
+    /* Subtract the tail value from the state variable for the next iteration. */
+    ps_state->f32_sum -= af32_history[u32_tail];
+    return f32_out;
+}
+
+/**
  * @brief Calculate rolling averaging filter.
  * @param ps_state Filter state memory struct.
  * @param af32_history Filter history array.
@@ -96,12 +131,12 @@ static inline pdsp_f32_t pdsp_med3_run(
  * @returns pdsp_f32_t Filter ouptut.
  */
 static inline pdsp_f32_t pdsp_rolling_avg_run(
-    pdsp_rolling_avg_t *ps_state,
+    pdsp_rolling_sum_t *ps_state,
     pdsp_f32_t af32_history[],
     pdsp_u32_t u32_size,
     pdsp_f32_t f32_in)
 {
-    return 0.0f;
+    return pdsp_rolling_sum_run(ps_state, af32_history, u32_size, f32_in);
 }
 
 /**
@@ -113,27 +148,12 @@ static inline pdsp_f32_t pdsp_rolling_avg_run(
  * @returns pdsp_f32_t Filter ouptut.
  */
 static inline pdsp_f32_t pdsp_rolling_rms_run(
-    pdsp_rolling_rms_t *ps_state,
+    pdsp_rolling_sum_t *ps_state,
     pdsp_f32_t af32_history[],
     pdsp_u32_t u32_size,
     pdsp_f32_t f32_in)
 {
-    pdsp_u32_t u32_tail = 0U;
-    pdsp_f32_t f32_out = 0.0f;
-    /* Place new scaled value to head position. */
-    af32_history[ps_state->u32_head] = (f32_in * f32_in) * (1.0f / (pdsp_f32_t)u32_size);
-    /* Add the head value to the sum of squares state variable. */
-    ps_state->f32_sumsq += af32_history[ps_state->u32_head];
-    /* Calculate square root for the output */
-    f32_out = sqrtf(ps_state->f32_sumsq);
-    /* compute the new tail index by using bitmask */
-    // tail = (r->rms_head + 1U) & (size_pow2 - 1U)
-    u32_tail = (ps_state->u32_head < (u32_size - 1U)) ? (ps_state->u32_head + 1U) : (0U);
-    /* Set the head to tail for the next iteration. */
-    ps_state->u32_head = u32_tail;
-    /* Subtract the tail value from the state variable for the next iteration. */
-    ps_state->f32_sumsq -= af32_history[u32_tail];
-    return f32_out;
+    return sqrtf(pdsp_rolling_sum_run(ps_state, af32_history, u32_size, f32_in * f32_in));
 }
 
 #endif /* PDSP_SIGNAL_H */

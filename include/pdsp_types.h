@@ -144,25 +144,14 @@ typedef struct pdsp_med3_tag
     pdsp_f32_t f32_x2;
 } pdsp_med3_t;
 
-/** Rolling average state memory struct. */
-typedef struct pdsp_rolling_avg_tag
+/** Rolling sum state memory struct. */
+typedef struct pdsp_rolling_sum_tag
 {
-    /**  */
+    /** Sum of history array (divided by size) */
     pdsp_f32_t f32_sum;
-    /**  */
+    /** Head nindex of history array. */
     pdsp_u32_t u32_head;
-} pdsp_rolling_avg_t;
-
-/** Rolling rms state memory struct. */
-typedef struct pdsp_rolling_rms_tag
-{
-    /**  */
-    pdsp_f32_t f32_sumsq;
-    /**  */
-    pdsp_u32_t u32_head;
-    /**  */
-    pdsp_f32_t f32_num;
-} pdsp_rolling_rms_t;
+} pdsp_rolling_sum_t;
 
 /** PI controller parameter struct. */
 typedef struct pdsp_pi_err_param_tag

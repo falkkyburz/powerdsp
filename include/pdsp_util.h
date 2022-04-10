@@ -27,8 +27,8 @@ static inline pdsp_f32_t pdsp_map(
     pdsp_f32_t f32_out_lo,
     pdsp_f32_t f32_out_hi)
 {
-    return ((f32_out_lo * (f32_in_hi - f32_in) + f32_out_hi * (f32_in - f32_in_lo)) /
-            (f32_in_hi - f32_in_lo));
+    return (f32_out_lo +
+            (f32_in - f32_in_lo) * (f32_out_hi - f32_out_lo) / (f32_in_hi - f32_in_lo));
 }
 
 /**
@@ -65,14 +65,14 @@ static inline void pdsp_linspace(
     pdsp_f32_t f32_end)
 {
     pdsp_u32_t u32_idx = 0;
-    pdsp_f32_t f32_idx_max = (pdsp_f32_t)u32_size - 1.0f;
     for (u32_idx = 0; u32_idx < u32_size; u32_idx++)
     {
-        af32_out[u32_idx] = pdsp_map((pdsp_f32_t)u32_idx,
-                                     0.0f,
-                                     f32_idx_max,
-                                     f32_start,
-                                     f32_end);
+        af32_out[u32_idx] = pdsp_map(
+            (pdsp_f32_t)u32_idx,
+            0.0f,
+            (pdsp_f32_t)u32_size - 1.0f,
+            f32_start,
+            f32_end);
     }
 }
 
@@ -90,16 +90,14 @@ static inline void pdsp_logspace(
     pdsp_f32_t f32_end)
 {
     pdsp_u32_t u32_idx = 0;
-    pdsp_f32_t u32_idx_max = (pdsp_f32_t)u32_size - 1.0f;
-    pdsp_f32_t u32_exp = 0.0f;
     for (u32_idx = 0; u32_idx < u32_size; u32_idx++)
     {
-        u32_exp = pdsp_map((pdsp_f32_t)u32_idx,
-                           0.0f,
-                           u32_idx_max,
-                           f32_start,
-                           f32_end);
-        af32_out[u32_idx] = powf(10.0f, u32_exp);
+        af32_out[u32_idx] = powf(10.0f, pdsp_map(
+                                            (pdsp_f32_t)u32_idx,
+                                            0.0f,
+                                            (pdsp_f32_t)u32_size - 1.0f,
+                                            f32_start,
+                                            f32_end));
     }
 }
 
@@ -111,11 +109,11 @@ static inline void pdsp_logspace(
 static inline pdsp_status_t pdsp_abc_dq_reset(
     pdsp_abc_dq_t *ps_state)
 {
-    ps_state->f32_alpha = 0;
-    ps_state->f32_beta = 0;
-    ps_state->f32_d = 0;
-    ps_state->f32_q = 0;
-    ps_state->f32_zero = 0;
+    ps_state->f32_alpha = 0.0f;
+    ps_state->f32_beta = 0.0f;
+    ps_state->f32_d = 0.0f;
+    ps_state->f32_q = 0.0f;
+    ps_state->f32_zero = 0.0f;
     return PDSP_OK;
 }
 
@@ -179,11 +177,11 @@ static inline pdsp_status_t pdsp_abc_dq_neg_run(
 static inline pdsp_status_t pdsp_dq0_abc_reset(
     pdsp_dq_abc_t *ps_state)
 {
-    ps_state->f32_alpha = 0;
-    ps_state->f32_beta = 0;
-    ps_state->f32_a = 0;
-    ps_state->f32_b = 0;
-    ps_state->f32_c = 0;
+    ps_state->f32_alpha = 0.0f;
+    ps_state->f32_beta = 0.0f;
+    ps_state->f32_a = 0.0f;
+    ps_state->f32_b = 0.0f;
+    ps_state->f32_c = 0.0f;
     return PDSP_OK;
 }
 
@@ -215,7 +213,6 @@ static inline pdsp_status_t pdsp_dq0_abc_run(
 
 /**
  * @brief 2D Interpollation (X->input, Y->Output)
- * @details See: https://en.wikipedia.org/wiki/Linear_interpolation. Requiers division.
  * @param af32_x X axis array. Size must be 2 or higher. Values must be monotonically increasing.
  * @param af32_y Y axis array. Size must be 2 or higher and must be the same as x_arr.
  * @param u32_size Site of the x and y array.
@@ -228,24 +225,17 @@ static inline pdsp_f32_t pdsp_interpollate_2d(
     pdsp_u32_t u32_size,
     pdsp_f32_t f32_x_in)
 {
-    /* Index of higher array element */
+    /* Index of higher array element. */
     pdsp_u32_t u32_idx_hi = 1U;
-    /* Index of lower array element. */
-    pdsp_u32_t u32_idx_lo = 0U;
-    /* Maximum index */
-    pdsp_u32_t u32_idx_max = u32_size - 1U;
-    /* Find the higher array index >= 1 (value dependent duration, linear time) */
-    while ((af32_x[u32_idx_hi] < f32_x_in) && (u32_idx_hi < u32_idx_max))
+    /* Find the higher array index >= 1. */
+    while ((af32_x[u32_idx_hi] < f32_x_in) && (u32_idx_hi < (u32_size - 1U)))
     {
         u32_idx_hi++;
     }
-    /* Calculate the lower array index (can be 0). */
-    u32_idx_lo = u32_idx_hi - 1U;
-    /* Calculate the output (uses division) */
-    return (af32_y[u32_idx_lo] +
-            (f32_x_in - af32_x[u32_idx_lo]) *
-                (af32_y[u32_idx_hi] - af32_y[u32_idx_lo]) /
-                (af32_x[u32_idx_hi] - af32_x[u32_idx_lo]));
+    /* Calculate the output. */
+    return pdsp_map(f32_x_in,
+                    af32_x[u32_idx_hi - 1U], af32_x[u32_idx_hi],
+                    af32_y[u32_idx_hi - 1U], af32_y[u32_idx_hi]);
 }
 
 #endif /* PDSP_UTIL_H */
