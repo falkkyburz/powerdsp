@@ -13,9 +13,9 @@
 
 /*---------------------------------------------------------------------------*/
 /* Configuration options: */
-#define ASSERT_ENABLE
-#define ASSERT_FUNCTION(x) \
-    if (!(x))              \
+#define PDSP_ASSERT_ENABLE
+#define PDSP_ASSERT_FUNCTION(x) \
+    if (!(x))                   \
         while (1)
 
 /*---------------------------------------------------------------------------*/
@@ -26,7 +26,7 @@
 #define PDSP_ON 1
 #define PDSP_OFF 0
 
-/* Defines for math constants */
+/* Defines for math constants. */
 #define PDSP_PI (3.14159265358f)
 #define PDSP_PI_2 (1.57079632679f)
 #define PDSP_PI_4 (0.78539816339f)
@@ -36,12 +36,16 @@
 #define PDSP_SQRT2 (1.41421356237f)
 #define PDSP_SQRT1_2 (0.70710678118f)
 #define PDSP_ABS_ZERO (-273.15f)
-
+/** Null pointer. */
 #define PDSP_NULL ((void *)0)
+/** Floating point not a number. */
 #define PDSP_NAN (0.0 / 0.0)
+/* Floating point not positive infinity. */
 #define PDSP_POS_INF (1.0 / 0.0)
+/* Floating point not negative infinity. */
 #define PDSP_NEG_INF (-1.0 / 0.0)
 
+/* Fixed and floating point types */
 #if defined(_WIN64)
 #define PDSP_HOST
 typedef float pdsp_f32_t;
@@ -49,7 +53,7 @@ typedef int pdsp_i32_t;
 typedef unsigned int pdsp_u32_t;
 typedef int pdsp_bool_t;
 #elif defined(__TMS320C2000__)
-#define PDSP_CPU
+#define PDSP_MCU
 typedef float pdsp_f32_t;
 typedef long pdsp_i32_t;
 typedef unsigned long pdsp_u32_t;
@@ -62,11 +66,13 @@ typedef unsigned int pdsp_u32_t;
 typedef int pdsp_bool_t;
 #endif
 
-#ifdef ASSERT_ENABLE
-#define PDSP_ASSERT(x) ASSERT_FUNCTION((x))
+/** Assert function to reduce programmer errors. */
+#ifdef PDSP_ASSERT_ENABLE
+#define PDSP_ASSERT(x) PDSP_ASSERT_FUNCTION((x))
 #else
 #define PDSP_ASSERT(x)
 #endif
+
 /*---------------------------------------------------------------------------*/
 
 /** PDSP status */
@@ -95,24 +101,16 @@ typedef struct pdsp_override_tag
     pdsp_f32_t f32_value;
 } pdsp_override_t;
 
-/** Raw signal processing parameter struct. */
-typedef struct pdsp_signal_tag
+/** Min-max state variable struct. */
+typedef struct pdsp_minmax_tag
 {
-    /** Signal actual / current value. */
-    pdsp_f32_t f32_act;
-    /** Signal average value. */
-    pdsp_f32_t f32_avg;
-    /** Signal filtered value. */
-    pdsp_f32_t f32_flt;
-    /** Signal filtered value for can. */
-    pdsp_f32_t f32_can;
     /** Minimum value since last clear. */
     pdsp_f32_t f32_min;
     /** Maximum value sincce last clear. */
     pdsp_f32_t f32_max;
     /** Delta (max-min) value since last clear. */
     pdsp_f32_t f32_delta;
-} pdsp_signal_t;
+} pdsp_minmax_t;
 
 /** Exponential average parameter struct. */
 typedef struct pdsp_expavg_param_tag
@@ -847,6 +845,37 @@ static inline pdsp_f32_t pdsp_sig_conv(
 }
 
 /**
+ * @brief Initialize / Clear min-max struct.
+ * @param ps_state Min-max state variable struct.
+ * @return pdsp_status_t PDSP_OK
+ */
+static inline pdsp_status_t pdsp_minmax_init(
+    pdsp_minmax_t *ps_state)
+{
+    PDSP_ASSERT(ps_state);
+    ps_state->f32_min = PDSP_POS_INF;
+    ps_state->f32_max = PDSP_NEG_INF;
+    ps_state->f32_delta = 0.0f;
+    return PDSP_OK;
+}
+
+/**
+ * @brief Process min-max.
+ * @param ps_state Min-max state variable struct.
+ * @return pdsp_status_t PDSP_OK
+ */
+static inline pdsp_status_t pdsp_minmax(
+    pdsp_minmax_t *ps_state,
+    pdsp_f32_t f23_in)
+{
+    PDSP_ASSERT(ps_state);
+    ps_state->f32_min = fminf(ps_state->f32_min, f23_in);
+    ps_state->f32_max = fmaxf(ps_state->f32_min, f23_in);
+    ps_state->f32_delta = ps_state->f32_max - ps_state->f32_min;
+    return PDSP_OK;
+}
+
+/**
  * @brief Initialize simple exponential average struct.
  * @param ps_state Filter state variable struct.
  * @returns pdsp_status_t PDSP_OK
@@ -1447,9 +1476,37 @@ static inline pdsp_status_t pdsp_dpll_1ph_notch_init(
 }
 
 static inline pdsp_status_t pdsp_dpll_1ph_notch(
-    pdsp_dpll_1ph_notch_t *ps_state)
+    pdsp_dpll_1ph_notch_t *ps_state,
+    pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state);
+    /* Phase detector */
+    ps_state->upd[0] = f32_in * ps_state->cosine;
+    /* Notch filter. */
+    ps_state->y_notch1[0] = (-ps_state->y_notch1[1] * ps_state->notch_coeff.f32_a1 - ps_state->y_notch1[2] * ps_state->notch_coeff.f32_a2 + ps_state->upd[0] * ps_state->notch_coeff.f32_b0 + ps_state->upd[1] * ps_state->notch_coeff.f32_b1 + ps_state->upd[2] * ps_state->notch_coeff.f32_b2);
+    ps_state->y_notch2[0] = (-ps_state->y_notch2[1] * ps_state->notch_coeff.f32_a1 - ps_state->y_notch2[2] * ps_state->notch_coeff.f32_a2 + ps_state->y_notch1[0] * ps_state->notch_coeff.f32_b0 + ps_state->y_notch1[1] * ps_state->notch_coeff.f32_b1 + ps_state->y_notch1[2] * ps_state->notch_coeff.f32_b2);
+    /* Lop filter. */
+    ps_state->ylf[0] = ps_state->ylf[1] + (ps_state->lpf_coeff.f32_b0 * ps_state->y_notch2[0]) + (ps_state->lpf_coeff.f32_b1 * ps_state->y_notch2[1]);
+    // ps_state->ylf[0] = (ps_state->ylf[0]>100)?100:ps_state->ylf[0];
+    // ps_state->ylf[0] = (ps_state->ylf[0]<-100)?-100:ps_state->ylf[0];
+
+    /* Update array elements */
+    ps_state->upd[2] = ps_state->upd[1];
+    ps_state->upd[1] = ps_state->upd[0];
+    ps_state->y_notch1[2] = ps_state->y_notch1[1];
+    ps_state->y_notch1[1] = ps_state->y_notch1[0];
+    ps_state->y_notch2[2] = ps_state->y_notch2[1];
+    ps_state->y_notch2[1] = ps_state->y_notch2[0];
+    ps_state->ylf[1] = ps_state->ylf[0];
+    /* VCO */
+    ps_state->fo = ps_state->fn + ps_state->ylf[0];
+    ps_state->theta = ps_state->theta + (ps_state->fo * ps_state->delta_t) * PDSP_2_PI;
+    if (ps_state->theta > PDSP_2_PI)
+    {
+        ps_state->theta = ps_state->theta - PDSP_2_PI;
+    }
+    ps_state->sine = (pdsp_f32_t)sinf(ps_state->theta);
+    ps_state->cosine = (pdsp_f32_t)cosf(ps_state->theta);
     return PDSP_OK;
 }
 
@@ -1461,9 +1518,50 @@ static inline pdsp_status_t pdsp_dpll_1ph_sogi_init(
 }
 
 static inline pdsp_status_t pdsp_dpll_1ph_sogi(
-    pdsp_dpll_1ph_sogi_t *ps_state)
+    pdsp_dpll_1ph_sogi_t *ps_state,
+    pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state);
+    // Update the ps_state->u[0] with the grid value
+    ps_state->u[0] = f32_in;
+    /* Orthogonal sitgnal generator */
+    ps_state->osg_u[0] = (ps_state->osg_coeff.osg_b0 *
+                          (ps_state->u[0] - ps_state->u[2])) +
+                         (ps_state->osg_coeff.osg_a1 * ps_state->osg_u[1]) +
+                         (ps_state->osg_coeff.osg_a2 * ps_state->osg_u[2]);
+    ps_state->osg_u[2] = ps_state->osg_u[1];
+    ps_state->osg_u[1] = ps_state->osg_u[0];
+    ps_state->osg_qu[0] = (ps_state->osg_coeff.osg_qb0 * ps_state->u[0]) +
+                          (ps_state->osg_coeff.osg_qb1 * ps_state->u[1]) +
+                          (ps_state->osg_coeff.osg_qb2 * ps_state->u[2]) +
+                          (ps_state->osg_coeff.osg_a1 * ps_state->osg_qu[1]) +
+                          (ps_state->osg_coeff.osg_a2 * ps_state->osg_qu[2]);
+    ps_state->osg_qu[2] = ps_state->osg_qu[1];
+    ps_state->osg_qu[1] = ps_state->osg_qu[0];
+    ps_state->u[2] = ps_state->u[1];
+    ps_state->u[1] = ps_state->u[0];
+    /* Park transform */
+    ps_state->u_Q[0] = (ps_state->cosine * ps_state->osg_u[0]) +
+                       (ps_state->sine * ps_state->osg_qu[0]);
+    ps_state->u_D[0] = (ps_state->cosine * ps_state->osg_qu[0]) -
+                       (ps_state->sine * ps_state->osg_u[0]);
+    /* Loop filter */
+    ps_state->ylf[0] = ps_state->ylf[1] +
+                       (ps_state->lpf_coeff.f32_b0 * ps_state->u_Q[0]) +
+                       (ps_state->lpf_coeff.f32_b1 * ps_state->u_Q[1]);
+    ps_state->ylf[1] = ps_state->ylf[0];
+    ps_state->u_Q[1] = ps_state->u_Q[0];
+    /* VCO */
+    ps_state->fo = ps_state->fn + ps_state->ylf[0];
+    ps_state->theta = ps_state->theta + (ps_state->fo * ps_state->delta_t) *
+                                            PDSP_2_PI;
+    if (ps_state->theta > PDSP_2_PI)
+    {
+        ps_state->theta = ps_state->theta - PDSP_2_PI;
+        // ps_state->theta=0;
+    }
+    ps_state->sine = (pdsp_f32_t)sinf(ps_state->theta);
+    ps_state->cosine = (pdsp_f32_t)cosf(ps_state->theta);
     return PDSP_OK;
 }
 
@@ -1475,9 +1573,72 @@ static inline pdsp_status_t pdsp_dpll_1ph_sogi_fll_init(
 }
 
 static inline pdsp_status_t pdsp_dpll_1ph_sogi_fll(
-    pdsp_dpll_1ph_sogi_fll_t *ps_state)
+    pdsp_dpll_1ph_sogi_fll_t *ps_state,
+    pdsp_f32_t f32_in)
 {
+    pdsp_f32_t osgx, osgy, temp;
     PDSP_ASSERT(ps_state);
+
+    /* Update the ps_state->u[0] with the grid value */
+    ps_state->u[0] = f32_in;
+    /* Orthogonal Signal Generator */
+    ps_state->osg_u[0] = (ps_state->osg_coeff.osg_b0 *
+                          (ps_state->u[0] - ps_state->u[2])) +
+                         (ps_state->osg_coeff.osg_a1 * ps_state->osg_u[1]) +
+                         (ps_state->osg_coeff.osg_a2 * ps_state->osg_u[2]);
+    ps_state->osg_u[2] = ps_state->osg_u[1];
+    ps_state->osg_u[1] = ps_state->osg_u[0];
+    ps_state->osg_qu[0] = (ps_state->osg_coeff.osg_qb0 * ps_state->u[0]) +
+                          (ps_state->osg_coeff.osg_qb1 * ps_state->u[1]) +
+                          (ps_state->osg_coeff.osg_qb2 * ps_state->u[2]) +
+                          (ps_state->osg_coeff.osg_a1 * ps_state->osg_qu[1]) +
+                          (ps_state->osg_coeff.osg_a2 * ps_state->osg_qu[2]);
+    ps_state->osg_qu[2] = ps_state->osg_qu[1];
+    ps_state->osg_qu[1] = ps_state->osg_qu[0];
+    ps_state->u[2] = ps_state->u[1];
+    ps_state->u[1] = ps_state->u[0];
+    /* Park Transform from alpha beta to d-q axis */
+    ps_state->u_Q[0] = (ps_state->cosine * ps_state->osg_u[0]) +
+                       (ps_state->sine * ps_state->osg_qu[0]);
+    ps_state->u_D[0] = (ps_state->cosine * ps_state->osg_qu[0]) -
+                       (ps_state->sine * ps_state->osg_u[0]);
+    /* Loop Filter */
+    ps_state->ylf[0] = ps_state->ylf[1] +
+                       (ps_state->lpf_coeff.f32_b0 * ps_state->u_Q[0]) +
+                       (ps_state->lpf_coeff.f32_b1 * ps_state->u_Q[1]);
+    ps_state->ylf[1] = ps_state->ylf[0];
+    // ps_state->ylf[0] = (ps_state->ylf[0]>0.5)?0.5:ps_state->ylf[0];
+    // ps_state->ylf[0] = (ps_state->ylf[0]<-0.5)?-0.5:ps_state->ylf[0];
+    ps_state->u_Q[1] = ps_state->u_Q[0];
+    /* VCO */
+    ps_state->fo = ps_state->fn + ps_state->ylf[0];
+    ps_state->theta = ps_state->theta + (ps_state->fo * ps_state->delta_t) *
+                                            PDSP_2_PI;
+    if (ps_state->theta > PDSP_2_PI)
+    {
+        ps_state->theta = ps_state->theta - PDSP_2_PI;
+    }
+    ps_state->sine = sinf(ps_state->theta);
+    ps_state->cosine = cosf(ps_state->theta);
+    /* FLL */
+    ps_state->ef2 = ((ps_state->u[0] - ps_state->osg_u[0]) * ps_state->osg_qu[0]) * ps_state->gamma * ps_state->delta_t * -1.0f;
+    ps_state->x3[0] = ps_state->x3[1] + ps_state->ef2;
+    // ps_state->x3[0]= (ps_state->x3[0]>1.0)?1.0:ps_state->x3[0];
+    // ps_state->x3[0]= (ps_state->x3[0]<-1.0)?-1.0:ps_state->x3[0];
+    ps_state->x3[1] = ps_state->x3[0];
+    ps_state->w_dash = ps_state->wc + ps_state->x3[0];
+    ps_state->fn = ps_state->w_dash / PDSP_2_PI;
+    osgx = (2.0f * ps_state->k * ps_state->w_dash * ps_state->delta_t);
+    osgy = (ps_state->w_dash * ps_state->delta_t * ps_state->w_dash *
+                        ps_state->delta_t);
+    temp = 1.0f / (osgx + osgy + 4.0f);
+    ps_state->osg_coeff.osg_b0 = osgx * temp;
+    ps_state->osg_coeff.osg_b2 = -1.0f * ps_state->osg_coeff.osg_b0;
+    ps_state->osg_coeff.osg_a1 = ((2.0f * (4.0f - osgy)) * temp);
+    ps_state->osg_coeff.osg_a2 = ((osgx - osgy - 4.0f) * temp);
+    ps_state->osg_coeff.osg_qb0 = (ps_state->k * osgy * temp);
+    ps_state->osg_coeff.osg_qb1 = (ps_state->osg_coeff.osg_qb0 * 2.0f);
+    ps_state->osg_coeff.osg_qb2 = ps_state->osg_coeff.osg_qb0;
     return PDSP_OK;
 }
 
@@ -1489,9 +1650,54 @@ static inline pdsp_status_t pdsp_dpll_3ph_ddsrf_init(
 }
 
 static inline pdsp_status_t pdsp_dpll_3ph_ddsrf(
-    pdsp_dpll_3ph_ddsrf_t *ps_state)
+    pdsp_dpll_3ph_ddsrf_t *ps_state,
+    pdsp_f32_t d_p,
+    pdsp_f32_t d_n,
+    pdsp_f32_t q_p,
+    pdsp_f32_t q_n)
 {
     PDSP_ASSERT(ps_state);
+    /*
+     * before calling this routine run the ABC_DQ0_Pos & Neg run routines
+     * pass updated values for d_p,d_n,q_p,q_n
+     * and update the cos_2theta and sin_2theta values with the prev angle
+     */
+    /* Decoupling Network */
+    ps_state->d_p_decoupl = d_p - (ps_state->d_n_decoupl_lpf * ps_state->cos_2theta) - (ps_state->q_n_decoupl * ps_state->sin_2theta);
+    ps_state->q_p_decoupl = q_p + (ps_state->d_n_decoupl_lpf * ps_state->sin_2theta) - (ps_state->q_n_decoupl * ps_state->cos_2theta);
+
+    ps_state->d_n_decoupl = d_n - (ps_state->d_p_decoupl_lpf * ps_state->cos_2theta) + (ps_state->q_p_decoupl * ps_state->sin_2theta);
+    ps_state->q_n_decoupl = q_n - (ps_state->d_p_decoupl_lpf * ps_state->sin_2theta) - (ps_state->q_p_decoupl * ps_state->cos_2theta);
+    /* Low pass filter */
+    ps_state->y[1] = (ps_state->d_p_decoupl * ps_state->k1) - (ps_state->y[0] * ps_state->k2);
+    ps_state->d_p_decoupl_lpf = ps_state->y[1] + ps_state->y[0];
+    ps_state->y[0] = ps_state->y[1];
+    ps_state->x[1] = (ps_state->q_p_decoupl * ps_state->k1) - (ps_state->x[0] * ps_state->k2);
+    ps_state->q_p_decoupl_lpf = ps_state->x[1] + ps_state->x[0];
+    ps_state->x[0] = ps_state->x[1];
+    ps_state->w[1] = (ps_state->d_n_decoupl * ps_state->k1) - (ps_state->w[0] * ps_state->k2);
+    ps_state->d_n_decoupl_lpf = ps_state->w[1] + ps_state->w[0];
+    ps_state->w[0] = ps_state->w[1];
+    ps_state->z[1] = (ps_state->q_n_decoupl * ps_state->k1) - (ps_state->z[0] * ps_state->k2);
+    ps_state->q_n_decoupl_lpf = ps_state->z[1] + ps_state->z[0];
+    ps_state->z[0] = ps_state->z[1];
+    ps_state->v_q[0] = ps_state->q_p_decoupl;
+    /* Loop Filter */
+    ps_state->ylf[0] = ps_state->ylf[1] + (ps_state->lpf_coeff.f32_b0 * ps_state->v_q[0]) + (ps_state->lpf_coeff.f32_b1 * ps_state->v_q[1]);
+    ps_state->ylf[1] = ps_state->ylf[0];
+    ps_state->v_q[1] = ps_state->v_q[0];
+    /* VCO */
+    ps_state->fo = ps_state->fn + ps_state->ylf[0];
+    ps_state->theta[0] = ps_state->theta[1] +
+                         ((ps_state->fo * ps_state->delta_t) * (pdsp_f32_t)(2.0f * 3.1415926f));
+    if (ps_state->theta[0] > (pdsp_f32_t)(2.0f * 3.1415926f))
+    {
+        ps_state->theta[0] = ps_state->theta[0] -
+                             (pdsp_f32_t)(2.0f * 3.1415926f);
+    }
+    ps_state->theta[1] = ps_state->theta[0];
+    ps_state->cos_2theta = cosf(ps_state->theta[1] * 2.0f);
+    ps_state->sin_2theta = sinf(ps_state->theta[1] * 2.0f);
     return PDSP_OK;
 }
 
@@ -1503,9 +1709,27 @@ static inline pdsp_status_t pdsp_dpll_3ph_srf_init(
 }
 
 static inline pdsp_status_t pdsp_dpll_3ph_srf(
-    pdsp_dpll_3ph_srf_t *ps_state)
+    pdsp_dpll_3ph_srf_t *ps_state,
+    pdsp_f32_t f32_vq)
 {
     PDSP_ASSERT(ps_state);
+    /* Update the ps_state->v_q[0] with the grid value */
+    ps_state->v_q[0] = f32_vq;
+    /* Loop Filter */
+    ps_state->ylf[0] = ps_state->ylf[1] + (ps_state->lpf_coeff.f32_b0 * ps_state->v_q[0]) + (ps_state->lpf_coeff.f32_b1 * ps_state->v_q[1]);
+    ps_state->ylf[1] = ps_state->ylf[0];
+    ps_state->v_q[1] = ps_state->v_q[0];
+    ps_state->ylf[0] = (ps_state->ylf[0] > (pdsp_f32_t)(200.0)) ? (pdsp_f32_t)(200.0) : ps_state->ylf[0];
+    /* VCO */
+    ps_state->fo = ps_state->fn + ps_state->ylf[0];
+    ps_state->theta[0] = ps_state->theta[1] +
+                         ((ps_state->fo * ps_state->delta_t) *
+                          (pdsp_f32_t)(2.0 * 3.1415926));
+    if (ps_state->theta[0] > (pdsp_f32_t)(2.0 * 3.1415926))
+    {
+        ps_state->theta[0] = ps_state->theta[0] - (pdsp_f32_t)(2.0 * 3.1415926);
+    }
+    ps_state->theta[1] = ps_state->theta[0];
     return PDSP_OK;
 }
 
