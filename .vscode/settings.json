@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "pdsp_types.h": "c",
+        "pdsp_control.h": "c",
+        "pdsp_fault.h": "c",
+        "pdsp_dpll.h": "c",
+        "pdsp_util.h": "c",
+        "pdsp_signal.h": "c"
+    }
+}
