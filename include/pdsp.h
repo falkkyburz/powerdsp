@@ -574,8 +574,7 @@ typedef struct pdsp_logger_tag
  * @returns pdsp_status_t PDSP_OK
  */
 static inline pdsp_status_t pdsp_set(pdsp_f32_t af32_array[],
-                                     pdsp_u32_t u32_size, 
-                                     pdsp_u32_t f32_value)
+                                     pdsp_u32_t u32_size, pdsp_u32_t f32_value)
 {
     pdsp_u32_t u32_idx = 0;
     PDSP_ASSERT(af32_array && u32_size);
@@ -671,6 +670,20 @@ static inline pdsp_status_t pdsp_logspace(pdsp_f32_t af32_out[],
                                                  f32_start, f32_end));
     }
     return PDSP_OK;
+}
+
+/**
+ * @brief Weighted mean from two values.
+ * @details Can be used to improve reconstruction of triangular currents.
+ * @param f32_in0 First sample.
+ * @param f32_in1 Second sample
+ * @param f32_weight0 Weight of first sample [0, 1], current duty cycle.
+ * @return pdsp_f32_t Weighted mean.
+ */
+static inline pdsp_f32_t pdsp_mean2(pdsp_f32_t f32_in0, pdsp_f32_t f32_in1,
+                                    pdsp_f32_t f32_weight0)
+{
+    return (f32_in0 * f32_weight0) + (f32_in1 * (1.0f - f32_weight0));
 }
 
 /**
@@ -1454,6 +1467,24 @@ static inline pdsp_status_t
 pdsp_dpll_1ph_notch_init(pdsp_dpll_1ph_notch_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
+    ps_state->upd[0] = 0.0f;
+    ps_state->upd[1] = 0.0f;
+    ps_state->upd[2] = 0.0f;
+    ps_state->y_notch1[0] = 0.0f;
+    ps_state->y_notch1[1] = 0.0f;
+    ps_state->y_notch1[2] = 0.0f;
+    ps_state->y_notch2[0] = 0.0f;
+    ps_state->y_notch2[1] = 0.0f;
+    ps_state->y_notch2[2] = 0.0f;
+    ps_state->ylf[1] = 0.0f;
+    ps_state->ylf[2] = 0.0f;
+    ps_state->fo = 0.0f;
+    ps_state->fn = 0.0f;
+    ps_state->theta = 0.0f;
+    ps_state->cosine = 0.0f;
+    ps_state->sine = 0.0f;
+    ps_state->delta_t = 0.0f;
+    /* TODO Init coefficients */
     return PDSP_OK;
 }
 
@@ -1508,6 +1539,28 @@ static inline pdsp_status_t
 pdsp_dpll_1ph_sogi_init(pdsp_dpll_1ph_sogi_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
+    ps_state->u[0] = 0.0f;
+    ps_state->u[1] = 0.0f;
+    ps_state->u[2] = 0.0f;
+    ps_state->osg_u[0] = 0.0f;
+    ps_state->osg_u[1] = 0.0f;
+    ps_state->osg_u[2] = 0.0f;
+    ps_state->osg_qu[0] = 0.0f;
+    ps_state->osg_qu[1] = 0.0f;
+    ps_state->osg_qu[2] = 0.0f;
+    ps_state->u_Q[0] = 0.0f;
+    ps_state->u_Q[1] = 0.0f;
+    ps_state->u_D[0] = 0.0f;
+    ps_state->u_D[1] = 0.0f;
+    ps_state->ylf[1] = 0.0f;
+    ps_state->ylf[2] = 0.0f;
+    ps_state->fo = 0.0f;
+    ps_state->fn = 0.0f;
+    ps_state->theta = 0.0f;
+    ps_state->cosine = 0.0f;
+    ps_state->sine = 0.0f;
+    ps_state->delta_t = 0.0f;
+    /* TODO Init coefficients */
     return PDSP_OK;
 }
 
@@ -1562,6 +1615,35 @@ static inline pdsp_status_t
 pdsp_dpll_1ph_sogi_fll_init(pdsp_dpll_1ph_sogi_fll_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
+    ps_state->u[0] = 0.0f;
+    ps_state->u[1] = 0.0f;
+    ps_state->u[2] = 0.0f;
+    ps_state->osg_u[0] = 0.0f;
+    ps_state->osg_u[1] = 0.0f;
+    ps_state->osg_u[2] = 0.0f;
+    ps_state->osg_qu[0] = 0.0f;
+    ps_state->osg_qu[1] = 0.0f;
+    ps_state->osg_qu[2] = 0.0f;
+    ps_state->u_Q[0] = 0.0f;
+    ps_state->u_Q[1] = 0.0f;
+    ps_state->u_D[0] = 0.0f;
+    ps_state->u_D[1] = 0.0f;
+    ps_state->ylf[1] = 0.0f;
+    ps_state->ylf[2] = 0.0f;
+    ps_state->fo = 0.0f;
+    ps_state->fn = 0.0f;
+    ps_state->wc = 0.0f;
+    ps_state->theta = 0.0f;
+    ps_state->cosine = 0.0f;
+    ps_state->sine = 0.0f;
+    ps_state->delta_t = 0.0f;
+    ps_state->ef2 = 0.0f;
+    ps_state->x3[0] = 0.0f;
+    ps_state->x3[1] = 0.0f;
+    ps_state->w_dash = 0.0f;
+    ps_state->gamma = 0.0f;
+    ps_state->k = 0.0f;
+    /* TODO Init coefficients */
     return PDSP_OK;
 }
 
@@ -1640,6 +1722,36 @@ static inline pdsp_status_t
 pdsp_dpll_3ph_ddsrf_init(pdsp_dpll_3ph_ddsrf_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
+    ps_state->d_p_decoupl = 0.0f;
+    ps_state->d_n_decoupl = 0.0f;
+    ps_state->q_p_decoupl = 0.0f;
+    ps_state->q_n_decoupl = 0.0f;
+    ps_state->cos_2theta = 0.0f;
+    ps_state->sin_2theta = 0.0f;
+    ps_state->y[0] = 0.0f;
+    ps_state->y[1] = 0.0f;
+    ps_state->x[0] = 0.0f;
+    ps_state->x[1] = 0.0f;
+    ps_state->w[0] = 0.0f;
+    ps_state->w[1] = 0.0f;
+    ps_state->z[0] = 0.0f;
+    ps_state->z[1] = 0.0f;
+    ps_state->k1 = 0.0f;
+    ps_state->k2 = 0.0f;
+    ps_state->d_p_decoupl_lpf = 0.0f;
+    ps_state->d_n_decoupl_lpf = 0.0f;
+    ps_state->q_p_decoupl_lpf = 0.0f;
+    ps_state->q_n_decoupl_lpf = 0.0f;
+    ps_state->v_q[0] = 0.0f;
+    ps_state->v_q[1] = 0.0f;
+    ps_state->theta[0] = 0.0f;
+    ps_state->theta[1] = 0.0f;
+    ps_state->ylf[0] = 0.0f;
+    ps_state->ylf[1] = 0.0f;
+    ps_state->fo = 0.0f;
+    ps_state->fn = 0.0f;
+    ps_state->delta_t = 0.0f;
+    /* TODO Init coefficients */
     return PDSP_OK;
 }
 
@@ -1711,6 +1823,16 @@ static inline pdsp_status_t
 pdsp_dpll_3ph_srf_init(pdsp_dpll_3ph_srf_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
+    ps_state->v_q[0] = 0.0f;
+    ps_state->v_q[1] = 0.0f;
+    ps_state->ylf[0] = 0.0f;
+    ps_state->ylf[1] = 0.0f;
+    ps_state->fo = 0.0f;
+    ps_state->fn = 0.0f;
+    ps_state->theta[0] = 0.0f;
+    ps_state->theta[1] = 0.0f;
+    ps_state->delta_t = 0.0f;
+    /* TODO Init coefficients */
     return PDSP_OK;
 }
 
@@ -1761,10 +1883,10 @@ static inline pdsp_status_t pdsp_fault_init(pdsp_fault_t *ps_state)
  * @param ps_state Fault status struct.
  * @param ps_param Fault param struct.
  * @param b_condition Condition to be evaluated.
- * @return pdsp_bool_t Tripped status.
+ * @return pdsp_bool_t Fault status.
  */
 static inline pdsp_bool_t
-_pdsp_fault_check_condition(pdsp_fault_t *ps_state,
+pdsp_fault_check_condition(pdsp_fault_t *ps_state,
                             pdsp_fault_param_t *ps_param,
                             pdsp_bool_t b_condition)
 {
@@ -1815,14 +1937,14 @@ _pdsp_fault_check_condition(pdsp_fault_t *ps_state,
  * @param ps_state Fault status struct.
  * @param ps_param Fault param struct.
  * @param b_condition Condition to be evaluated.
- * @return pdsp_bool_t Tripped status.
+ * @return pdsp_bool_t Fault status.
  */
 static inline pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_state,
                                                 pdsp_fault_param_t *ps_param,
                                                 pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return _pdsp_fault_check_condition(ps_state, ps_param,
+    return pdsp_fault_check_condition(ps_state, ps_param,
                                        f32_in > ps_param->f32_value);
 }
 
@@ -1831,14 +1953,14 @@ static inline pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_state,
  * @param ps_state Fault status struct.
  * @param ps_param Fault param struct.
  * @param b_condition Condition to be evaluated.
- * @return pdsp_bool_t Tripped status.
+ * @return pdsp_bool_t Fault status.
  */
 static inline pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_state,
                                                  pdsp_fault_param_t *ps_param,
                                                  pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return _pdsp_fault_check_condition(ps_state, ps_param,
+    return pdsp_fault_check_condition(ps_state, ps_param,
                                        f32_in < ps_param->f32_value);
 }
 
@@ -1847,14 +1969,14 @@ static inline pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_state,
  * @param ps_state Fault status struct.
  * @param ps_param Fault param struct.
  * @param b_condition Condition to be evaluated.
- * @return pdsp_bool_t Tripped status.
+ * @return pdsp_bool_t Fault status.
  */
 static inline pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_state,
                                                  pdsp_fault_param_t *ps_param,
                                                  pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return _pdsp_fault_check_condition(ps_state, ps_param,
+    return pdsp_fault_check_condition(ps_state, ps_param,
                                        f32_in == ps_param->f32_value);
 }
 
@@ -1863,13 +1985,13 @@ static inline pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_state,
  * @param ps_state Fault status struct.
  * @param ps_param Fault param struct.
  * @param b_condition Condition to be evaluated.
- * @return pdsp_bool_t Tripped status.
+ * @return pdsp_bool_t Fault status.
  */
 static inline pdsp_bool_t pdsp_fault_check_true(pdsp_fault_t *ps_state,
                                                 pdsp_fault_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return _pdsp_fault_check_condition(ps_state, ps_param, PDSP_TRUE);
+    return pdsp_fault_check_condition(ps_state, ps_param, PDSP_TRUE);
 }
 
 /**
@@ -1877,13 +1999,13 @@ static inline pdsp_bool_t pdsp_fault_check_true(pdsp_fault_t *ps_state,
  * @param ps_state Fault status struct.
  * @param ps_param Fault param struct.
  * @param b_condition Condition to be evaluated.
- * @return pdsp_bool_t Tripped status.
+ * @return pdsp_bool_t Fault status.
  */
 static inline pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_state,
                                                  pdsp_fault_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return _pdsp_fault_check_condition(ps_state, ps_param, PDSP_FALSE);
+    return pdsp_fault_check_condition(ps_state, ps_param, PDSP_FALSE);
 }
 
 /**
