@@ -83,6 +83,26 @@ typedef enum pdsp_status_tag
     PDSP_BUSY
 } pdsp_status_t;
 
+/** Hysteresis parameter struct */
+typedef struct pdsp_hyst_time_param_tag
+{
+    /** Hysteresis time step. */
+    pdsp_f32_t f32_t_step;
+    /** Hysteresis detection time. High transition. */
+    pdsp_f32_t f32_t_high;
+    /** Hysteresis recovery time. Low transition. */
+    pdsp_f32_t f32_t_low;
+} pdsp_hyst_time_param_t;
+
+/** Hysteresis status struct */
+typedef struct pdsp_hyst_time_tag
+{
+    /** Hysteresis status state variable. */
+    pdsp_bool_t b_state;
+    /** Hysteresis time state variable. */
+    pdsp_f32_t f32_time;
+} pdsp_hyst_time_t;
+
 /** Raw signal processing parameter struct. */
 typedef struct pdsp_sig_param_tag
 {
@@ -507,16 +527,12 @@ typedef struct pdsp_dpll_3ph_srf_tag
 /** Fault parameter struct */
 typedef struct pdsp_fault_param_tag
 {
-    /** Fault variable sampling time */
-    pdsp_f32_t f32_t_smp;
-    /** Fault detection time */
-    pdsp_f32_t f32_t_det;
-    /** Fault recovery time */
-    pdsp_f32_t f32_t_rec;
+    /** Time hysteresis parameters. */
+    pdsp_hyst_time_param_t s_hyst_param;
     /** Fault trip value. */
     pdsp_f32_t f32_value;
     /** Fault group status */
-    pdsp_bool_t *b_group;
+    pdsp_u32_t *b_group;
     /** Fault group bit position */
     pdsp_u32_t u32_bit;
 } pdsp_fault_param_t;
@@ -526,10 +542,8 @@ typedef struct pdsp_fault_tag
 {
     /** Fault enable  */
     pdsp_bool_t b_ena;
-    /** Fault detect state variable. */
-    pdsp_f32_t f32_time;
-    /** Fault tripped output. */
-    pdsp_bool_t b_tripped;
+    /** Time hysteresis status. */
+    pdsp_hyst_time_t s_hyst;
 } pdsp_fault_t;
 
 typedef enum pdsp_logger_mode_tag
@@ -670,6 +684,102 @@ static inline pdsp_status_t pdsp_logspace(pdsp_f32_t af32_out[],
                                                  f32_start, f32_end));
     }
     return PDSP_OK;
+}
+
+/**
+ * @brief Prototype value hysteresis function.
+ * @details Changes to high state if input is greater than the high threshold.
+ * Changes to low state if input is less than the low threshold. No action if
+ * value is between the low and high threshold.
+ * Ouptut:      false   true
+ *                |<------|------- f32_high
+ *              dn|       |up
+ * f32_low -------|------>|
+ * Content of the function can also be copied and used as a prototype.
+ * @param b_state_mem State input PDSP_FALSE: low, PDSP_FALSE: high
+ * @param f32_high Higher hysteresis threshold.
+ * @param f32_low Lower hysteresis threshold.
+ * @param f32_in Value input.
+ * @return pdsp_bool_t State output.
+ */
+static inline pdsp_bool_t pdsp_hysteresis_value(pdsp_bool_t *b_state_mem,
+                                                pdsp_f32_t f32_in,
+                                                pdsp_f32_t f32_low,
+                                                pdsp_f32_t f32_high)
+{
+    PDSP_ASSERT(b_state_mem && (f32_low < f32_high));
+    /* PDSP_FALSE or OFF state */
+    if (!(*b_state_mem) && (f32_in > f32_high))
+    {
+        *b_state_mem = PDSP_FALSE;
+        /* State change actions */
+    }
+    /* PDSP_TRUE or ON state */
+    else if ((*b_state_mem) && (f32_in < f32_low))
+    {
+        *b_state_mem = PDSP_FALSE;
+        /* State change actions */
+    }
+    else
+    {
+        /* do nothing */
+    }
+    return *b_state_mem;
+}
+
+static inline pdsp_bool_t pdsp_hysteresis_time(pdsp_hyst_time_t *ps_state,
+                                               pdsp_hyst_time_param_t *ps_param,
+                                               pdsp_bool_t b_in)
+{
+    PDSP_ASSERT(ps_state && ps_param);
+    /* PDSP_FALSE or OFF state */
+    if (!(ps_state->b_state) && b_in)
+    {
+        ps_state->f32_time += ps_param->f32_t_step;
+        if (ps_state->f32_time > ps_param->f32_t_high)
+        {
+            ps_state->b_state = PDSP_TRUE;
+            ps_state->f32_time = 0.0f;
+            /* State change actions */
+        }
+        else
+        {
+            /* do nothing */
+        }
+    }
+    /* PDSP_TRUE or ON state */
+    else if ((ps_state->b_state) && !b_in)
+    {
+        ps_state->f32_time += ps_param->f32_t_step;
+        if (ps_state->f32_time > ps_param->f32_t_low)
+        {
+            ps_state->b_state = PDSP_FALSE;
+            ps_state->f32_time = 0.0f;
+            /* State change actions */
+        }
+        else
+        {
+            /* do nothing */
+        }
+    }
+    else
+    {
+        ps_state->f32_time = 0.0f;
+    }
+    return ps_state->b_state;
+}
+
+static inline void pdsp_write_bit(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_bit,
+                                  pdsp_bool_t b_value)
+{
+    if (b_value)
+    {
+        *pu32_mem |= (1 << u32_bit);
+    }
+    else
+    {
+        *pu32_mem &= ~(1 << u32_bit);
+    }
 }
 
 /**
@@ -1873,63 +1983,9 @@ static inline pdsp_status_t pdsp_fault_init(pdsp_fault_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
     ps_state->b_ena = 0U;
-    ps_state->f32_time = 0.0f;
-    ps_state->b_tripped = PDSP_FALSE;
+    ps_state->s_hyst.f32_time = 0.0f;
+    ps_state->s_hyst.b_state = PDSP_FALSE;
     return PDSP_OK;
-}
-
-/**
- * @brief Check fault condition (internal). Do not use in your application.
- * @param ps_state Fault status struct.
- * @param ps_param Fault param struct.
- * @param b_condition Condition to be evaluated.
- * @return pdsp_bool_t Fault status.
- */
-static inline pdsp_bool_t
-pdsp_fault_check_condition(pdsp_fault_t *ps_state,
-                            pdsp_fault_param_t *ps_param,
-                            pdsp_bool_t b_condition)
-{
-    PDSP_ASSERT(ps_state && ps_param);
-    /* Tripped State */
-    if (ps_state->b_tripped)
-    {
-        if (!b_condition)
-        {
-            ps_state->f32_time += ps_param->f32_t_smp;
-            /* State transition to Normal State: */
-            if (ps_state->f32_time > ps_param->f32_t_rec)
-            {
-                ps_state->b_tripped = PDSP_FALSE;
-                *ps_param->b_group &= ~(1 << ps_param->u32_bit);
-                ps_state->f32_time = 0.0;
-            }
-        }
-        else
-        {
-            ps_state->f32_time = 0.0;
-        }
-    }
-    /* Normal State */
-    else
-    {
-        if (b_condition)
-        {
-            ps_state->f32_time += ps_param->f32_t_smp;
-            /* State transition to Tripped State: */
-            if (ps_state->f32_time > ps_param->f32_t_det)
-            {
-                ps_state->b_tripped = PDSP_TRUE;
-                *ps_param->b_group |= (1 << ps_param->u32_bit);
-                ps_state->f32_time = 0.0;
-            }
-        }
-        else
-        {
-            ps_state->f32_time = 0.0;
-        }
-    }
-    return ps_state->b_tripped;
 }
 
 /**
@@ -1944,8 +2000,11 @@ static inline pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_state,
                                                 pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return pdsp_fault_check_condition(ps_state, ps_param,
-                                       f32_in > ps_param->f32_value);
+    pdsp_bool_t b_status_out =
+        pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
+                             f32_in > ps_param->f32_value);
+    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    return b_status_out;
 }
 
 /**
@@ -1960,8 +2019,11 @@ static inline pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_state,
                                                  pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return pdsp_fault_check_condition(ps_state, ps_param,
-                                       f32_in < ps_param->f32_value);
+    pdsp_bool_t b_status_out =
+        pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
+                             f32_in < ps_param->f32_value);
+    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    return b_status_out;
 }
 
 /**
@@ -1976,8 +2038,11 @@ static inline pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_state,
                                                  pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return pdsp_fault_check_condition(ps_state, ps_param,
-                                       f32_in == ps_param->f32_value);
+    pdsp_bool_t b_status_out =
+        pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
+                             f32_in == ps_param->f32_value);
+    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    return b_status_out;
 }
 
 /**
@@ -1991,7 +2056,10 @@ static inline pdsp_bool_t pdsp_fault_check_true(pdsp_fault_t *ps_state,
                                                 pdsp_fault_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return pdsp_fault_check_condition(ps_state, ps_param, PDSP_TRUE);
+    pdsp_bool_t b_status_out = pdsp_hysteresis_time(
+        &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_TRUE);
+    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    return b_status_out;
 }
 
 /**
@@ -2005,7 +2073,10 @@ static inline pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_state,
                                                  pdsp_fault_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    return pdsp_fault_check_condition(ps_state, ps_param, PDSP_FALSE);
+    pdsp_bool_t b_status_out = pdsp_hysteresis_time(
+        &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_FALSE);
+    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    return b_status_out;
 }
 
 /**
