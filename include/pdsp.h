@@ -548,8 +548,8 @@ typedef struct pdsp_fault_tag
 
 typedef enum pdsp_logger_mode_tag
 {
-    /** Logger in rolling (ring) buffer mode. */
-    PDSP_LOG_MODE_ROLL,
+    /* Logger is not triggered. */
+    PDSP_LOG_MODE_TRIG_NONE,
     /** Logger is triggered by forcing through software-> f23_trigval > 0.0f. */
     PDSP_LOG_MODE_TRIG_FORCE,
     /** Logger is in rising edge trigger mode. */
@@ -561,22 +561,43 @@ typedef enum pdsp_logger_mode_tag
 /** Data logger variable struct */
 typedef struct pdsp_logger_param_tag
 {
-    /** Logging history array. */
-    pdsp_f32_t *af32_history;
-    /** History array size. */
+    /** Logging history array for channel 0. */
+    pdsp_f32_t *af32_history0;
+    /** Logging history array for channel 1. */
+    pdsp_f32_t *af32_history1;
+    /** Logging history array for channel 2. */
+    pdsp_f32_t *af32_history2;
+    /** Logging history array for channel 3. */
+    pdsp_f32_t *af32_history3;
+    /** History array size */
     pdsp_u32_t u32_size;
+    /** History array maximum index. Normally u32_size-1*/
+    pdsp_u32_t u32_index_max;
 } pdsp_logger_param_t;
 
 /** Data logger variable struct */
 typedef struct pdsp_logger_tag
 {
-    /** Logging mode */
-    pdsp_logger_mode_e e_mode;
+    /** User setting: Trigger mode */
+    pdsp_logger_mode_e e_trig_mode;
+    /** User setting: Trigger value */
+    pdsp_f32_t f23_trig_value;
+    /** User setting: Trigger offset p.u. of buffer size. */
+    pdsp_f32_t f23_trig_offset;
+    /** Sample countdown counter. Counts down when b_triggered is PDSP_TRUE */
+    pdsp_u32_t u23_counter;
+    /** Triggered state. PDSP_TRUE when trigger condition was met. */
+    pdsp_bool_t b_triggered;
     /** Current head array index. */
     pdsp_u32_t u32_head;
-    /** Trigger value */
-    pdsp_f32_t f23_trigval;
 } pdsp_logger_t;
+
+/** Stopwatch parameter struct. */
+typedef struct pdsp_stopwatch_param_tag
+{
+    pdsp_u32_t u32_hw_max;
+    pdsp_f32_t f32_tick_per;
+} pdsp_stopwatch_param_t;
 
 /*---------------------------------------------------------------------------*/
 
@@ -587,8 +608,9 @@ typedef struct pdsp_logger_tag
  * @param f32_value Value to set array elements to.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_set(pdsp_f32_t af32_array[],
-                                     pdsp_u32_t u32_size, pdsp_u32_t f32_value)
+static inline pdsp_status_t pdsp_array_set(pdsp_f32_t af32_array[],
+                                           pdsp_u32_t u32_size,
+                                           pdsp_u32_t f32_value)
 {
     pdsp_u32_t u32_idx = 0;
     PDSP_ASSERT(af32_array && u32_size);
@@ -624,7 +646,7 @@ static inline pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
  * @param p_func Function to apply to the elements.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_apply(pdsp_f32_t af32_in[],
+static inline pdsp_status_t pdsp_apply(const pdsp_f32_t af32_in[],
                                        pdsp_f32_t af32_out[],
                                        pdsp_u32_t u32_size,
                                        pdsp_u32_t p_func(pdsp_u32_t))
@@ -687,7 +709,7 @@ static inline pdsp_status_t pdsp_logspace(pdsp_f32_t af32_out[],
 }
 
 /**
- * @brief Prototype value hysteresis function.
+ * @brief Value hysteresis function.
  * @details Changes to high state if input is greater than the high threshold.
  * Changes to low state if input is less than the low threshold. No action if
  * value is between the low and high threshold.
@@ -727,9 +749,16 @@ static inline pdsp_bool_t pdsp_hysteresis_value(pdsp_bool_t *b_state_mem,
     return *b_state_mem;
 }
 
-static inline pdsp_bool_t pdsp_hysteresis_time(pdsp_hyst_time_t *ps_state,
-                                               pdsp_hyst_time_param_t *ps_param,
-                                               pdsp_bool_t b_in)
+/**
+ * @brief Condition/time hysteresis function with detecting and recovering time.
+ * @param ps_state Hysteresis state struct.
+ * @param ps_param Hysteresis parameter struct.
+ * @param b_in Input condition.
+ * @return pdsp_bool_t Status output.
+ */
+static inline pdsp_bool_t
+pdsp_hysteresis_time(pdsp_hyst_time_t *ps_state,
+                     const pdsp_hyst_time_param_t *ps_param, pdsp_bool_t b_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
     /* PDSP_FALSE or OFF state */
@@ -769,7 +798,13 @@ static inline pdsp_bool_t pdsp_hysteresis_time(pdsp_hyst_time_t *ps_state,
     return ps_state->b_state;
 }
 
-static inline void pdsp_write_bit(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_bit,
+/**
+ * @brief Write bit in pdsp_u32_t variable.
+ * @param pu32_mem Memory pointer to the variable.
+ * @param u32_bit Bit number in memory variable.
+ * @param b_value Boolean value to write to bit.
+ */
+static inline void pdsp_bit_write(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_bit,
                                   pdsp_bool_t b_value)
 {
     if (b_value)
@@ -780,6 +815,18 @@ static inline void pdsp_write_bit(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_bit,
     {
         *pu32_mem &= ~(1 << u32_bit);
     }
+}
+
+/**
+ * @brief Read bit in pdsp_u32_t variable.
+ * @param pu32_mem Memory pointer to the variable.
+ * @param u32_bit Bit number in memory variable.
+ * @returns pdsp_bool_t Value of bit at position u32_bit.
+ */
+static inline pdsp_bool_t pdsp_bit_read(const pdsp_u32_t *pu32_mem,
+                                        pdsp_u32_t u32_bit)
+{
+    return (pdsp_bool_t)((*pu32_mem >> u32_bit) && 1U);
 }
 
 /**
@@ -908,7 +955,7 @@ pdsp_dq0_abc(pdsp_dq_abc_t *ps_state, pdsp_f32_t f32_d, pdsp_f32_t f32_q,
 }
 
 /**
- * @brief 2D Interpollation (X->input, Y->Output)
+ * @brief 2D Interpollation (X->input, Y->Output).
  * @param af32_x X axis array. Size must be 2 or higher. Values must be
  * monotonically increasing.
  * @param af32_y Y axis array. Size must be 2 or higher and must be the same as
@@ -917,8 +964,8 @@ pdsp_dq0_abc(pdsp_dq_abc_t *ps_state, pdsp_f32_t f32_d, pdsp_f32_t f32_q,
  * @param f32_x_in Interpollation input.
  * @returns pdsp_f32_t Interpollated value.
  */
-static inline pdsp_f32_t pdsp_interpollate_2d(pdsp_f32_t af32_x[],
-                                              pdsp_f32_t af32_y[],
+static inline pdsp_f32_t pdsp_interpollate_2d(const pdsp_f32_t af32_x[],
+                                              const pdsp_f32_t af32_y[],
                                               pdsp_u32_t u32_size,
                                               pdsp_f32_t f32_x_in)
 {
@@ -1091,7 +1138,7 @@ static inline pdsp_status_t pdsp_rollsum_init(pdsp_rollsum_t *ps_state,
     PDSP_ASSERT(ps_state && af32_history && u32_size);
     ps_state->f32_sum = 0.0f;
     ps_state->u32_head = 0U;
-    pdsp_set(af32_history, u32_size, 0.0f);
+    pdsp_array_set(af32_history, u32_size, 0.0f);
     return PDSP_OK;
 }
 
@@ -1975,6 +2022,35 @@ static inline pdsp_status_t pdsp_dpll_3ph_srf(pdsp_dpll_3ph_srf_t *ps_state,
 }
 
 /**
+ * @brief Start the stopwatch with 32bit HW counter.
+ * @param u32_hw_now Current time from the hardware timer.
+ * @return pdsp_u32_t Current time to be stored for the pdsp_stopwatch_stop
+ * function.
+ */
+static inline void pdsp_stopwatch_start(pdsp_u32_t *u32_state,
+                                        pdsp_u32_t u32_hw_now)
+{
+    PDSP_ASSERT(u32_state);
+    *u32_state = u32_hw_now;
+}
+
+/**
+ * @brief Calculate the time elapsed since the start.
+ * @param ps_param Stopwatch parameter struct.
+ * @param u32_state Stopwatch state struct.
+ * @param u32_hw_now Current time from the hardware timer.
+ * @return pdsp_u32_t Elapsed time in timer ticks.
+ */
+static inline pdsp_u32_t
+pdsp_stopwatch_stop(const pdsp_stopwatch_param_t *ps_param,
+                    pdsp_u32_t *u32_state, pdsp_u32_t u32_hw_now)
+{
+    PDSP_ASSERT(ps_param && u32_state);
+    pdsp_u32_t u32_time[2] = {0U, ps_param->u32_hw_max};
+    return u32_hw_now - *u32_state + u32_time[(*u32_state < u32_hw_now)];
+}
+
+/**
  * @brief Initalize fault struct.
  * @param ps_state Fault state struct.
  * @return pdsp_status_t PDSP_OK
@@ -1995,15 +2071,15 @@ static inline pdsp_status_t pdsp_fault_init(pdsp_fault_t *ps_state)
  * @param b_condition Condition to be evaluated.
  * @return pdsp_bool_t Fault status.
  */
-static inline pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_state,
-                                                pdsp_fault_param_t *ps_param,
-                                                pdsp_f32_t f32_in)
+static inline pdsp_bool_t
+pdsp_fault_check_over(pdsp_fault_t *ps_state,
+                      const pdsp_fault_param_t *ps_param, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out =
         pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
                              f32_in > ps_param->f32_value);
-    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2014,15 +2090,15 @@ static inline pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_state,
  * @param b_condition Condition to be evaluated.
  * @return pdsp_bool_t Fault status.
  */
-static inline pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_state,
-                                                 pdsp_fault_param_t *ps_param,
-                                                 pdsp_f32_t f32_in)
+static inline pdsp_bool_t
+pdsp_fault_check_under(pdsp_fault_t *ps_state,
+                       const pdsp_fault_param_t *ps_param, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out =
         pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
                              f32_in < ps_param->f32_value);
-    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2033,15 +2109,15 @@ static inline pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_state,
  * @param b_condition Condition to be evaluated.
  * @return pdsp_bool_t Fault status.
  */
-static inline pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_state,
-                                                 pdsp_fault_param_t *ps_param,
-                                                 pdsp_f32_t f32_in)
+static inline pdsp_bool_t
+pdsp_fault_check_equal(pdsp_fault_t *ps_state,
+                       const pdsp_fault_param_t *ps_param, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out =
         pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
                              f32_in == ps_param->f32_value);
-    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2052,13 +2128,14 @@ static inline pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_state,
  * @param b_condition Condition to be evaluated.
  * @return pdsp_bool_t Fault status.
  */
-static inline pdsp_bool_t pdsp_fault_check_true(pdsp_fault_t *ps_state,
-                                                pdsp_fault_param_t *ps_param)
+static inline pdsp_bool_t
+pdsp_fault_check_true(pdsp_fault_t *ps_state,
+                      const pdsp_fault_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out = pdsp_hysteresis_time(
         &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_TRUE);
-    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2069,13 +2146,14 @@ static inline pdsp_bool_t pdsp_fault_check_true(pdsp_fault_t *ps_state,
  * @param b_condition Condition to be evaluated.
  * @return pdsp_bool_t Fault status.
  */
-static inline pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_state,
-                                                 pdsp_fault_param_t *ps_param)
+static inline pdsp_bool_t
+pdsp_fault_check_false(pdsp_fault_t *ps_state,
+                       const pdsp_fault_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out = pdsp_hysteresis_time(
         &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_FALSE);
-    pdsp_write_bit(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2102,12 +2180,19 @@ pdsp_fault_process_group(pdsp_bool_t b_group, pdsp_status_t pf_callback(void))
  * @return pdsp_status_t PDSP_OK
  */
 static inline pdsp_status_t pdsp_log_init(pdsp_logger_t *ps_state,
-                                          pdsp_logger_param_t *ps_param)
+                                          const pdsp_logger_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    pdsp_set(ps_param->af32_history, ps_param->u32_size, 0.0f);
+    pdsp_array_set(ps_param->af32_history0, ps_param->u32_size, 0.0f);
+    pdsp_array_set(ps_param->af32_history1, ps_param->u32_size, 0.0f);
+    pdsp_array_set(ps_param->af32_history2, ps_param->u32_size, 0.0f);
+    pdsp_array_set(ps_param->af32_history3, ps_param->u32_size, 0.0f);
+    ps_state->e_trig_mode = PDSP_LOG_MODE_TRIG_NONE;
+    ps_state->f23_trig_value = 0.0f;
+    ps_state->f23_trig_offset = 0.5f;
+    ps_state->u23_counter = 1U;
+    ps_state->b_triggered = PDSP_FALSE;
     ps_state->u32_head = 0U;
-    ps_state->f23_trigval = 0;
     return PDSP_OK;
 }
 
@@ -2118,11 +2203,13 @@ static inline pdsp_status_t pdsp_log_init(pdsp_logger_t *ps_state,
  * to trigger.
  * @return pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_log_set_trigval(pdsp_logger_t *ps_state,
-                                                 pdsp_f32_t f32_value)
+static inline pdsp_status_t pdsp_log_set_trigger(pdsp_logger_t *ps_state,
+                                                 pdsp_f32_t f32_value,
+                                                 pdsp_f32_t f32_offset)
 {
     PDSP_ASSERT(ps_state);
-    ps_state->f23_trigval = f32_value;
+    ps_state->f23_trig_value = f32_value;
+    ps_state->f23_trig_offset = f32_offset;
     return PDSP_OK;
 }
 
@@ -2136,33 +2223,69 @@ static inline pdsp_status_t pdsp_log_set_mode(pdsp_logger_t *ps_state,
                                               pdsp_logger_mode_e e_mode)
 {
     PDSP_ASSERT(ps_state);
-    ps_state->e_mode = e_mode;
+    ps_state->e_trig_mode = e_mode;
     return PDSP_OK;
 }
 
 /**
- * @brief Main logger function to called periodically.
+ * @brief Logging data acquisition function.
+ * @param ps_state Logger state variable struct.
+ * @param ps_param Logger parameter variable struct.
+ * @param f32_in Data input.
+ */
+static inline void pdsp_log_daq(pdsp_logger_t *ps_state,
+                                const pdsp_logger_param_t *ps_param,
+                                pdsp_f32_t f32_in0, pdsp_f32_t f32_in1,
+                                pdsp_f32_t f32_in2, pdsp_f32_t f32_in3)
+{
+    PDSP_ASSERT(ps_state && ps_param);
+    if (ps_state->u23_counter > 0U)
+    {
+        ps_param->af32_history0[ps_state->u32_head] = f32_in0;
+        ps_param->af32_history1[ps_state->u32_head] = f32_in1;
+        ps_param->af32_history2[ps_state->u32_head] = f32_in2;
+        ps_param->af32_history3[ps_state->u32_head] = f32_in3;
+        ps_state->u32_head++;
+        if (ps_state->u32_head > ps_param->u32_index_max)
+        {
+            ps_state->u32_head = 0U;
+        }
+        if (ps_state->b_triggered)
+        {
+            ps_state->u23_counter--;
+        }
+    }
+}
+
+/**
+ * @brief Logging trigger detection.
  * @param ps_state Logger state variable struct.
  * @param ps_param Logger parameter variable struct.
  * @param f32_in ILogger input value to be stored.
  * @return pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_log(pdsp_logger_t *ps_state,
-                                     pdsp_logger_param_t *ps_param,
-                                     pdsp_f32_t f32_in)
+static inline pdsp_status_t pdsp_log_trig(pdsp_logger_t *ps_state,
+                                          const pdsp_logger_param_t *ps_param,
+                                          pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    if (ps_state->e_mode == PDSP_LOG_MODE_ROLL)
+    if (ps_state->b_triggered == PDSP_FALSE)
     {
-    }
-    else if (ps_state->e_mode == PDSP_LOG_MODE_TRIG_FORCE)
-    {
-    }
-    else if (ps_state->e_mode == PDSP_LOG_MODE_TRIG_RISE)
-    {
-    }
-    else if (ps_state->e_mode == PDSP_LOG_MODE_TRIG_FALL)
-    {
+        if (ps_state->e_trig_mode == PDSP_LOG_MODE_TRIG_FORCE)
+        {
+            ps_state->b_triggered = PDSP_TRUE;
+            ps_state->u23_counter =
+                (pdsp_u32_t)((pdsp_f32_t)ps_param->u32_index_max *
+                             ps_state->f23_trig_offset);
+        }
+        else if (ps_state->e_trig_mode == PDSP_LOG_MODE_TRIG_RISE)
+        {
+            /* todo */
+        }
+        else if (ps_state->e_trig_mode == PDSP_LOG_MODE_TRIG_FALL)
+        {
+            /* todo */
+        }
     }
     return PDSP_OK;
 }

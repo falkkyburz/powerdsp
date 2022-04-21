@@ -4,6 +4,7 @@
 
 #include "pdsp.h"
 #include <stdio.h>
+#include <time.h>
 
 static pdsp_sig_param_t s_vbus_raw_par = {.f32_gain = 1.0f, .f32_offset = 0.0f};
 static pdsp_override_t s_vbus_ovr = {.u32_enable = 0U, .f32_value = 0.0f};
@@ -165,6 +166,35 @@ void test_avg(void)
    fclose(fptr);
 }
 
+pdsp_u32_t test_nobrach(pdsp_u32_t u32_in)
+{
+   pdsp_u32_t u32_out[2] = {0, 1};
+   return u32_out[u32_in > 1000];
+}
+
+pdsp_u32_t test_brach(pdsp_u32_t u32_in)
+{
+   return u32_in > 1000 ? 1: 0;
+}
+
+void test_brach_nobranch(void)
+{
+   pdsp_u32_t index = 0U;
+   int start = clock();
+   for (index = 0; index<100000000; index++)
+   {
+      test_nobrach(index);
+   }
+   printf("time0 =%lu", clock() - start);
+   start = clock();
+   for (index = 0; index<100000000; index++)
+   {
+      test_brach(index);
+   }
+   printf("time1 =%lu", clock() - start);
+
+}
+
 int main()
 {
    // signal_read_task();
@@ -172,10 +202,11 @@ int main()
 
    // test_linspace();
    // test_logspace();
-   test_saw();
+   // test_saw();
    //test_raw();
    //test_rolling_avg_rms();
    //test_avg();
+   test_brach_nobranch();
 
    return 0;
 }
