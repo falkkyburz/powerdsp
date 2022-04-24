@@ -48,21 +48,30 @@
 /* Fixed and floating point types */
 #if defined(_WIN64)
 #define PDSP_HOST
+#define F32_TO_INT_ROUNDS_TO_NEAREST
 typedef float pdsp_f32_t;
 typedef int pdsp_i32_t;
 typedef unsigned int pdsp_u32_t;
+typedef short pdsp_i16_t;
+typedef unsigned short pdsp_u16_t;
 typedef int pdsp_bool_t;
 #elif defined(__TMS320C2000__)
 #define PDSP_MCU
+#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 typedef float pdsp_f32_t;
 typedef long pdsp_i32_t;
 typedef unsigned long pdsp_u32_t;
+typedef int pdsp_i16_t;
+typedef unsigned int pdsp_u16_t;
 typedef int pdsp_bool_t;
 #elif defined(__TMS320C28XX_CLA__)
 #define PDSP_CLA
+#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 typedef float pdsp_f32_t;
 typedef int pdsp_i32_t;
 typedef unsigned int pdsp_u32_t;
+typedef short pdsp_i16_t;
+typedef unsigned short pdsp_u16_t;
 typedef int pdsp_bool_t;
 #endif
 
@@ -82,6 +91,15 @@ typedef enum pdsp_status_tag
     PDSP_NOT_OK,
     PDSP_BUSY
 } pdsp_status_t;
+
+/** X, Y Vector */
+typedef struct pdsp_vec_tag
+{
+    /** X value. */
+    pdsp_f32_t x;
+    /** Y value. */
+    pdsp_f32_t y;
+} pdsp_vec_t;
 
 /** Hysteresis parameter struct */
 typedef struct pdsp_hyst_time_param_tag
@@ -534,7 +552,7 @@ typedef struct pdsp_fault_param_tag
     /** Fault group status */
     pdsp_u32_t *b_group;
     /** Fault group bit position */
-    pdsp_u32_t u32_bit;
+    pdsp_u32_t u16_bit;
 } pdsp_fault_param_t;
 
 /** Fault state variable struct */
@@ -623,19 +641,44 @@ static inline pdsp_status_t pdsp_array_set(pdsp_f32_t af32_array[],
 
 /**
  * @brief Map a value from one range to another (Uses division).
+ * @details y = (y1 - y0) / (x1 - x0) * (x - x0) + y0
  * @param f32_in Input value.
  * @param f32_in_lo Input range low value.
- * @param f32_in_hi Input range high value.
+ * @param f32_in_hi Input range high value (must be greater than f32_in_lo).
  * @param f32_out_lo Output range low value.
- * @param f32_out_hi Output range high value.
+ * @param f32_out_hi Output range high value (must be greater than f32_out_lo).
  * @return pdsp_f32_t Ouput value.
  */
-static inline pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
-                                  pdsp_f32_t f32_in_hi, pdsp_f32_t f32_out_lo,
-                                  pdsp_f32_t f32_out_hi)
+static inline pdsp_f32_t
+pdsp_map_unsave(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo, pdsp_f32_t f32_in_hi,
+                pdsp_f32_t f32_out_lo, pdsp_f32_t f32_out_hi)
 {
-    return (f32_out_lo + (f32_in - f32_in_lo) * (f32_out_hi - f32_out_lo) /
-                             (f32_in_hi - f32_in_lo));
+    return ((f32_out_hi - f32_out_lo) / (f32_in_hi - f32_in_lo) *
+                (f32_in - f32_in_lo) +
+            f32_out_lo);
+}
+
+/**
+ * @brief Map a value to an index (Uses division, uses float to int conversion).
+ * @param f32_in Input value (must be greater than zero).
+ * @param f32_in_lo Input range low value.
+ * @param f32_in_hi Input range high value (must be greater than f32_in_lo).
+ * @param f32_idx_hi Maximum index.
+ * @return pdsp_u16_t Ouput value.
+ */
+static inline pdsp_u16_t pdsp_map_unsave_idx(pdsp_f32_t f32_in,
+                                             pdsp_f32_t f32_in_lo,
+                                             pdsp_f32_t f32_in_hi,
+                                             pdsp_u16_t f32_idx_hi)
+{
+    pdsp_f32_t f32_index = (f32_idx_hi / (f32_in_hi - f32_in_lo) *
+                            fmaxf(f32_in - f32_in_lo, 0.0f));
+/* Float to int conversion is implementation specific. */
+#if defined(F32_TO_INT_ROUNDS_TO_NEAREST)
+    return (pdsp_u16_t)(f32_index - 0.5);
+#elif defined(F32_TO_INT_ROUNDS_TOWARDS_ZERO)
+    return (pdsp_u16_t)(f32_index);
+#endif
 }
 
 /**
@@ -646,10 +689,10 @@ static inline pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
  * @param p_func Function to apply to the elements.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_apply(const pdsp_f32_t af32_in[],
-                                       pdsp_f32_t af32_out[],
-                                       pdsp_u32_t u32_size,
-                                       pdsp_u32_t p_func(pdsp_u32_t))
+static inline pdsp_status_t pdsp_array_apply(const pdsp_f32_t af32_in[],
+                                             pdsp_f32_t af32_out[],
+                                             pdsp_u32_t u32_size,
+                                             pdsp_u32_t p_func(pdsp_u32_t))
 {
     pdsp_u32_t u32_idx = 0;
     PDSP_ASSERT(af32_in && af32_out && u32_size && p_func);
@@ -668,18 +711,18 @@ static inline pdsp_status_t pdsp_apply(const pdsp_f32_t af32_in[],
  * @param f32_end End Value.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_linspace(pdsp_f32_t af32_out[],
-                                          pdsp_u32_t u32_size,
-                                          pdsp_f32_t f32_start,
-                                          pdsp_f32_t f32_end)
+static inline pdsp_status_t pdsp_array_linspace(pdsp_f32_t af32_out[],
+                                                pdsp_u32_t u32_size,
+                                                pdsp_f32_t f32_start,
+                                                pdsp_f32_t f32_end)
 {
     pdsp_u32_t u32_idx = 0;
     PDSP_ASSERT(af32_out && u32_size);
     for (u32_idx = 0; u32_idx < u32_size; u32_idx++)
     {
         af32_out[u32_idx] =
-            pdsp_map((pdsp_f32_t)u32_idx, 0.0f, (pdsp_f32_t)u32_size - 1.0f,
-                     f32_start, f32_end);
+            pdsp_map_unsave((pdsp_f32_t)u32_idx, 0.0f,
+                            (pdsp_f32_t)u32_size - 1.0f, f32_start, f32_end);
     }
     return PDSP_OK;
 }
@@ -692,18 +735,19 @@ static inline pdsp_status_t pdsp_linspace(pdsp_f32_t af32_out[],
  * @param f32_end End exponent.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_logspace(pdsp_f32_t af32_out[],
-                                          pdsp_u32_t u32_size,
-                                          pdsp_f32_t f32_start,
-                                          pdsp_f32_t f32_end)
+static inline pdsp_status_t pdsp_array_logspace(pdsp_f32_t af32_out[],
+                                                pdsp_u32_t u32_size,
+                                                pdsp_f32_t f32_start,
+                                                pdsp_f32_t f32_end)
 {
     pdsp_u32_t u32_idx = 0;
     PDSP_ASSERT(af32_out && u32_size);
     for (u32_idx = 0; u32_idx < u32_size; u32_idx++)
     {
-        af32_out[u32_idx] = powf(10.0f, pdsp_map((pdsp_f32_t)u32_idx, 0.0f,
-                                                 (pdsp_f32_t)u32_size - 1.0f,
-                                                 f32_start, f32_end));
+        af32_out[u32_idx] =
+            powf(10.0f, pdsp_map_unsave((pdsp_f32_t)u32_idx, 0.0f,
+                                        (pdsp_f32_t)u32_size - 1.0f, f32_start,
+                                        f32_end));
     }
     return PDSP_OK;
 }
@@ -799,48 +843,111 @@ pdsp_hysteresis_time(pdsp_hyst_time_t *ps_state,
 }
 
 /**
- * @brief Write bit in pdsp_u32_t variable.
- * @param pu32_mem Memory pointer to the variable.
- * @param u32_bit Bit number in memory variable.
+ * @brief Write bit in pdsp_u16_t variable.
+ * @param pu16_mem Memory pointer to the variable.
+ * @param u16_bit Bit number in memory variable.
  * @param b_value Boolean value to write to bit.
  */
-static inline void pdsp_bit_write(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_bit,
-                                  pdsp_bool_t b_value)
+static inline void pdsp_bit_write_u16(pdsp_u32_t *pu16_mem, pdsp_u16_t u16_bit,
+                                      pdsp_bool_t b_value)
 {
+    PDSP_ASSERT(pu16_mem);
     if (b_value)
     {
-        *pu32_mem |= (1 << u32_bit);
+        *pu16_mem |= (1 << u16_bit);
     }
     else
     {
-        *pu32_mem &= ~(1 << u32_bit);
+        *pu16_mem &= ~(1 << u16_bit);
+    }
+}
+
+/**
+ * @brief Write bit in pdsp_u32_t variable.
+ * @param pu32_mem Memory pointer to the variable.
+ * @param u16_bit Bit number in memory variable.
+ * @param b_value Boolean value to write to bit.
+ */
+static inline void pdsp_bit_write_u32(pdsp_u32_t *pu32_mem, pdsp_u16_t u16_bit,
+                                      pdsp_bool_t b_value)
+{
+    PDSP_ASSERT(pu32_mem);
+    if (b_value)
+    {
+        *pu32_mem |= (1 << u16_bit);
+    }
+    else
+    {
+        *pu32_mem &= ~(1 << u16_bit);
     }
 }
 
 /**
  * @brief Read bit in pdsp_u32_t variable.
- * @param pu32_mem Memory pointer to the variable.
- * @param u32_bit Bit number in memory variable.
- * @returns pdsp_bool_t Value of bit at position u32_bit.
+ * @param pu16_mem Memory pointer to the variable.
+ * @param u16_bit Bit number in memory variable.
+ * @returns pdsp_bool_t Value of bit at position u16_bit.
  */
-static inline pdsp_bool_t pdsp_bit_read(const pdsp_u32_t *pu32_mem,
-                                        pdsp_u32_t u32_bit)
+static inline pdsp_bool_t pdsp_bit_read_u16(const pdsp_u16_t *pu16_mem,
+                                            pdsp_u16_t u16_bit)
 {
-    return (pdsp_bool_t)((*pu32_mem >> u32_bit) && 1U);
+    PDSP_ASSERT(pu16_mem);
+    return (pdsp_bool_t)((*pu16_mem >> u16_bit) && 1U);
+}
+
+/**
+ * @brief Read bit in pdsp_u32_t variable.
+ * @param pu32_mem Memory pointer to the variable.
+ * @param u16_bit Bit number in memory variable.
+ * @returns pdsp_bool_t Value of bit at position u16_bit.
+ */
+static inline pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
+                                            pdsp_u16_t u16_bit)
+{
+    PDSP_ASSERT(pu32_mem);
+    return (pdsp_bool_t)((*pu32_mem >> u16_bit) && 1U);
 }
 
 /**
  * @brief Weighted mean from two values.
- * @details Can be used to improve reconstruction of triangular currents.
  * @param f32_in0 First sample.
- * @param f32_in1 Second sample
- * @param f32_weight0 Weight of first sample [0, 1], current duty cycle.
+ * @param f32_in1 Second sample.
+ * @param f32_weight0 Weight of first sample [0, 1]. Second sample weight is
+ * (1-f32_weight0).
  * @return pdsp_f32_t Weighted mean.
  */
-static inline pdsp_f32_t pdsp_mean2(pdsp_f32_t f32_in0, pdsp_f32_t f32_in1,
-                                    pdsp_f32_t f32_weight0)
+static inline pdsp_f32_t pdsp_mean2w_f32(pdsp_f32_t f32_in0, pdsp_f32_t f32_in1,
+                                         pdsp_f32_t f32_weight0)
 {
     return (f32_in0 * f32_weight0) + (f32_in1 * (1.0f - f32_weight0));
+}
+
+/**
+ * @brief Mean from four 16bit values. Use to average 4 ADC values.
+ * @param a4u16_in Sample array of length 4.
+ * @return pdsp_f32_t Mean value.
+ */
+static inline pdsp_f32_t pdsp_mean4_u16(pdsp_u16_t a4u16_in[])
+{
+    PDSP_ASSERT(a4u16_in);
+    return 0.25f *
+           (pdsp_f32_t)((pdsp_u32_t)a4u16_in[0] + (pdsp_u32_t)a4u16_in[1] +
+                        (pdsp_u32_t)a4u16_in[2] + (pdsp_u32_t)a4u16_in[3]);
+}
+
+/**
+ * @brief Mean from eight 16bit values. Use to average 8 ADC values.
+ * @param a8u16_in Sample array of length 8.
+ * @return pdsp_f32_t Mean value.
+ */
+static inline pdsp_f32_t pdsp_mean8_u16(pdsp_u16_t a8u16_in[])
+{
+    PDSP_ASSERT(a8u16_in);
+    return 0.125f *
+           (pdsp_f32_t)((pdsp_u32_t)a8u16_in[0] + (pdsp_u32_t)a8u16_in[1] +
+                        (pdsp_u32_t)a8u16_in[2] + (pdsp_u32_t)a8u16_in[3] +
+                        (pdsp_u32_t)a8u16_in[4] + (pdsp_u32_t)a8u16_in[5] +
+                        (pdsp_u32_t)a8u16_in[6] + (pdsp_u32_t)a8u16_in[7]);
 }
 
 /**
@@ -860,13 +967,14 @@ static inline pdsp_status_t pdsp_abc_dq_init(pdsp_abc_dq_t *ps_state)
 }
 
 /**
- * @brief Runs abc-dq pos routine
+ * @brief Runs abc-dq pos routine.
+ * @details see https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_transformation
  * @param ps_state Pointer to abc_dq structure.
- * @param a Phase a value.
- * @param b Phase b value.
- * @param c Phase c value.
- * @param sin_val Sine value of the grid angle.
- * @param cos_val Cosine value of the grid angle.
+ * @param f32_a Phase a value.
+ * @param f32_b Phase b value.
+ * @param f32_c Phase c value.
+ * @param f32_sin_val Sine value of the grid angle.
+ * @param f32_cos_val Cosine value of the grid angle.
  * @return pdsp_status_t PDSP_OK
  */
 static inline pdsp_status_t pdsp_abc_dq_pos(pdsp_abc_dq_t *ps_state,
@@ -889,11 +997,11 @@ static inline pdsp_status_t pdsp_abc_dq_pos(pdsp_abc_dq_t *ps_state,
 /**
  * @brief Runs abc-dq neg routine
  * @param ps_state Pointer to abc_dq structure.
- * @param a Phase a value.
- * @param b Phase b value.
- * @param c Phase c value.
- * @param sin_val Sine value of the grid angle.
- * @param cos_val Cosine value of the grid angle.
+ * @param f32_a Phase a value.
+ * @param f32_b Phase b value.
+ * @param f32_c Phase c value.
+ * @param f32_sin_val Sine value of the grid angle.
+ * @param f32_cos_val Cosine value of the grid angle.
  * @return pdsp_status_t PDSP_OK
  */
 static inline pdsp_status_t pdsp_abc_dq_neg(pdsp_abc_dq_t *ps_state,
@@ -979,8 +1087,9 @@ static inline pdsp_f32_t pdsp_interpollate_2d(const pdsp_f32_t af32_x[],
         u32_idx_hi++;
     }
     /* Calculate the output. */
-    return pdsp_map(f32_x_in, af32_x[u32_idx_hi - 1U], af32_x[u32_idx_hi],
-                    af32_y[u32_idx_hi - 1U], af32_y[u32_idx_hi]);
+    return pdsp_map_unsave(f32_x_in, af32_x[u32_idx_hi - 1U],
+                           af32_x[u32_idx_hi], af32_y[u32_idx_hi - 1U],
+                           af32_y[u32_idx_hi]);
 }
 
 /**
@@ -1006,7 +1115,7 @@ static inline pdsp_f32_t pdsp_sig_conv(const pdsp_sig_param_t *ps_param,
  * @param ps_state Min-max state variable struct.
  * @return pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_minmax_init(pdsp_minmax_t *ps_state)
+static inline pdsp_status_t pdsp_minmax_clear(pdsp_minmax_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
     ps_state->f32_min = PDSP_POS_INF;
@@ -1031,11 +1140,11 @@ static inline pdsp_status_t pdsp_minmax(pdsp_minmax_t *ps_state,
 }
 
 /**
- * @brief Initialize simple exponential average struct.
+ * @brief Initialize / Clear simple exponential average struct.
  * @param ps_state Filter state variable struct.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_expavg_init(pdsp_expavg_t *ps_state)
+static inline pdsp_status_t pdsp_expavg_clear(pdsp_expavg_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
     ps_state->f32_x1 = 0.0f;
@@ -1059,11 +1168,11 @@ static inline pdsp_f32_t pdsp_expavg(pdsp_expavg_t *ps_state,
 }
 
 /**
- * @brief Initialize DF22 biquad filter struct.
+ * @brief Initialize / Clear DF22 biquad filter struct.
  * @param ps_state Filter state variable struct.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_df22_init(pdsp_df22_t *ps_state)
+static inline pdsp_status_t pdsp_df22_clear(pdsp_df22_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
     ps_state->f32_x1 = 0.0f;
@@ -1092,11 +1201,11 @@ static inline pdsp_f32_t pdsp_df22(pdsp_df22_t *ps_state,
 }
 
 /**
- * @brief Initialize median filter struct.
+ * @brief Initialize / Clear median filter struct.
  * @param ps_state Filter state variable struct.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_med3_init(pdsp_med3_t *ps_state)
+static inline pdsp_status_t pdsp_med3_clear(pdsp_med3_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
     ps_state->f32_x0 = 0.0f;
@@ -1127,13 +1236,13 @@ static inline pdsp_f32_t pdsp_med3(pdsp_med3_t *ps_state, pdsp_f32_t f32_in)
 }
 
 /**
- * @brief Initialize rolling sum struct.
+ * @brief Initialize / Clear rolling sum struct.
  * @param ps_state Filter state variable struct.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_rollsum_init(pdsp_rollsum_t *ps_state,
-                                              pdsp_f32_t af32_history[],
-                                              pdsp_u32_t u32_size)
+static inline pdsp_status_t pdsp_rollsum_clear(pdsp_rollsum_t *ps_state,
+                                               pdsp_f32_t af32_history[],
+                                               pdsp_u32_t u32_size)
 {
     PDSP_ASSERT(ps_state && af32_history && u32_size);
     ps_state->f32_sum = 0.0f;
@@ -1177,18 +1286,18 @@ static inline pdsp_f32_t pdsp_rollsum(pdsp_rollsum_t *ps_state,
 }
 
 /**
- * @brief Initialize rolling averaging struct.
+ * @brief Initialize / clear rolling averaging struct.
  * @param ps_state Filter state variable struct.
  * @param af32_history Rolling sum history array.
  * @param u32_size History size.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_rollavg_init(pdsp_rollsum_t *ps_state,
-                                              pdsp_f32_t af32_history[],
-                                              pdsp_u32_t u32_size)
+static inline pdsp_status_t pdsp_rollavg_clear(pdsp_rollsum_t *ps_state,
+                                               pdsp_f32_t af32_history[],
+                                               pdsp_u32_t u32_size)
 {
     PDSP_ASSERT(ps_state && af32_history && u32_size);
-    pdsp_rollsum_init(ps_state, af32_history, u32_size);
+    pdsp_rollsum_clear(ps_state, af32_history, u32_size);
     return PDSP_OK;
 }
 
@@ -1209,18 +1318,18 @@ static inline pdsp_f32_t pdsp_rollavg(pdsp_rollsum_t *ps_state,
 }
 
 /**
- * @brief Initialize rolling rms struct.
+ * @brief Initialize / clear rolling rms struct.
  * @param ps_state Filter state variable struct.
  * @param af32_history Rolling sum history array.
  * @param u32_size History size.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_rollrms_init(pdsp_rollsum_t *ps_state,
-                                              pdsp_f32_t af32_history[],
-                                              pdsp_u32_t u32_size)
+static inline pdsp_status_t pdsp_rollrms_clear(pdsp_rollsum_t *ps_state,
+                                               pdsp_f32_t af32_history[],
+                                               pdsp_u32_t u32_size)
 {
     PDSP_ASSERT(ps_state && af32_history && u32_size);
-    pdsp_rollsum_init(ps_state, af32_history, u32_size);
+    pdsp_rollsum_clear(ps_state, af32_history, u32_size);
     return PDSP_OK;
 }
 
@@ -1242,11 +1351,11 @@ static inline pdsp_f32_t pdsp_rollrms(pdsp_rollsum_t *ps_state,
 }
 
 /**
- * @brief Initialize pi controller struct.
+ * @brief Initialize / clear pi controller struct.
  * @param ps_state Controller state memory struct.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_pi_init(pdsp_pi_t *ps_state)
+static inline pdsp_status_t pdsp_pi_clear(pdsp_pi_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
     ps_state->u32_active = 0U;
@@ -2079,7 +2188,7 @@ pdsp_fault_check_over(pdsp_fault_t *ps_state,
     pdsp_bool_t b_status_out =
         pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
                              f32_in > ps_param->f32_value);
-    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write_u32(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2098,7 +2207,7 @@ pdsp_fault_check_under(pdsp_fault_t *ps_state,
     pdsp_bool_t b_status_out =
         pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
                              f32_in < ps_param->f32_value);
-    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write_u32(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2117,7 +2226,7 @@ pdsp_fault_check_equal(pdsp_fault_t *ps_state,
     pdsp_bool_t b_status_out =
         pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
                              f32_in == ps_param->f32_value);
-    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2135,7 +2244,7 @@ pdsp_fault_check_true(pdsp_fault_t *ps_state,
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out = pdsp_hysteresis_time(
         &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_TRUE);
-    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2153,7 +2262,7 @@ pdsp_fault_check_false(pdsp_fault_t *ps_state,
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out = pdsp_hysteresis_time(
         &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_FALSE);
-    pdsp_bit_write(ps_param->b_group, ps_param->u32_bit, b_status_out);
+    pdsp_bit_write(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 

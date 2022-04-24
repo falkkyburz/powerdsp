@@ -39,7 +39,7 @@ void test_raw(void)
    pdsp_sig_param_t s_raw_par = {.f32_gain = 2.0f, .f32_offset = -22.0f};
    pdsp_override_t s_ovr = {.u32_enable = 0U, .f32_value = 30.0f};
 
-   pdsp_linspace(f32_arr, 100, 11, 55);
+   pdsp_array_linspace(f32_arr, 100, 11, 55);
 
    for (u32_idx = 0; u32_idx < 100; u32_idx++)
    {
@@ -60,7 +60,7 @@ void test_linspace(void)
    pdsp_u32_t u32_idx = 0;
    pdsp_f32_t f32_arr[100];
 
-   pdsp_linspace(f32_arr, 100, 11, 55);
+   pdsp_array_linspace(f32_arr, 100, 11, 55);
 
    FILE *fptr;
    fptr = fopen("test.csv", "w");
@@ -74,7 +74,7 @@ void test_logspace(void)
    pdsp_u32_t u32_idx = 0;
    pdsp_f32_t f32_arr[100];
 
-   pdsp_logspace(f32_arr, 100, 1, 4);
+   pdsp_array_logspace(f32_arr, 100, 1, 4);
 
    FILE *fptr;
    fptr = fopen("test.csv", "w");
