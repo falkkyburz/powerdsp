@@ -1,15 +1,44 @@
 /** @file pdsp.h
  *
- * @brief Power electronics digital signal processing types.
- * @details Some parts of this library are taken fom the TI C2000 Ware libarary.
- *
  * @author Falk Kyburz
+ * @brief Power electronics digital signal processing types.
+ * @details
+ *
+ *
+ *
+ * @copyright
+ * This is free and unencumbered software released into the public domain.
+ *
+ * Anyone is free to copy, modify, publish, use, compile, sell, or
+ * distribute this software, either in source code form or as a compiled
+ * binary, for any purpose, commercial or non-commercial, and by any
+ * means.
+ *
+ * In jurisdictions that recognize copyright laws, the author or authors
+ * of this software dedicate any and all copyright interest in the
+ * software to the public domain. We make this dedication for the benefit
+ * of the public at large and to the detriment of our heirs and
+ * successors. We intend this dedication to be an overt act of
+ * relinquishment in perpetuity of all present and future rights to this
+ * software under copyright law.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * For more information, please refer to <https://unlicense.org>
  */
 
 #ifndef PDSP_H
 #define PDSP_H
 
 #include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 /*---------------------------------------------------------------------------*/
 /* Configuration options: */
@@ -38,12 +67,12 @@
 #define PDSP_ABS_ZERO (-273.15f)
 /** Null pointer. */
 #define PDSP_NULL ((void *)0)
-/** Floating point not a number. */
-#define PDSP_NAN (0.0 / 0.0)
-/* Floating point not positive infinity. */
-#define PDSP_POS_INF (1.0 / 0.0)
-/* Floating point not negative infinity. */
-#define PDSP_NEG_INF (-1.0 / 0.0)
+/** Floating point not a number. (0.0 / 0.0) */
+#define PDSP_NAN NAN
+/* Floating point positive infinity. */
+#define PDSP_POS_INF INFINITY
+/* Floating point negative infinity. */
+#define PDSP_NEG_INF (-INFINITY)
 
 /* Fixed and floating point types */
 #if defined(_WIN64)
@@ -54,7 +83,9 @@ typedef int pdsp_i32_t;
 typedef unsigned int pdsp_u32_t;
 typedef short pdsp_i16_t;
 typedef unsigned short pdsp_u16_t;
-typedef int pdsp_bool_t;
+typedef bool pdsp_bool_t;
+typedef size_t pdsp_size_t;
+typedef char pdsp_char_t;
 #elif defined(__TMS320C2000__)
 #define PDSP_MCU
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
@@ -64,6 +95,8 @@ typedef unsigned long pdsp_u32_t;
 typedef int pdsp_i16_t;
 typedef unsigned int pdsp_u16_t;
 typedef int pdsp_bool_t;
+typedef size_t pdsp_size_t;
+typedef char pdsp_char_t;
 #elif defined(__TMS320C28XX_CLA__)
 #define PDSP_CLA
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
@@ -73,6 +106,8 @@ typedef unsigned int pdsp_u32_t;
 typedef short pdsp_i16_t;
 typedef unsigned short pdsp_u16_t;
 typedef int pdsp_bool_t;
+typedef size_t pdsp_size_t;
+typedef char pdsp_char_t;
 #endif
 
 /** Assert function to reduce programmer errors. */
@@ -89,6 +124,7 @@ typedef enum pdsp_status_tag
 {
     PDSP_OK,
     PDSP_NOT_OK,
+    PDSP_ILLEGAL,
     PDSP_BUSY
 } pdsp_status_t;
 
@@ -580,17 +616,30 @@ typedef enum pdsp_logger_mode_tag
 typedef struct pdsp_logger_param_tag
 {
     /** Logging history array for channel 0. */
-    pdsp_f32_t *af32_history0;
+    pdsp_i16_t *ai16_history0;
     /** Logging history array for channel 1. */
-    pdsp_f32_t *af32_history1;
+    pdsp_i16_t *ai16_history1;
     /** Logging history array for channel 2. */
-    pdsp_f32_t *af32_history2;
+    pdsp_i16_t *ai16_history2;
     /** Logging history array for channel 3. */
-    pdsp_f32_t *af32_history3;
+    pdsp_i16_t *ai16_history3;
     /** History array size */
     pdsp_u32_t u32_size;
     /** History array maximum index. Normally u32_size-1*/
     pdsp_u32_t u32_index_max;
+    /** Conversion gain for channel 0. Used for conversion from f32 to
+     * i16. */
+    pdsp_f32_t f32_conv_gain0;
+    /** Conversion gain for channel 1. Used for conversion from f32 to
+     * i16. */
+    pdsp_f32_t f32_conv_gain1;
+    /** Conversion gain for channel 2. Used for conversion from f32 to
+     * i16. */
+    pdsp_f32_t f32_conv_gain2;
+    /** Conversion gain for channel 3. Used for conversion from f32 to
+     * i16. */
+    pdsp_f32_t f32_conv_gain3;
+
 } pdsp_logger_param_t;
 
 /** Data logger variable struct */
@@ -617,22 +666,151 @@ typedef struct pdsp_stopwatch_param_tag
     pdsp_f32_t f32_tick_per;
 } pdsp_stopwatch_param_t;
 
+/** Funtion pointer (pointer to i16 function) */
+typedef pdsp_i16_t (*pdsp_p16f_t)(void);
+
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Set all elements in array to given value.
+ * @brief Call a function from the jump table apf_list.
+ *
+ * @details Use this function for a handler based state machine implementation.
+ * Can also be used to implement remote routine call functionality by setting
+ * the first array element to a dummy function and return 0 in each remote
+ * routine function.
+ *
+ * State Machine Example:
+ * typedef enum {STATE_IDLE, STATE_RUNNING, STATE_SIZE};
+ * pdsp_i16_t idle_handler(void) {return 1;}
+ * pdsp_i16_t running_handler(void) {return 0;}
+ * pdsp_p16f_t flist[STATE_SIZE] = {idle_handler, running_handler};
+ * pdsp_i16_t state = 0;
+ * pdsp_i16_t state_x1 = 0;
+ * while(1)
+ * {
+ *     // Run state macine
+ *     pdsp_call_pi16f(flist, STATE_SIZE, state_x1, &state)
+ *     state_x1 = state;
+ * }
+ *
+ * Remote Routine Example:
+ * typedef enum {FUNC_NOP, FUNC_START, FUNC_STOP, FUNC_SIZE};
+ * pdsp_i16_t func_nop(void) {return (pdsp_i16_t)FUNC_NOP;}
+ * pdsp_i16_t func_start_converter(void) {return (pdsp_i16_t)FUNC_NOP;}
+ * pdsp_i16_t func_stop_converter(void) {return (pdsp_i16_t)FUNC_NOP;}
+ * pdsp_p16f_t flist[FUNC_SIZE] = {func_nan, func_start_converter,
+ * func_stop_converter}; pdsp_i16_t index = (pdsp_i16_t)FUNC_NOP; // Use
+ * debugger to trigger functions remotely. pdsp_i16_t index_x1 =
+ * (pdsp_i16_t)FUNC_NOP; while(1)
+ * {
+ *     // Call the requested function or func_nop, if nothing is requested.
+ *     pdsp_call_pi16f(flist, 3, index_x1, &index)
+ *     index_x1 =  index;
+ * }
+ *
+ * @param apf_list List of function pointers.
+ * @param s_size Array size.
+ * @param i16_idx Index for the function pointer array.
+ * @param i16_out Return value of the called function.
+ * @return pdsp_i16_t Returns PDSP_OK, except if the table entry was NULL or the
+ * index is out or range, then PDSP_ILLEGAL is returned.
+ */
+static inline pdsp_i16_t pdsp_call_pi16f(const pdsp_p16f_t apf_list[],
+                                         pdsp_size_t s_size, pdsp_i16_t i16_idx,
+                                         pdsp_i16_t *i16_out)
+{
+    pdsp_i16_t status = PDSP_ILLEGAL;
+    PDSP_ASSERT(apf_list && i16_out && s_size);
+    if ((apf_list[i16_idx] != PDSP_NULL) && (i16_idx < s_size))
+    {
+        *i16_out = apf_list[i16_idx]();
+        status = PDSP_OK;
+    }
+    return status;
+}
+
+/**
+ * @brief Convert the number i16_in to a 6 character fixed length string.
+ * @details Currently converting -32768 does not work.
+ * @param i16_in Input number.
+ * @param c_out Output string of fixed length 6.
+ * @return Pointer to the next element in the sring.
+ */
+static inline pdsp_char_t *pdsp_convert_i16_to_a6c(pdsp_i16_t i16_in,
+                                                   pdsp_char_t *a6c_out)
+{
+    pdsp_i16_t idx = 5;
+    pdsp_i16_t rem = 0;
+    pdsp_bool_t neg = PDSP_FALSE;
+    PDSP_ASSERT(a6c_out);
+    /* Clamp to -32767 */
+    if (i16_in == -32768)
+    {
+        i16_in = -32767;
+    }
+    /* Handle negative numbers. */
+    if (i16_in < 0)
+    {
+        i16_in = -i16_in;
+        neg = PDSP_TRUE;
+    }
+    /* Handle 0 or convert digits. */
+    if (i16_in == 0)
+    {
+        a6c_out[idx--] = '0';
+        a6c_out[idx--] = ' ';
+        a6c_out[idx--] = ' ';
+        a6c_out[idx--] = ' ';
+        a6c_out[idx--] = ' ';
+        a6c_out[idx--] = ' ';
+    }
+    else
+    {
+        while (idx >= 0)
+        {
+            if (i16_in != 0)
+            {
+                rem = i16_in % 10;
+                a6c_out[idx--] = rem + '0';
+                i16_in = i16_in / 10;
+            }
+            else
+            {
+                if (neg)
+                {
+                    a6c_out[idx--] = '-';
+                    neg = PDSP_FALSE;
+                }
+                else
+                {
+                    a6c_out[idx--] = ' ';
+                }
+            }
+        }
+    }
+    return &a6c_out[6];
+}
+
+/**
+ * @brief Set all elements in f32 array to given value.
+ * @details Example:
+ * pdsp_f32_t af32_test[5] = {0};
+ * // af32_test contents before [0.0, 0.0, 0.0, 0.0, 0.0]
+ * pdsp_array_set_f32(af32_test, 5, 1.0f);
+ * // af32_test contents before [1.0, 1.0, 1.0, 1.0, 1.0]
+ *
  * @param af32_array Array where values are set.
- * @param u32_size  Size of array.
+ * @param s_size  Size of array.
  * @param f32_value Value to set array elements to.
  * @returns pdsp_status_t PDSP_OK
  */
-static inline pdsp_status_t pdsp_array_set(pdsp_f32_t af32_array[],
-                                           pdsp_u32_t u32_size,
-                                           pdsp_u32_t f32_value)
+static inline pdsp_status_t pdsp_array_set_f32(pdsp_f32_t af32_array[],
+                                               pdsp_size_t s_size,
+                                               pdsp_f32_t f32_value)
 {
     pdsp_u32_t u32_idx = 0;
-    PDSP_ASSERT(af32_array && u32_size);
-    for (u32_idx = 0; u32_idx < u32_size; u32_idx++)
+    PDSP_ASSERT(af32_array && s_size);
+    for (u32_idx = 0; u32_idx < s_size; u32_idx++)
     {
         af32_array[u32_idx] = f32_value;
     }
@@ -640,8 +818,37 @@ static inline pdsp_status_t pdsp_array_set(pdsp_f32_t af32_array[],
 }
 
 /**
+ * @brief Set all elements in i16 array to given value.
+ * @details Example:
+ * pdsp_i16_t ai16_test[5] = {0};
+ * // ai16_test contents before [0, 0, 0, 0, 0]
+ * pdsp_array_set_i16(ai16_test, 5, 1);
+ * // ai16_test contents before [1, 1, 1, 1, 1]
+ *
+ * @param ai16_array Array where values are set.
+ * @param s_size  Size of array.
+ * @param i16_value Value to set array elements to.
+ * @returns pdsp_status_t PDSP_OK
+ */
+static inline pdsp_status_t pdsp_array_set_i16(pdsp_i16_t ai16_array[],
+                                               pdsp_size_t s_size,
+                                               pdsp_i16_t i16_value)
+{
+    pdsp_u32_t u32_idx = 0;
+    PDSP_ASSERT(ai16_array && s_size);
+    for (u32_idx = 0; u32_idx < s_size; u32_idx++)
+    {
+        ai16_array[u32_idx] = i16_value;
+    }
+    return PDSP_OK;
+}
+
+/**
  * @brief Map a value from one range to another (Uses division).
- * @details y = (y1 - y0) / (x1 - x0) * (x - x0) + y0
+ * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
+ * to implement the mapping (interpollation). There are no checks done on (x1
+ * (x1-x0) to to prevent division by zero, which makes it efficient but requires
+ * the inputs to be defined as const.
  * @param f32_in Input value.
  * @param f32_in_lo Input range low value.
  * @param f32_in_hi Input range high value (must be greater than f32_in_lo).
@@ -666,7 +873,7 @@ pdsp_map_unsave(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo, pdsp_f32_t f32_in_hi,
  * @param f32_idx_hi Maximum index.
  * @return pdsp_u16_t Ouput value.
  */
-static inline pdsp_u16_t pdsp_map_unsave_idx(pdsp_f32_t f32_in,
+static inline pdsp_u16_t pdsp_map_idx_unsave(pdsp_f32_t f32_in,
                                              pdsp_f32_t f32_in_lo,
                                              pdsp_f32_t f32_in_hi,
                                              pdsp_u16_t f32_idx_hi)
@@ -995,7 +1202,7 @@ static inline pdsp_status_t pdsp_abc_dq_pos(pdsp_abc_dq_t *ps_state,
 }
 
 /**
- * @brief Runs abc-dq neg routine
+ * @brief Runs abc-dq neg routine => q=-q_pos
  * @param ps_state Pointer to abc_dq structure.
  * @param f32_a Phase a value.
  * @param f32_b Phase b value.
@@ -1247,7 +1454,7 @@ static inline pdsp_status_t pdsp_rollsum_clear(pdsp_rollsum_t *ps_state,
     PDSP_ASSERT(ps_state && af32_history && u32_size);
     ps_state->f32_sum = 0.0f;
     ps_state->u32_head = 0U;
-    pdsp_array_set(af32_history, u32_size, 0.0f);
+    pdsp_array_set_f32(af32_history, u32_size, 0.0f);
     return PDSP_OK;
 }
 
@@ -1742,8 +1949,8 @@ pdsp_dpll_1ph_notch_init(pdsp_dpll_1ph_notch_t *ps_state)
     ps_state->y_notch2[0] = 0.0f;
     ps_state->y_notch2[1] = 0.0f;
     ps_state->y_notch2[2] = 0.0f;
+    ps_state->ylf[0] = 0.0f;
     ps_state->ylf[1] = 0.0f;
-    ps_state->ylf[2] = 0.0f;
     ps_state->fo = 0.0f;
     ps_state->fn = 0.0f;
     ps_state->theta = 0.0f;
@@ -1818,8 +2025,8 @@ pdsp_dpll_1ph_sogi_init(pdsp_dpll_1ph_sogi_t *ps_state)
     ps_state->u_Q[1] = 0.0f;
     ps_state->u_D[0] = 0.0f;
     ps_state->u_D[1] = 0.0f;
+    ps_state->ylf[0] = 0.0f;
     ps_state->ylf[1] = 0.0f;
-    ps_state->ylf[2] = 0.0f;
     ps_state->fo = 0.0f;
     ps_state->fn = 0.0f;
     ps_state->theta = 0.0f;
@@ -1894,8 +2101,8 @@ pdsp_dpll_1ph_sogi_fll_init(pdsp_dpll_1ph_sogi_fll_t *ps_state)
     ps_state->u_Q[1] = 0.0f;
     ps_state->u_D[0] = 0.0f;
     ps_state->u_D[1] = 0.0f;
+    ps_state->ylf[0] = 0.0f;
     ps_state->ylf[1] = 0.0f;
-    ps_state->ylf[2] = 0.0f;
     ps_state->fo = 0.0f;
     ps_state->fn = 0.0f;
     ps_state->wc = 0.0f;
@@ -2226,7 +2433,7 @@ pdsp_fault_check_equal(pdsp_fault_t *ps_state,
     pdsp_bool_t b_status_out =
         pdsp_hysteresis_time(&ps_state->s_hyst, &ps_param->s_hyst_param,
                              f32_in == ps_param->f32_value);
-    pdsp_bit_write(ps_param->b_group, ps_param->u16_bit, b_status_out);
+    pdsp_bit_write_u32(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2244,7 +2451,7 @@ pdsp_fault_check_true(pdsp_fault_t *ps_state,
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out = pdsp_hysteresis_time(
         &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_TRUE);
-    pdsp_bit_write(ps_param->b_group, ps_param->u16_bit, b_status_out);
+    pdsp_bit_write_u32(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2262,7 +2469,7 @@ pdsp_fault_check_false(pdsp_fault_t *ps_state,
     PDSP_ASSERT(ps_state && ps_param);
     pdsp_bool_t b_status_out = pdsp_hysteresis_time(
         &ps_state->s_hyst, &ps_param->s_hyst_param, PDSP_FALSE);
-    pdsp_bit_write(ps_param->b_group, ps_param->u16_bit, b_status_out);
+    pdsp_bit_write_u32(ps_param->b_group, ps_param->u16_bit, b_status_out);
     return b_status_out;
 }
 
@@ -2292,10 +2499,10 @@ static inline pdsp_status_t pdsp_log_init(pdsp_logger_t *ps_state,
                                           const pdsp_logger_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    pdsp_array_set(ps_param->af32_history0, ps_param->u32_size, 0.0f);
-    pdsp_array_set(ps_param->af32_history1, ps_param->u32_size, 0.0f);
-    pdsp_array_set(ps_param->af32_history2, ps_param->u32_size, 0.0f);
-    pdsp_array_set(ps_param->af32_history3, ps_param->u32_size, 0.0f);
+    pdsp_array_set_i16(ps_param->ai16_history0, ps_param->u32_size, 0);
+    pdsp_array_set_i16(ps_param->ai16_history1, ps_param->u32_size, 0);
+    pdsp_array_set_i16(ps_param->ai16_history2, ps_param->u32_size, 0);
+    pdsp_array_set_i16(ps_param->ai16_history3, ps_param->u32_size, 0);
     ps_state->e_trig_mode = PDSP_LOG_MODE_TRIG_NONE;
     ps_state->f23_trig_value = 0.0f;
     ps_state->f23_trig_offset = 0.5f;
@@ -2340,7 +2547,10 @@ static inline pdsp_status_t pdsp_log_set_mode(pdsp_logger_t *ps_state,
  * @brief Logging data acquisition function.
  * @param ps_state Logger state variable struct.
  * @param ps_param Logger parameter variable struct.
- * @param f32_in Data input.
+ * @param f32_in0 Data input ch0.
+ * @param f32_in1 Data input ch1.
+ * @param f32_in2 Data input ch2.
+ * @param f32_in3 Data input ch3.
  */
 static inline void pdsp_log_daq(pdsp_logger_t *ps_state,
                                 const pdsp_logger_param_t *ps_param,
@@ -2350,10 +2560,14 @@ static inline void pdsp_log_daq(pdsp_logger_t *ps_state,
     PDSP_ASSERT(ps_state && ps_param);
     if (ps_state->u23_counter > 0U)
     {
-        ps_param->af32_history0[ps_state->u32_head] = f32_in0;
-        ps_param->af32_history1[ps_state->u32_head] = f32_in1;
-        ps_param->af32_history2[ps_state->u32_head] = f32_in2;
-        ps_param->af32_history3[ps_state->u32_head] = f32_in3;
+        ps_param->ai16_history0[ps_state->u32_head] =
+            (pdsp_i16_t)(f32_in0 * ps_param->f32_conv_gain0);
+        ps_param->ai16_history1[ps_state->u32_head] =
+            (pdsp_i16_t)(f32_in1 * ps_param->f32_conv_gain1);
+        ps_param->ai16_history2[ps_state->u32_head] =
+            (pdsp_i16_t)(f32_in2 * ps_param->f32_conv_gain2);
+        ps_param->ai16_history3[ps_state->u32_head] =
+            (pdsp_i16_t)(f32_in3 * ps_param->f32_conv_gain3);
         ps_state->u32_head++;
         if (ps_state->u32_head > ps_param->u32_index_max)
         {
@@ -2396,6 +2610,36 @@ static inline pdsp_status_t pdsp_log_trig(pdsp_logger_t *ps_state,
             /* todo */
         }
     }
+    return PDSP_OK;
+}
+
+/**
+ * @brief Convert the log data into a csv ascii string to be sent over serial.
+ * @details Use in a loop to send out the log data over serial as comma
+ * separated values.
+ * @param ps_param Logger parameter variable struct.
+ * @param i16_index Log buffer index to convert.
+ * @param ac_buf String buffer to write the csv data into. Minimum length is 32
+ * chars.
+ * @return pdsp_status_t
+ */
+static inline pdsp_status_t
+pdsp_log_convert_csv(const pdsp_logger_param_t *ps_param, pdsp_i16_t i16_index,
+                     pdsp_char_t *ac_buf)
+{
+    PDSP_ASSERT(ps_param && ac_buf);
+    ac_buf =
+        pdsp_convert_i16_to_a6c(ps_param->ai16_history0[i16_index], ac_buf);
+    *(ac_buf++) = ',';
+    ac_buf =
+        pdsp_convert_i16_to_a6c(ps_param->ai16_history1[i16_index], ac_buf);
+    *(ac_buf++) = ',';
+    ac_buf =
+        pdsp_convert_i16_to_a6c(ps_param->ai16_history2[i16_index], ac_buf);
+    *(ac_buf++) = ',';
+    ac_buf =
+        pdsp_convert_i16_to_a6c(ps_param->ai16_history3[i16_index], ac_buf);
+    *(ac_buf++) = '\n';
     return PDSP_OK;
 }
 
