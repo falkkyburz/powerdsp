@@ -1,3 +1,6 @@
 {
+    "files.associations": {
+        "pdsp.h": "c"
+    }
 
 }
