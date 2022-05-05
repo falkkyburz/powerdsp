@@ -2,12 +2,12 @@ TARGET = example
 CC = gcc
 CFLAGS = -Wall
 
-INC=-I../inc/
+INC=-I./
 
 $(TARGET): pdsp.o examples.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-pdsp.o: ../src/pdsp.c
+pdsp.o: pdsp.c
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 examples.o: examples.c
