@@ -18,5 +18,8 @@ clean:
 	del pdsp.o
 	del examples.o
 
+doc: 
+	doxygen
+
 run: $(TARGET)
 	$(TARGET)
