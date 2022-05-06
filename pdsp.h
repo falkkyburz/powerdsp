@@ -64,6 +64,7 @@
 /*==============================================================================
  INCLUDE FILES
  =============================================================================*/
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -287,6 +288,10 @@ typedef pdsp_i16_t (*pdsp_pi16_func_t)(void);
 /** Funtion pointer (pointer to i32 function) */
 typedef pdsp_i32_t (*pdsp_pi32_func_t)(void);
 
+/** Funtion pointer (pointer to f32 function) */
+typedef pdsp_f32_t (*pdsp_pf32_func_t)(void);
+
+
 /** Stopwatch variable struct. */
 typedef struct pdsp_hyst_var_tag
 {
@@ -447,8 +452,6 @@ typedef struct pdsp_df11_param_tag
 /** Median memory struct. */
 typedef struct pdsp_med3_var_tag
 {
-    /** Median of 3 current value. */
-    pdsp_f32_t f32_x0;
     /** Median of 3 last value. */
     pdsp_f32_t f32_x1;
     /** Median of 3 before last value. */
@@ -462,8 +465,6 @@ typedef struct pdsp_rollsum_var_tag
     pdsp_f32_t f32_sum;
     /** Inverse window length. */
     pdsp_f32_t f32_win_size_inv;
-    /** Queue variables */
-    pdsp_queue_var_t s_queue_var;
 } pdsp_rollsum_var_t;
 
 /** Rolling sum data struct. */
@@ -471,8 +472,8 @@ typedef struct pdsp_rollsum_tag
 {
     /** Pointer to the pdsp_rollsum_t struct. */
     pdsp_rollsum_var_t *ps_var;
-    /** Queue struct */
-    const pdsp_queue_t s_queue;
+    /** Pointer to queue struct */
+    const pdsp_queue_t *ps_queue;
 } pdsp_rollsum_t;
 
 /** @} signal */
@@ -1065,7 +1066,7 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
  * @brief Convert the number i16_in to a 6 character fixed length string.
  * @details Converting -32768 is not possible and will be saturated to -32767.
  * @param i16_in Input number.
- * @param c_out Output string of fixed length 6.
+ * @param a6c_out Output string of length 6.
  * @return Pointer to the next element in the sring.
  */
 pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
@@ -1454,6 +1455,19 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data);
  * @returns pdsp_f32_t Result = (raw * gain + offset) * enable + override.
  */
 pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw);
+
+/**
+ * @brief Set and enable override.
+ * @param ps_data Signal data struct.
+ * @param f32_raw Raw input signal.
+ */
+pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw);
+
+/**
+ * @brief Enable disable.
+ * @param ps_data Signal data struct.
+ */
+pdsp_extern void pdsp_ain_ovr_disable(const pdsp_ain_t *ps_data);
 
 /**
  * @brief Calibrate analog input gain value.

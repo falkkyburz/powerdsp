@@ -606,6 +606,19 @@ pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw)
     return af32_ret[ps_data->ps_ovr->u32_enable];
 }
 
+pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data,
+                                     pdsp_f32_t f32_raw)
+{
+    PDSP_ASSERT(ps_data && ps_data->ps_ovr);
+    ps_data->ps_ovr->u32_enable = PDSP_TRUE;
+    ps_data->ps_ovr->f32_value = f32_raw;
+}
+
+pdsp_extern void pdsp_ain_ovr_disable(const pdsp_ain_t *ps_data)
+{
+    ps_data->ps_ovr->u32_enable = PDSP_FALSE;
+}
+
 pdsp_extern pdsp_f32_t pdsp_ain_calibrate_gain(pdsp_f32_t f32_gain_old,
                                                pdsp_f32_t f32_ref,
                                                pdsp_f32_t f32_raw)
@@ -679,50 +692,50 @@ pdsp_extern pdsp_f32_t pdsp_df22(pdsp_df22_var_t *ps_var,
 pdsp_extern void pdsp_med3_clear(pdsp_med3_var_t *ps_var)
 {
     PDSP_ASSERT(ps_var);
-    ps_var->f32_x0 = 0.0f;
     ps_var->f32_x1 = 0.0f;
     ps_var->f32_x2 = 0.0f;
 }
 
 pdsp_extern pdsp_f32_t pdsp_med3(pdsp_med3_var_t *ps_var, pdsp_f32_t f32_in)
 {
+    static pdsp_f32_t out;
     PDSP_ASSERT(ps_var);
-    /* calculate median3 filter */
-    ps_var->f32_x0 = ((ps_var->f32_x1 + ps_var->f32_x2 + f32_in) -
-                      fminf(ps_var->f32_x1, fminf(ps_var->f32_x2, f32_in)) -
-                      fmaxf(ps_var->f32_x1, fmaxf(ps_var->f32_x2, f32_in)));
+    out = ((ps_var->f32_x2 + ps_var->f32_x1 + f32_in) -
+           fminf(ps_var->f32_x2, fminf(ps_var->f32_x1, f32_in)) -
+           fmaxf(ps_var->f32_x2, fmaxf(ps_var->f32_x1, f32_in)));
     /* store history x[k-2] = x[k-1] */
     ps_var->f32_x2 = ps_var->f32_x1;
-    /* store history x[k-1] = new */
-    ps_var->f32_x1 = ps_var->f32_x0;
-    return ps_var->f32_x0;
+    /* store history x[k-1] = x[k] */
+    ps_var->f32_x1 = f32_in;
+    /* Return median. */
+    return out;
 }
 
 pdsp_extern void pdsp_rollsum_init(const pdsp_rollsum_t *ps_data,
                                    pdsp_i16_t i16_win_size)
 {
+    static const pdsp_queue_t *ps_queue;
     static pdsp_queue_var_t *ps_queue_var;
     static pdsp_rollsum_var_t *ps_roll_var;
     PDSP_ASSERT(ps_data);
-    ps_queue_var = ps_data->s_queue.ps_var;
+    ps_queue = ps_data->ps_queue;
+    ps_queue_var = ps_queue->ps_var;
     ps_roll_var = ps_data->ps_var;
 
     ps_roll_var->f32_sum = 0.0f;
-    ps_queue_var->i16_count = ps_data->s_queue.i16_size;
-    ps_queue_var->i16_head = ps_data->s_queue.i16_size - 1;
-    if (i16_win_size <= ps_data->s_queue.i16_size)
+    ps_queue_var->i16_count = ps_queue->i16_size;
+    ps_queue_var->i16_head = ps_queue->i16_size - 1;
+    if (i16_win_size <= ps_queue->i16_size)
     {
-        ps_queue_var->i16_tail = ps_data->s_queue.i16_size - i16_win_size;
+        ps_queue_var->i16_tail = ps_queue->i16_size - i16_win_size;
         ps_roll_var->f32_win_size_inv = 1.0f / (pdsp_f32_t)i16_win_size;
     }
     else
     {
         ps_queue_var->i16_tail = 0;
-        ps_roll_var->f32_win_size_inv =
-            1.0f / (pdsp_f32_t)ps_data->s_queue.i16_size;
+        ps_roll_var->f32_win_size_inv = 1.0f / (pdsp_f32_t)ps_queue->i16_size;
     }
-    pdsp_array_set_f32(ps_data->s_queue.pav_data, ps_data->s_queue.i16_size,
-                       0.0f);
+    pdsp_array_set_f32(ps_queue->pav_data, ps_queue->i16_size, 0.0f);
 }
 
 pdsp_extern pdsp_f32_t pdsp_rollsum(const pdsp_rollsum_t *ps_data,
@@ -732,9 +745,9 @@ pdsp_extern pdsp_f32_t pdsp_rollsum(const pdsp_rollsum_t *ps_data,
     PDSP_ASSERT(ps_data);
     ps_var = ps_data->ps_var;
     /* Subtract tail and advance  */
-    ps_var->f32_sum -= pdsp_queue_pop_f32(&ps_data->s_queue);
+    ps_var->f32_sum -= pdsp_queue_pop_f32(ps_data->ps_queue);
     /* Place new scaled value to head position. */
-    pdsp_queue_push_f32(&ps_data->s_queue, f32_in);
+    pdsp_queue_push_f32(ps_data->ps_queue, f32_in);
     /* Add the head value to the sum state variable. */
     ps_var->f32_sum += f32_in;
     return ps_var->f32_sum;
