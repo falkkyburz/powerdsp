@@ -1,15 +1,15 @@
 /** @file pdsp.h
  *
  * @author Falk Kyburz
- * @brief Power electronics digital signal processing types.
- * @details
- *
- * Configuration options (define before includeing pdsp.h):
- * // #define PDSP_DISABLE_ASSERT
- * // #define PDSP_CUSTOM_ASSERT
- * // #define PDSP_STATIC_FUNCTIONS
+ * @brief Power electronics digital signal processing module.
+ * @details Configuration options:
+ * @code
+ * #define PDSP_DISABLE_ASSERT
+ * #define PDSP_CUSTOM_ASSERT
+ * #define PDSP_STATIC_FUNCTIONS
  * #include "pdsp.h"
- *
+ * @endcode
+ * 
  * @copyright
  * This is free and unencumbered software released into the public domain.
  *
@@ -37,27 +37,6 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-/**
- * @mainpage
- *
- * @tableofcontents
- *
- * @section Introduction
- * This is a test.
- * @ref const
- *
- * @section Usage
- *
- *
- * @section Modules
- *
- *
- *
- * @section References
- *
- *
- */
-
 #ifndef PDSP_H
 #define PDSP_H
 
@@ -78,6 +57,7 @@
 #ifdef PDSP_CUSTOM_ASSERT
 #define PDSP_ASSERT(x) pdsp_assert_true(x)
 #else
+/** Default assert function */
 #define PDSP_ASSERT(x)                                                         \
     if (!(x))                                                                  \
         while (1)
@@ -85,8 +65,10 @@
 #endif
 
 #ifdef PDSP_STATIC_FUNCTIONS
+/** All functions have storage class static */
 #define pdsp_extern static
 #else
+/** All functions have storage class extern */
 #define pdsp_extern extern
 #endif
 
@@ -184,10 +166,12 @@
 
 /* Fixed and floating point types */
 #if defined(_WIN64)
+/** Defined if compiling on host */
 #define PDSP_HOST
+/** Floating point rounding behavior is set to round to nearest. */
 #define F32_TO_INT_ROUNDS_TO_NEAREST
 /** 64bit unsigned integer type.  */
-typedef unsigned long pdsp_u64_t;
+typedef unsigned long long pdsp_u64_t;
 /** 32bit floating point type. */
 typedef float pdsp_f32_t;
 /** 32bit integer type.  */
@@ -205,7 +189,9 @@ typedef size_t pdsp_size_t;
 /** 16bit signed integer type. */
 typedef char pdsp_char_t;
 #elif defined(__TMS320C2000__)
+/** Defined if cross compiling for MCU */
 #define PDSP_MCU
+/** Floating point rounding behavior is set to round towards zero. */
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 typedef unsigned long pdsp_u64_t;
 typedef float pdsp_f32_t;
@@ -217,7 +203,9 @@ typedef int pdsp_bool_t;
 typedef size_t pdsp_size_t;
 typedef char pdsp_char_t;
 #elif defined(__TMS320C28XX_CLA__)
+/** Defined if cross compiling for CLA */
 #define PDSP_CLA
+/** Floating point rounding behavior is set to round towards zero. */
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 typedef unsigned long pdsp_u64_t;
 typedef float pdsp_f32_t;
@@ -267,6 +255,7 @@ typedef struct pdsp_signal_prop_tag
 /** Stopwatch variable struct. */
 typedef struct pdsp_stopwatch_var_tag
 {
+    /** Time state variable, stores start time. */
     pdsp_u32_t u32_time_mem;
 } pdsp_stopwatch_var_t;
 
@@ -295,12 +284,14 @@ typedef pdsp_f32_t (*pdsp_pf32_func_t)(void);
 /** Stopwatch variable struct. */
 typedef struct pdsp_hyst_var_tag
 {
+    /** Hysteresis state variable. */
     pdsp_bool_t b_state;
 } pdsp_hyst_var_t;
 
 /** Stopwatch struct. */
 typedef struct pdsp_hyst_tag
 {
+    /** Pointer to hysteresis variable struct. */
     pdsp_hyst_var_t *ps_var;
     /** Lower hysteresis threshold. */
     pdsp_f32_t f32_low;
@@ -337,7 +328,7 @@ typedef struct pdsp_queue_var_tag
     pdsp_i16_t i16_head;
     /** Tail index of the queue. */
     pdsp_i16_t i16_tail;
-    /* Number of items in the queue. */
+    /** Number of items in the queue. */
     pdsp_i16_t i16_count;
 } pdsp_queue_var_t;
 
@@ -513,7 +504,7 @@ typedef struct pdsp_pi_tag
 {
     /** PI controller parameter struct array. */
     pdsp_pi_err_param_t *pas_param;
-    /* Size of parameter struct */
+    /** Size of parameter struct */
     pdsp_i16_t i16_param_size;
     /** PI controller variable struct. */
     pdsp_pi_var_t *ps_var;
@@ -543,11 +534,11 @@ typedef struct pdsp_pi2_tag
 {
     /** PI controller parameter struct array. */
     pdsp_pi_err_param_t *pas_param0;
-    /* Size of parameter struct */
+    /** Size of parameter struct */
     pdsp_i16_t i16_param_size0;
     /** PI controller parameter struct array. */
     pdsp_pi_err_param_t *pas_param1;
-    /* Size of parameter struct */
+    /** Size of parameter struct */
     pdsp_i16_t i16_param_size1;
     /** PI controller variable struct. */
     pdsp_pi2_var_t *ps_var;
@@ -581,19 +572,19 @@ typedef struct pdsp_pi4_tag
 {
     /** PI controller parameter struct array. */
     pdsp_pi_err_param_t *pas_param0;
-    /* Size of parameter struct */
+    /** Size of parameter struct */
     pdsp_i16_t i16_param_size0;
     /** PI controller parameter struct array. */
     pdsp_pi_err_param_t *pas_param1;
-    /* Size of parameter struct */
+    /** Size of parameter struct */
     pdsp_i16_t i16_param_size1;
     /** PI controller parameter struct array. */
     pdsp_pi_err_param_t *pas_param2;
-    /* Size of parameter struct */
+    /** Size of parameter struct */
     pdsp_i16_t i16_param_size2;
     /** PI controller parameter struct array. */
     pdsp_pi_err_param_t *pas_param3;
-    /* Size of parameter struct */
+    /** Size of parameter struct */
     pdsp_i16_t i16_param_size3;
     /** PI controller variable struct. */
     pdsp_pi4_var_t *ps_var;
@@ -606,9 +597,9 @@ typedef struct pdsp_pi4_tag
 /** Set point parameter struct. */
 typedef struct pdsp_setp_param_tag
 {
-    /**  */
+    /** Setpoint minimum value. */
     pdsp_f32_t f32_min;
-    /**  */
+    /** Setpoint maximum value. */
     pdsp_f32_t f32_max;
     /** Absolute step size for ramp. First relative step for exponential
      * process. */
@@ -627,18 +618,18 @@ typedef struct pdsp_setp_tag
 /** Sine generator parameter struct */
 typedef struct pdsp_saw_param_tag
 {
-    /**  */
+    /** Phase step */
     pdsp_f32_t f32_step;
-    /**  */
+    /** todo */
     pdsp_f32_t f32_out_low;
-    /**  */
+    /** todo */
     pdsp_f32_t f32_out_high;
 } pdsp_saw_param_t;
 
 /** Sine generator memory struct */
 typedef struct pdsp_saw_tag
 {
-    /**  */
+    /** todo */
     pdsp_f32_t f32_x0;
 } pdsp_saw_t;
 
@@ -701,27 +692,28 @@ typedef struct pdsp_dpll_1ph_notch_tag
     pdsp_df11_param_t lpf_coeff;
 } pdsp_dpll_1ph_notch_t;
 
+/** Orthogonal signal generator variables. */
 typedef struct pdsp_osg_param_tag
 {
-    /**  */
+    /** todo */
     pdsp_f32_t osg_k;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_x;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_y;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_b0;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_b2;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_a1;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_a2;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_qb0;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_qb1;
-    /**  */
+    /** todo */
     pdsp_f32_t osg_qb2;
 } pdsp_osg_param_t;
 
@@ -842,7 +834,7 @@ typedef struct pdsp_dpll_3ph_ddsrf_tag
     pdsp_f32_t q_p_decoupl_lpf;
     /** Decoupled negative sequence Q-axis component filtered */
     pdsp_f32_t q_n_decoupl_lpf;
-    /**  */
+    /** todo */
     pdsp_f32_t v_q[2];
     /** Grid phase angle */
     pdsp_f32_t theta[2];
@@ -854,7 +846,7 @@ typedef struct pdsp_dpll_3ph_ddsrf_tag
     pdsp_f32_t fn;
     /** 1/Frequency of calling the PLL routine */
     pdsp_f32_t delta_t;
-    /**  */
+    /** todo */
     pdsp_df11_param_t lpf_coeff;
 } pdsp_dpll_3ph_ddsrf_t;
 
@@ -895,6 +887,7 @@ typedef struct pdsp_fault_var_tag
 /** Fault parameter struct */
 typedef struct pdsp_fault_tag
 {
+    /** Pointer to fault variable struct. */
     pdsp_fault_var_t *ps_var;
     /** Time hysteresis parameters. */
     pdsp_hyst_time_t s_hyst_param;
@@ -994,8 +987,6 @@ pdsp_extern void pdsp_assert_true(pdsp_bool_t b_in);
  * @brief Start the stopwatch with 32bit HW counter.
  * @param ps_data Stopwatch struct.
  * @param u32_hw_now Current time from the hardware timer.
- * @return pdsp_u32_t Current time to be stored for the pdsp_stopwatch_stop
- * function.
  */
 pdsp_extern void pdsp_stopwatch_start(const pdsp_stopwatch_t *ps_data,
                                       pdsp_u32_t u32_hw_now);
@@ -1071,6 +1062,24 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
  */
 pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
                                             pdsp_char_t *a6c_out);
+
+/**
+ * @brief Convert the number u16_in to a length 4 hex string.
+ * @param u16_in Input number.
+ * @param ach_out Output string.
+ * @return Pointer to the next element in the sring.
+ */
+pdsp_extern pdsp_char_t *pdsp_u16_to_hex(pdsp_u16_t u16_in,
+                                         pdsp_char_t *ach_out);
+
+                                         /**
+ * @brief Convert the number u64_in to a length 16 hex string.
+ * @param u64_in Input number.
+ * @param ach_out Output string.
+ * @return Pointer to the next element in the sring.
+ */
+pdsp_extern pdsp_char_t *pdsp_u64_to_hex(pdsp_u64_t u64_in,
+                                         pdsp_char_t *ach_out);
 
 /**
  * @brief Map a value from one range to another (Uses division).
@@ -1166,7 +1175,6 @@ pdsp_extern void pdsp_array_apply_f32(const pdsp_f32_t af32_in[],
  * @param ai16_out Out array.
  * @param u32_size Size of input / output array.
  * @param p_func Function to apply to the elements.
- * @returns pdsp_status_t PDSP_OK
  */
 pdsp_extern void pdsp_array_apply_i16(const pdsp_i16_t ai16_in[],
                                       pdsp_f32_t ai16_out[],
@@ -1179,7 +1187,6 @@ pdsp_extern void pdsp_array_apply_i16(const pdsp_i16_t ai16_in[],
  * @param u32_size Output array size.
  * @param f32_start Start value.
  * @param f32_end End Value.
- * @returns pdsp_status_t PDSP_OK
  */
 pdsp_extern void pdsp_array_linspace_f32(pdsp_f32_t af32_out[],
                                          pdsp_u32_t u32_size,
@@ -1275,8 +1282,8 @@ pdsp_extern pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
 /**
  * @brief Convert (gain/offset) f32 to i16 and write signal into a 64bit word
  * (big endian)
- * @param u64_word Data word.
  * @param ps_prop Pointer to signal property struct.
+ * @param pu64_mem Pointer to data word to write to.
  * @param f32_data Data to write to signal.
  */
 pdsp_extern void pdsp_signal_write_f32(const pdsp_signal_prop_t *ps_prop,
@@ -1286,16 +1293,17 @@ pdsp_extern void pdsp_signal_write_f32(const pdsp_signal_prop_t *ps_prop,
 /**
  * @brief Read and convert (gain/offset) f32 signal from a 64bit word (big
  * endian).
- * @param u64_word Data word.
  * @param ps_prop Pointer to signal property struct.
+ * @param pu64_mem Pointer to data word to read from.
+ * @returns pdsp_f32_t Data read from pu64_mem with rule ps_prop.
  */
 pdsp_extern pdsp_f32_t pdsp_signal_read_f32(const pdsp_signal_prop_t *ps_prop,
                                             pdsp_u64_t *pu64_mem);
 
 /**
  * @brief Write u16 and then shift by length.
- * @param u64_word Data word.
  * @param ps_prop Pointer to signal property struct.
+ * @param pu64_mem Pointer to data word to write to.
  * @param u16_data Data to write to signal.
  */
 pdsp_extern void pdsp_signal_write_u16(const pdsp_signal_prop_t *ps_prop,
@@ -1304,8 +1312,9 @@ pdsp_extern void pdsp_signal_write_u16(const pdsp_signal_prop_t *ps_prop,
 
 /**
  * @brief Read u16 signal from a 64bit word (big endian).
- * @param u64_word Data word.
  * @param ps_prop Pointer to signal property struct.
+ * @param pu64_mem Pointer to data word to read from.
+ * @returns pdsp_u16_t Data read from pu64_mem with rule ps_prop.
  */
 pdsp_extern pdsp_u16_t pdsp_signal_read_u16(const pdsp_signal_prop_t *ps_prop,
                                             pdsp_u64_t *pu64_mem);
@@ -1410,35 +1419,35 @@ pdsp_extern void pdsp_queue_push_u64(const pdsp_queue_t *ps_data,
 /**
  * @brief Pop data from the queue of char.
  * @param ps_data Pointer to the queue struct.
- * @param ch_in Data to push to the queue.
+ * @returns pdsp_char_t Data popped from queue.
  */
 pdsp_extern pdsp_char_t pdsp_queue_pop_ch(const pdsp_queue_t *ps_data);
 
 /**
  * @brief Pop data from the queue of i16.
  * @param ps_data Pointer to the queue struct.
- * @param i16_in Data to push to the queue.
+ * @returns pdsp_i16_t Data popped from queue.
  */
 pdsp_extern pdsp_i16_t pdsp_queue_pop_i16(const pdsp_queue_t *ps_data);
 
 /**
  * @brief Pop data from the queue of i32.
  * @param ps_data Pointer to the queue struct.
- * @param i32_in Data to push to the queue.
+ * @returns pdsp_i32_t Data popped from queue.
  */
 pdsp_extern pdsp_i32_t pdsp_queue_pop_i32(const pdsp_queue_t *ps_data);
 
 /**
  * @brief Pop data from the queue of f32.
  * @param ps_data Pointer to the queue struct.
- * @param f32_in Data to push to the queue.
+ * @returns pdsp_f32_t Data popped from queue.
  */
 pdsp_extern pdsp_f32_t pdsp_queue_pop_f32(const pdsp_queue_t *ps_data);
 
 /**
  * @brief Pop data from the queue of u64.
  * @param ps_data Pointer to the queue struct.
- * @param u64_in Data to push to the queue.
+ * @returns pdsp_u64_t Data popped from queue.
  */
 pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data);
 
@@ -1500,8 +1509,9 @@ pdsp_extern void pdsp_minmax_clear(pdsp_minmax_var_t *ps_var);
 /**
  * @brief Process min-max.
  * @param ps_var Min-max state variable struct.
+ * @param f32_in Filter input.
  */
-pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f23_in);
+pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
  * @brief Initialize / Clear simple exponential average struct.
@@ -1512,6 +1522,7 @@ pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data);
 /**
  * @brief Calculate simplple exponential averaging filter.
  * @param ps_data Filter state variable struct.
+ * @param f32_in Filter input.
  * @returns pdsp_f32_t Filter ouptut.
  */
 pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
@@ -1569,6 +1580,8 @@ pdsp_extern pdsp_f32_t pdsp_rollsum(const pdsp_rollsum_t *ps_data,
 /**
  * @brief Initialize / clear rolling averaging struct.
  * @param ps_data Filter state variable struct.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
  */
 pdsp_extern void pdsp_rollavg_init(const pdsp_rollsum_t *ps_data,
                                    pdsp_i16_t i16_win_size);
@@ -1585,15 +1598,15 @@ pdsp_extern pdsp_f32_t pdsp_rollavg(const pdsp_rollsum_t *ps_data,
 /**
  * @brief Initialize / clear rolling rms struct.
  * @param ps_data Filter state variable struct.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
  */
 pdsp_extern void pdsp_rollrms_init(const pdsp_rollsum_t *ps_data,
                                    pdsp_i16_t i16_win_size);
 
 /**
  * @brief Calculate rolling Root Mean Square filter.
- * @param ps_state Filter state memory struct.
- * @param af32_history Filter history array.
- * @param u32_size History size.
+ * @param ps_data Filter state memory struct.
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter ouptut.
  */
@@ -1823,32 +1836,43 @@ pdsp_extern pdsp_f32_t pdsp_saw_shift(pdsp_f32_t f32_in,
                                       const pdsp_saw_param_t *ps_param,
                                       pdsp_f32_t f32_phase);
 
+/** todo */
 pdsp_extern pdsp_status_t
 pdsp_dpll_1ph_notch_init(pdsp_dpll_1ph_notch_t *ps_state);
 
+/** todo */
 pdsp_extern pdsp_status_t pdsp_dpll_1ph_notch(pdsp_dpll_1ph_notch_t *ps_state,
                                               pdsp_f32_t f32_in);
 
+/** todo */
 pdsp_extern pdsp_status_t
 pdsp_dpll_1ph_sogi_init(pdsp_dpll_1ph_sogi_t *ps_state);
 
+/** todo */
 pdsp_extern pdsp_status_t pdsp_dpll_1ph_sogi(pdsp_dpll_1ph_sogi_t *ps_state,
                                              pdsp_f32_t f32_in);
 
+/** todo */
 pdsp_extern pdsp_status_t
 pdsp_dpll_1ph_sogi_fll_init(pdsp_dpll_1ph_sogi_fll_t *ps_state);
 
+/** todo */
 pdsp_extern pdsp_status_t
 pdsp_dpll_1ph_sogi_fll(pdsp_dpll_1ph_sogi_fll_t *ps_state, pdsp_f32_t f32_in);
 
+/** todo */
 pdsp_extern pdsp_status_t
 pdsp_dpll_3ph_ddsrf_init(pdsp_dpll_3ph_ddsrf_t *ps_state);
 
+/** todo */
 pdsp_extern pdsp_status_t pdsp_dpll_3ph_ddsrf(pdsp_dpll_3ph_ddsrf_t *ps_state,
                                               pdsp_f32_t d_p, pdsp_f32_t d_n,
                                               pdsp_f32_t q_p, pdsp_f32_t q_n);
+
+/** todo */                                              
 pdsp_extern pdsp_status_t pdsp_dpll_3ph_srf_init(pdsp_dpll_3ph_srf_t *ps_state);
 
+/** todo */
 pdsp_extern pdsp_status_t pdsp_dpll_3ph_srf(pdsp_dpll_3ph_srf_t *ps_state,
                                             pdsp_f32_t f32_vq);
 
@@ -1867,7 +1891,7 @@ pdsp_extern void pdsp_fault_init(pdsp_fault_t *ps_data);
 /**
  * @brief Check over value fault.
  * @param ps_data Fault data struct.
- * @param b_condition Condition to be evaluated.
+ * @param f32_in Fault check input value.
  * @return pdsp_bool_t Fault status.
  */
 pdsp_extern pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_data,
@@ -1876,7 +1900,7 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_data,
 /**
  * @brief Check under value fault.
  * @param ps_data Fault data struct.
- * @param b_condition Condition to be evaluated.
+ * @param f32_in Fault check input value.
  * @return pdsp_bool_t Fault status.
  */
 pdsp_extern pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_data,
@@ -1885,7 +1909,7 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_data,
 /**
  * @brief Check equal value fault.
  * @param ps_data Fault data struct.
- * @param b_condition Condition to be evaluated.
+ * @param f32_in Fault check input value.
  * @return pdsp_bool_t Fault status.
  */
 pdsp_extern pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_data,
@@ -1918,6 +1942,7 @@ pdsp_fault_process_group(pdsp_bool_t b_group, pdsp_status_t pf_callback(void));
 /* ------------------------------------------------------------------------ */
 /** @addtogroup debug Debug
  *  @{
+ * @details Module containing funcions that can aid in debugging.
  */
 
 // /**
@@ -1976,6 +2001,8 @@ pdsp_fault_process_group(pdsp_bool_t b_group, pdsp_status_t pf_callback(void));
  * @return pdsp_extern DAV value to be convertetd to analog.
  */
 pdsp_extern pdsp_u16_t pdsp_aout(const pdsp_aout_t *sp_data);
+
+/** @} debug */
 
 /* Include function implementation in this compilation unit. */
 #ifdef PDSP_STATIC_FUNCTIONS

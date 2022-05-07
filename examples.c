@@ -76,6 +76,32 @@ void example_i16_to_string(void)
     PDSP_ASSERT(strcmp(out, ":  6666, -1111:") == 0);
 }
 
+void example_u16_to_hex(void)
+{
+    printf("-- void example_u16_to_hex(void) --\n");
+    pdsp_char_t out[16] = {0};
+    pdsp_char_t *pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u16_to_hex(0x1337, pos);
+    *pos++ = ',';
+    pos = pdsp_u16_to_hex(0xB00B, pos);
+    *pos++ = ':';
+    PDSP_ASSERT(strcmp(out, ":1337,B00B:") == 0);
+}
+
+void example_u64_to_hex(void)
+{
+    printf("-- void example_u16_to_hex(void) --\n");
+    pdsp_char_t out[64] = {0};
+    pdsp_char_t *pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u64_to_hex(0x0123456789ABCDEF, pos);
+    *pos++ = ',';
+    pos = pdsp_u64_to_hex(0xAFFAFFAFFAFFAFFA, pos);
+    *pos++ = ':';
+    PDSP_ASSERT(strcmp(out, ":0123456789ABCDEF,AFFAFFAFFAFFAFFA:") == 0);
+}
+
 void example_queue(void)
 {
     printf("-- void example_queue(void) --\n");
@@ -264,6 +290,8 @@ int main()
     example_stopwatch();
     example_call_i16_func();
     example_i16_to_string();
+    example_u16_to_hex();
+    example_u64_to_hex();
     example_queue();
     example_ain();
     example_ain_calibrate();

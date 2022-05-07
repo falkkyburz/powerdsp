@@ -4,22 +4,32 @@ CFLAGS = -Wall
 
 INC=-I./
 
+.PHONY: all
+all: $(TARGET) help run
+
 $(TARGET): pdsp.o examples.o
+	$(info Link target:)
 	$(CC) $(CFLAGS) -o $@ $^
 
 pdsp.o: pdsp.c
+	$(info Compile pdsp.c:)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 examples.o: examples.c
+	$(info Compile examples.c:)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
+.PHONY: clean
 clean:
 	del $(TARGET).exe
 	del pdsp.o
 	del examples.o
+	del doxylog.txt
 
-doc: 
-	doxygen
+help: pdsp.h
+	$(info Generate help:)
+	doxygen Doxyfile > doxylog.txt
 
 run: $(TARGET)
+	$(info Run target:)
 	$(TARGET)

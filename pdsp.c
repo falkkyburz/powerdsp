@@ -1,7 +1,7 @@
 /** @file pdsp.c
  *
  * @author Falk Kyburz
- * @brief Power electronics digital signal processing types.
+ * @brief Power electronics digital signal processing module.
  * @details
  *
  *
@@ -154,6 +154,37 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
         }
     }
     return &a6c_out[6];
+}
+
+pdsp_extern pdsp_char_t *pdsp_u16_to_hex(pdsp_u16_t u16_in,
+                                         pdsp_char_t *ach_out)
+{   
+    static pdsp_char_t ch_nibble;
+    PDSP_ASSERT(ach_out);
+    /* First digit (left to right). Hint: 'A' - 10 = '7' */
+    ch_nibble = (pdsp_char_t)((u16_in >> 12) & 0xf);
+    *(ach_out++) = ch_nibble + ((ch_nibble > 9) ? '7': '0');
+    /* Second digit (left to right) */
+    ch_nibble = (pdsp_char_t)((u16_in >> 8) & 0xf);
+    *(ach_out++) = ch_nibble + ((ch_nibble > 9) ? '7': '0');
+    /* Third digit (left to right) */
+    ch_nibble = (pdsp_char_t)((u16_in >> 4) & 0xf);
+    *(ach_out++) = ch_nibble + ((ch_nibble > 9) ? '7': '0');
+    /* Fourth digit (left to right) */
+    ch_nibble = (pdsp_char_t)((u16_in >> 0) & 0xf);
+    *(ach_out++) = ch_nibble + ((ch_nibble > 9) ? '7': '0');
+    return ach_out;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u64_to_hex(pdsp_u64_t u64_in,
+                                         pdsp_char_t *ach_out)
+{   
+    PDSP_ASSERT(ach_out);
+    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 48) & 0xFFFF), ach_out);
+    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 32) & 0xFFFF), ach_out);
+    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 16) & 0xFFFF), ach_out);
+    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 0) & 0xFFFF), ach_out);
+    return ach_out;
 }
 
 pdsp_extern pdsp_f32_t pdsp_map_unsave(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
@@ -645,11 +676,11 @@ pdsp_extern void pdsp_minmax_clear(pdsp_minmax_var_t *ps_var)
     ps_var->f32_delta = 0.0f;
 }
 
-pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f23_in)
+pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_var);
-    ps_var->f32_min = fminf(ps_var->f32_min, f23_in);
-    ps_var->f32_max = fmaxf(ps_var->f32_max, f23_in);
+    ps_var->f32_min = fminf(ps_var->f32_min, f32_in);
+    ps_var->f32_max = fmaxf(ps_var->f32_max, f32_in);
     ps_var->f32_delta = ps_var->f32_max - ps_var->f32_min;
 }
 
