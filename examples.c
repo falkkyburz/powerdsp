@@ -8,15 +8,18 @@
  * fclose(fptr);
  */
 
-#include <stdio.h>
-#include <time.h>
-#define PDSP_CUSTOM_ASSERT
 #include "pdsp.h"
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
-#define pdsp_assert_true(x)                                                    \
-    if (!(x))                                                                  \
+void pdsp_assert(pdsp_bool_t b_in)
+{
+    if (!(b_in))
+    {
         printf("Assert failed: %s:%i\n", __FILE__, __LINE__);
+    }
+}
 
 void example_assert_true(void)
 {
@@ -30,7 +33,6 @@ void example_stopwatch(void)
     printf("-- void example_stopwatch(void) --\n");
     pdsp_stopwatch_var_t watch_var = {0};
     pdsp_stopwatch_t watch = {.ps_var = &watch_var, .u32_hw_max = 1000};
-
     pdsp_u32_t out;
     pdsp_stopwatch_start(&watch, 0U);
     out = pdsp_stopwatch_stop(&watch, 555U);
@@ -40,7 +42,7 @@ void example_stopwatch(void)
     PDSP_ASSERT(out == 555);
 }
 
-enum
+enum funcs_e
 {
     FUNC_NOP,
     FUNC_START,
@@ -100,6 +102,181 @@ void example_u64_to_hex(void)
     pos = pdsp_u64_to_hex(0xAFFAFFAFFAFFAFFA, pos);
     *pos++ = ':';
     PDSP_ASSERT(strcmp(out, ":0123456789ABCDEF,AFFAFFAFFAFFAFFA:") == 0);
+}
+
+void example_map(void)
+{
+    printf("-- void example_map(void) --\n");
+    PDSP_ASSERT(pdsp_map(1.5f, 1.0f, 2.0f, 1.0f, 2.0f) == 1.5f);
+    PDSP_ASSERT(pdsp_map(1.5f, 1.0f, 1.0f, 1.0f, 2.0f) == 1.5f);
+    PDSP_ASSERT(pdsp_map(1.5f, 1.0f, 2.0f, 1.0f, 1.0f) == 1.0f);
+    PDSP_ASSERT(pdsp_map(-1.0f, 0.0f, 1.0f, 0.0f, 1.0f) == -1.0f);
+}
+
+void example_map_idx(void)
+{
+    printf("-- void example_map_idx(void) --\n");
+    PDSP_ASSERT((pdsp_u16_t)(1.5f) == 1U);
+    PDSP_ASSERT((pdsp_u16_t)(1.6f) == 1U);
+    PDSP_ASSERT((pdsp_u16_t)(1.4f) == 1U);
+    PDSP_ASSERT(pdsp_map_idx(1.5f, 1.0f, 2.0f, 10.0) == 5);
+    PDSP_ASSERT(pdsp_map_idx(-1.5f, 1.0f, 2.0f, 10.0) == 0);
+    PDSP_ASSERT(pdsp_map_idx(3.0f, 1.0f, 2.0f, 10.0) == 10);
+}
+
+void example_interpollate_2d(void)
+{
+    printf("-- void example_interpollate_2d(void) --\n");
+    const pdsp_f32_t xarr[5] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f};
+    const pdsp_f32_t yarr[5] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f};
+    const pdsp_f32_t yarrn[5] = {0.0f, -1.0f, -2.0f, -3.0f, -4.0f};
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, -0.5f) == -0.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 0.5f) == 0.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 1.5f) == 1.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 2.5f) == 2.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 3.5f) == 3.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 4.5f) == 4.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, -0.5f) == 0.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 0.5f) == -0.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 1.5f) == -1.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 2.5f) == -2.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 3.5f) == -3.5f);
+    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 4.5f) == -4.5f);
+}
+
+void example_array_set(void)
+{
+    printf("-- void example_array_set(void) --\n");
+    pdsp_f32_t af32[5] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
+    pdsp_i16_t ai16[5] = {1, 2, 3, 4, 5};
+    pdsp_array_set_f32(af32, 4, 0.0f);
+    pdsp_array_set_i16(ai16, 4, 0);
+    PDSP_ASSERT(af32[0] == 0.0f);
+    PDSP_ASSERT(af32[1] == 0.0f);
+    PDSP_ASSERT(af32[2] == 0.0f);
+    PDSP_ASSERT(af32[3] == 0.0f);
+    PDSP_ASSERT(af32[4] == 5.0f);
+    PDSP_ASSERT(ai16[0] == 0);
+    PDSP_ASSERT(ai16[1] == 0);
+    PDSP_ASSERT(ai16[2] == 0);
+    PDSP_ASSERT(ai16[3] == 0);
+    PDSP_ASSERT(ai16[4] == 5);
+    pdsp_array_set_f32(af32, 4, 1.0f);
+    pdsp_array_set_i16(ai16, 4, 1);
+    PDSP_ASSERT(af32[0] == 1.0f);
+    PDSP_ASSERT(af32[1] == 1.0f);
+    PDSP_ASSERT(af32[2] == 1.0f);
+    PDSP_ASSERT(af32[3] == 1.0f);
+    PDSP_ASSERT(af32[4] == 5.0f);
+    PDSP_ASSERT(ai16[0] == 1);
+    PDSP_ASSERT(ai16[1] == 1);
+    PDSP_ASSERT(ai16[2] == 1);
+    PDSP_ASSERT(ai16[3] == 1);
+    PDSP_ASSERT(ai16[4] == 5);
+}
+
+pdsp_f32_t app_f32(pdsp_f32_t in) { return in * 2.0f; }
+pdsp_i16_t app_i16(pdsp_i16_t in) { return in * 2; }
+
+void example_array_apply(void)
+{
+    printf("-- void example_array_apply(void) --\n");
+    const pdsp_f32_t af32[5] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
+    pdsp_f32_t af32_out[5] = {0};
+    const pdsp_i16_t ai16[5] = {1, 2, 3, 4, 5};
+    pdsp_i16_t ai16_out[5] = {0};
+    pdsp_array_apply_f32(af32, af32_out, 4, app_f32);
+    pdsp_array_apply_i16(ai16, ai16_out, 4, app_i16);
+    PDSP_ASSERT(af32_out[0] == 2.0f);
+    PDSP_ASSERT(af32_out[1] == 4.0f);
+    PDSP_ASSERT(af32_out[2] == 6.0f);
+    PDSP_ASSERT(af32_out[3] == 8.0f);
+    PDSP_ASSERT(af32_out[4] == 0.0f);
+    PDSP_ASSERT(af32_out[0] == 2);
+    PDSP_ASSERT(af32_out[1] == 4);
+    PDSP_ASSERT(af32_out[2] == 6);
+    PDSP_ASSERT(af32_out[3] == 8);
+    PDSP_ASSERT(af32_out[4] == 0);
+}
+
+void example_array_linlogspace(void)
+{
+    printf("-- void example_array_linlogspace(void) --\n");
+    pdsp_f32_t af32_out[5] = {0};
+    pdsp_array_linspace_f32(af32_out, 4, 10.0f, 40.0f);
+    PDSP_ASSERT(af32_out[0] == 10.0f);
+    PDSP_ASSERT(af32_out[1] == 20.0f);
+    PDSP_ASSERT(af32_out[2] == 30.0f);
+    PDSP_ASSERT(af32_out[3] == 40.0f);
+    PDSP_ASSERT(af32_out[4] == 0.0f);
+    pdsp_array_linspace_f32(af32_out, 5, 10.0f, 50.0f);
+    PDSP_ASSERT(af32_out[0] == 10.0f);
+    PDSP_ASSERT(af32_out[1] == 20.0f);
+    PDSP_ASSERT(af32_out[2] == 30.0f);
+    PDSP_ASSERT(af32_out[3] == 40.0f);
+    PDSP_ASSERT(af32_out[4] == 50.0f);
+    pdsp_array_logspace_f32(af32_out, 5, 1.0f, 2.0f);
+    PDSP_ASSERT(af32_out[0] == powf(10.0f, 1.0f));
+    PDSP_ASSERT(af32_out[1] == powf(10.0f, 1.25f));
+    PDSP_ASSERT(af32_out[2] == powf(10.0f, 1.5f));
+    PDSP_ASSERT(af32_out[3] == powf(10.0f, 1.75f));
+    PDSP_ASSERT(af32_out[4] == powf(10.0f, 2.0f));
+}
+
+void example_hysteresis_value(void)
+{
+    printf("-- void example_hysteresis_value(void) --\n");
+    pdsp_hyst_var_t hyst_var = {0};
+    pdsp_hyst_t hyst = {
+        .ps_var = &hyst_var, .f32_low = -1.0f, .f32_high = 1.0f};
+    pdsp_hysteresis_value_clear(&hyst);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, 1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
+}
+
+void example_hysteresis_time(void)
+{
+    printf("-- void example_hysteresis_time(void) --\n");
+    pdsp_hyst_time_var_t hyst_var = {0};
+    pdsp_hyst_time_t hyst = {.ps_var = &hyst_var,
+                             .f32_t_step = 1.0f,
+                             .f32_t_high = 2.0f,
+                             .f32_t_low = 2.0f};
+    pdsp_hysteresis_time_clear(&hyst);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
+}
+
+void example_mean(void)
+{
+    printf("-- void example_mean(void) --\n");
+    pdsp_u16_t m4[4] = {1, 2, 3, 4};
+    pdsp_u16_t m8[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    PDSP_ASSERT(pdsp_mean2w_f32(1.0f, 2.0f, 0.5f) == 1.5f);
+    PDSP_ASSERT(pdsp_mean2w_f32(1.0f, 2.0f, 1.0f) == 1.0f);
+    PDSP_ASSERT(pdsp_mean4_u16(m4) == 2.5f);
+    PDSP_ASSERT(pdsp_mean8_u16(m8) == 4.5f);
 }
 
 void example_queue(void)
@@ -283,6 +460,141 @@ void example_rollrms(void)
     PDSP_ASSERT(out == 0.5f);
 }
 
+void example_bit_read_write(void)
+{
+    printf("-- void example_bit_read_write(void) --\n");
+    pdsp_u16_t u16_data = 0;
+    pdsp_u32_t u32_data = 0;
+    pdsp_bit_write_u16(&u16_data, 4U, PDSP_TRUE);
+    pdsp_bit_write_u16(&u16_data, 8U, PDSP_TRUE);
+    pdsp_bit_write_u16(&u16_data, 12U, PDSP_TRUE);
+    PDSP_ASSERT(u16_data == (16 + 256 + 4096));
+    PDSP_ASSERT(pdsp_bit_read_u16(&u16_data, 0U) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_bit_read_u16(&u16_data, 4U) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_bit_read_u16(&u16_data, 8U) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_bit_read_u16(&u16_data, 12U) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_bit_read_u16(&u16_data, 15U) == PDSP_FALSE);
+    pdsp_bit_write_u16(&u16_data, 4U, PDSP_FALSE);
+    pdsp_bit_write_u16(&u16_data, 8U, PDSP_FALSE);
+    pdsp_bit_write_u16(&u16_data, 12U, PDSP_FALSE);
+    PDSP_ASSERT(u16_data == 0);
+    pdsp_bit_write_u32(&u32_data, 4U, PDSP_TRUE);
+    pdsp_bit_write_u32(&u32_data, 8U, PDSP_TRUE);
+    pdsp_bit_write_u32(&u32_data, 12U, PDSP_TRUE);
+    pdsp_bit_write_u32(&u32_data, 24U, PDSP_TRUE);
+    PDSP_ASSERT(u32_data == (16 + 256 + 4096 + 16777216));
+    PDSP_ASSERT(pdsp_bit_read_u32(&u32_data, 0U) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_bit_read_u32(&u32_data, 4U) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_bit_read_u32(&u32_data, 8U) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_bit_read_u32(&u32_data, 12U) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_bit_read_u32(&u32_data, 24U) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_bit_read_u32(&u32_data, 31U) == PDSP_FALSE);
+    pdsp_bit_write_u32(&u32_data, 4U, PDSP_FALSE);
+    pdsp_bit_write_u32(&u32_data, 8U, PDSP_FALSE);
+    pdsp_bit_write_u32(&u32_data, 12U, PDSP_FALSE);
+    pdsp_bit_write_u32(&u32_data, 24U, PDSP_FALSE);
+    PDSP_ASSERT(u32_data == 0);
+}
+
+void example_signal_read_write(void)
+{
+    printf("-- void example_signal_read_write(void) --\n");
+    pdsp_u64_t mem = 0;
+    const pdsp_signal_prop_t sig1 = {.f32_gain = 2.0f,
+                                     .f32_offset = 1.0f,
+                                     .u16_start = 0,
+                                     .u16_length = 8,
+                                     .u16_mask = 0xFF};
+    const pdsp_signal_prop_t sig2 = {.f32_gain = 2.0f,
+                                     .f32_offset = 1.0f,
+                                     .u16_start = 8,
+                                     .u16_length = 8,
+                                     .u16_mask = 0xFF};
+    const pdsp_signal_prop_t sig3 = {.f32_gain = NAN,
+                                     .f32_offset = NAN,
+                                     .u16_start = 63,
+                                     .u16_length = 1,
+                                     .u16_mask = 0x1};
+    pdsp_signal_write_f32(&sig1, &mem, 11.0);
+    PDSP_ASSERT(mem == 23);
+    PDSP_ASSERT(pdsp_signal_read_u16(&sig1, &mem) == 23);
+    PDSP_ASSERT(pdsp_signal_read_f32(&sig1, &mem) == 11.0f);
+    pdsp_signal_write_f32(&sig2, &mem, 11.0);
+    PDSP_ASSERT(mem == 23 * 256 + 23);
+    PDSP_ASSERT(pdsp_signal_read_u16(&sig2, &mem) == 23);
+    PDSP_ASSERT(pdsp_signal_read_f32(&sig2, &mem) == 11.0f);
+    mem = 0;
+    pdsp_signal_write_u16(&sig3, &mem, 1);
+    PDSP_ASSERT(mem == 0x8000000000000000);
+    PDSP_ASSERT(pdsp_signal_read_u16(&sig3, &mem) == 1);
+}
+
+void flt_group_cb(void) {}
+
+void example_fault(void)
+{
+    printf("-- void example_fault(void) --\n");
+    pdsp_u32_t flt_group = 0;
+    pdsp_hyst_time_var_t flt_hyst_var = {0};
+    pdsp_fault_var_t flt_var = {0};
+    pdsp_hyst_time_t flt_hyst = {.ps_var = &flt_hyst_var,
+                                 .f32_t_step = 1.0f,
+                                 .f32_t_low = 2.0f,
+                                 .f32_t_high = 2.0f};
+    pdsp_fault_t flt = {.ps_var = &flt_var,
+                        .ps_hyst = &flt_hyst,
+                        .f32_value = 1.0f,
+                        .b_group = &flt_group,
+                        .u16_bit = 0};
+    pdsp_fault_init(&flt);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_group == 0);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_group == 1);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_group == 0);
+
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_group == 0);
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_group == 1);
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_group == 0);
+
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_group == 0);
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_group == 1);
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_group == 0);
+
+    PDSP_ASSERT(pdsp_fault_check_true(&flt) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_true(&flt) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check_true(&flt) == PDSP_TRUE);
+    PDSP_ASSERT(flt_group == 1);
+    PDSP_ASSERT(pdsp_fault_check_false(&flt) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_false(&flt) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check_false(&flt) == PDSP_FALSE);
+    PDSP_ASSERT(flt_group == 0);
+
+    pdsp_fault_process_group(flt_group, &flt_group_cb);
+}
+
 int main()
 {
 
@@ -292,6 +604,15 @@ int main()
     example_i16_to_string();
     example_u16_to_hex();
     example_u64_to_hex();
+    example_map();
+    example_map_idx();
+    example_array_set();
+    example_array_apply();
+    example_array_linlogspace();
+    example_interpollate_2d();
+    example_hysteresis_value();
+    example_hysteresis_time();
+    example_mean();
     example_queue();
     example_ain();
     example_ain_calibrate();
@@ -301,6 +622,9 @@ int main()
     example_rollsum();
     example_rollavg();
     example_rollrms();
+    example_bit_read_write();
+    example_signal_read_write();
+    example_fault();
 
     return 0;
 }

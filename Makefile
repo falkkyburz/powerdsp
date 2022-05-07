@@ -1,7 +1,6 @@
 TARGET = example
 CC = gcc
 CFLAGS = -Wall
-
 INC=-I./
 
 .PHONY: all
@@ -25,6 +24,7 @@ clean:
 	del pdsp.o
 	del examples.o
 	del doxylog.txt
+	if exist html rmdir /s /q html
 
 help: pdsp.h
 	$(info Generate help:)

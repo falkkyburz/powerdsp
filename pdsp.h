@@ -2,14 +2,7 @@
  *
  * @author Falk Kyburz
  * @brief Power electronics digital signal processing module.
- * @details Configuration options:
- * @code
- * #define PDSP_DISABLE_ASSERT
- * #define PDSP_CUSTOM_ASSERT
- * #define PDSP_STATIC_FUNCTIONS
- * #include "pdsp.h"
- * @endcode
- * 
+ *
  * @copyright
  * This is free and unencumbered software released into the public domain.
  *
@@ -48,20 +41,27 @@
 #include <stddef.h>
 
 /*==============================================================================
+ USER CONFIGURATION
+ =============================================================================*/
+ /** Uncomment to disable assert */
+ // #define PDSP_DISABLE_ASSERT
+ 
+ /** Uncomment to custom assert function defined elsewhere. */
+ #define PDSP_CUSTOM_ASSERT
+
+/** Uncomment to set all functions to static and include them in this file. */
+ // #define PDSP_STATIC_FUNCTIONS
+
+/*==============================================================================
  CONFIGURATION
  =============================================================================*/
 
 #ifdef PDSP_DISABLE_ASSERT
+/** Empty assert macro in case assert is disabled. */
 #define PDSP_ASSERT(x)
 #else
-#ifdef PDSP_CUSTOM_ASSERT
-#define PDSP_ASSERT(x) pdsp_assert_true(x)
-#else
-/** Default assert function */
-#define PDSP_ASSERT(x)                                                         \
-    if (!(x))                                                                  \
-        while (1)
-#endif
+/** Assert macro */
+#define PDSP_ASSERT(x) pdsp_assert(x)
 #endif
 
 #ifdef PDSP_STATIC_FUNCTIONS
@@ -169,7 +169,7 @@
 /** Defined if compiling on host */
 #define PDSP_HOST
 /** Floating point rounding behavior is set to round to nearest. */
-#define F32_TO_INT_ROUNDS_TO_NEAREST
+#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 /** 64bit unsigned integer type.  */
 typedef unsigned long long pdsp_u64_t;
 /** 32bit floating point type. */
@@ -279,7 +279,6 @@ typedef pdsp_i32_t (*pdsp_pi32_func_t)(void);
 
 /** Funtion pointer (pointer to f32 function) */
 typedef pdsp_f32_t (*pdsp_pf32_func_t)(void);
-
 
 /** Stopwatch variable struct. */
 typedef struct pdsp_hyst_var_tag
@@ -880,8 +879,6 @@ typedef struct pdsp_fault_var_tag
 {
     /** Fault enable  */
     pdsp_bool_t b_ena;
-    /** Time hysteresis status. */
-    pdsp_hyst_time_t s_hyst;
 } pdsp_fault_var_t;
 
 /** Fault parameter struct */
@@ -890,7 +887,7 @@ typedef struct pdsp_fault_tag
     /** Pointer to fault variable struct. */
     pdsp_fault_var_t *ps_var;
     /** Time hysteresis parameters. */
-    pdsp_hyst_time_t s_hyst_param;
+    pdsp_hyst_time_t *ps_hyst;
     /** Fault trip value. */
     pdsp_f32_t f32_value;
     /** Fault group status */
@@ -940,7 +937,7 @@ typedef struct pdsp_fault_tag
 // } pdsp_sfra_t;
 
 /** Analog out data type enum. */
-typedef enum
+typedef enum pdsp_aout_enum
 {
     /** Analog out data pointer points to f32 */
     PDSP_AOUT_F32,
@@ -981,7 +978,7 @@ typedef struct pdsp_aout_tag
  * @brief Assert function to check validity of function parameters.
  * @param b_in Assert comparison input.
  */
-pdsp_extern void pdsp_assert_true(pdsp_bool_t b_in);
+pdsp_extern void pdsp_assert(pdsp_bool_t b_in);
 
 /**
  * @brief Start the stopwatch with 32bit HW counter.
@@ -1072,7 +1069,7 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
 pdsp_extern pdsp_char_t *pdsp_u16_to_hex(pdsp_u16_t u16_in,
                                          pdsp_char_t *ach_out);
 
-                                         /**
+/**
  * @brief Convert the number u64_in to a length 16 hex string.
  * @param u64_in Input number.
  * @param ach_out Output string.
@@ -1084,33 +1081,33 @@ pdsp_extern pdsp_char_t *pdsp_u64_to_hex(pdsp_u64_t u64_in,
 /**
  * @brief Map a value from one range to another (Uses division).
  * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
- * to implement the mapping (interpollation). There are no checks done on (x1
- * (x1-x0) to to prevent division by zero, which makes it efficient but requires
- * the inputs to be defined as const.
+ * to implement the mapping (interpollation). The output for (x1 - x0) == 0 is y
+ * = (y1 - y0) * 0.5. 
  * @param f32_in Input value.
  * @param f32_in_lo Input range low value.
- * @param f32_in_hi Input range high value (must be greater than f32_in_lo).
+ * @param f32_in_hi Input range high value.
  * @param f32_out_lo Output range low value.
- * @param f32_out_hi Output range high value (must be greater than f32_out_lo).
+ * @param f32_out_hi Output range high value.
  * @return pdsp_f32_t Ouput value.
  */
-pdsp_extern pdsp_f32_t pdsp_map_unsave(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
-                                       pdsp_f32_t f32_in_hi,
-                                       pdsp_f32_t f32_out_lo,
-                                       pdsp_f32_t f32_out_hi);
+pdsp_extern pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
+                                pdsp_f32_t f32_in_hi, pdsp_f32_t f32_out_lo,
+                                pdsp_f32_t f32_out_hi);
 
 /**
  * @brief Map a value to an index (Uses division, uses float to int conversion).
+ * @details It uses the formula y = y1 / (x1 - x0) * (x - x0) to
+ * to implement the mapping (interpollation). The output for (x1 - x0) == 0 is y
+ * = y1 * 0.5. 
  * @param f32_in Input value (must be greater than zero).
  * @param f32_in_lo Input range low value.
  * @param f32_in_hi Input range high value (must be greater than f32_in_lo).
  * @param f32_idx_hi Maximum index.
  * @return pdsp_u16_t Ouput value.
  */
-pdsp_extern pdsp_u16_t pdsp_map_idx_unsave(pdsp_f32_t f32_in,
-                                           pdsp_f32_t f32_in_lo,
-                                           pdsp_f32_t f32_in_hi,
-                                           pdsp_u16_t f32_idx_hi);
+pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
+                                    pdsp_f32_t f32_in_hi,
+                                    pdsp_f32_t f32_idx_hi);
 
 /**
  * @brief 2D Interpollation (X->input, Y->Output).
@@ -1167,7 +1164,7 @@ pdsp_extern void pdsp_array_set_i16(pdsp_i16_t ai16_array[], pdsp_size_t s_size,
 pdsp_extern void pdsp_array_apply_f32(const pdsp_f32_t af32_in[],
                                       pdsp_f32_t af32_out[],
                                       pdsp_u32_t u32_size,
-                                      pdsp_u32_t p_func(pdsp_u32_t));
+                                      pdsp_f32_t p_func(pdsp_f32_t));
 
 /**
  * @brief Apply a given function to each element.
@@ -1177,7 +1174,7 @@ pdsp_extern void pdsp_array_apply_f32(const pdsp_f32_t af32_in[],
  * @param p_func Function to apply to the elements.
  */
 pdsp_extern void pdsp_array_apply_i16(const pdsp_i16_t ai16_in[],
-                                      pdsp_f32_t ai16_out[],
+                                      pdsp_i16_t ai16_out[],
                                       pdsp_u32_t u32_size,
                                       pdsp_i16_t p_func(pdsp_i16_t));
 
@@ -1470,7 +1467,8 @@ pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw);
  * @param ps_data Signal data struct.
  * @param f32_raw Raw input signal.
  */
-pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw);
+pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data,
+                                     pdsp_f32_t f32_raw);
 
 /**
  * @brief Enable disable.
@@ -1869,7 +1867,7 @@ pdsp_extern pdsp_status_t pdsp_dpll_3ph_ddsrf(pdsp_dpll_3ph_ddsrf_t *ps_state,
                                               pdsp_f32_t d_p, pdsp_f32_t d_n,
                                               pdsp_f32_t q_p, pdsp_f32_t q_n);
 
-/** todo */                                              
+/** todo */
 pdsp_extern pdsp_status_t pdsp_dpll_3ph_srf_init(pdsp_dpll_3ph_srf_t *ps_state);
 
 /** todo */
@@ -1933,10 +1931,9 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_data);
  * @brief Check fault group and execute group callback.
  * @param b_group Fault group memory.
  * @param pf_callback Fault trip callback.
- * @return pdsp_status_t PDSP_OK
  */
-pdsp_extern pdsp_status_t
-pdsp_fault_process_group(pdsp_bool_t b_group, pdsp_status_t pf_callback(void));
+pdsp_extern void
+pdsp_fault_process_group(pdsp_bool_t b_group, void pf_callback(void));
 
 /** @} fault */
 /* ------------------------------------------------------------------------ */
