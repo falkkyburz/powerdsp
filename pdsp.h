@@ -43,14 +43,14 @@
 /*==============================================================================
  USER CONFIGURATION
  =============================================================================*/
- /** Uncomment to disable assert */
- // #define PDSP_DISABLE_ASSERT
- 
- /** Uncomment to custom assert function defined elsewhere. */
- #define PDSP_CUSTOM_ASSERT
+/** Uncomment to disable assert */
+// #define PDSP_DISABLE_ASSERT
+
+/** Uncomment to custom assert function defined elsewhere. */
+#define PDSP_CUSTOM_ASSERT
 
 /** Uncomment to set all functions to static and include them in this file. */
- // #define PDSP_STATIC_FUNCTIONS
+// #define PDSP_STATIC_FUNCTIONS
 
 /*==============================================================================
  CONFIGURATION
@@ -76,7 +76,7 @@
  PUBLIC DEFINES
  =============================================================================*/
 
-/** @addtogroup const Constants
+/** @addtogroup math Math
  *  @{
  */
 
@@ -84,11 +84,6 @@
 #define PDSP_TRUE 1
 /** False value. */
 #define PDSP_FALSE 0
-
-/** The thing is on. */
-#define PDSP_ON 1
-/** The thing is off. */
-#define PDSP_OFF 0
 
 /** Float literal holding PI. */
 #define PDSP_PI_F (3.14159265358f)
@@ -116,44 +111,41 @@
 #define PDSP_POS_INF INFINITY
 /** Floating point negative infinity. */
 #define PDSP_NEG_INF (-INFINITY)
-
-/** Bit mask 0x0001 for 16bit integers. */
-#define PDSP_MASK1 0x0001
-/** Bit mask 0x0003 for 16bit integers. */
-#define PDSP_MASK2 0x0003
-/** Bit mask 0x0007 for 16bit integers. */
-#define PDSP_MASK3 0x0007
-/** Bit mask 0x000F for 16bit integers. */
-#define PDSP_MASK4 0x000F
-/** Bit mask 0x001F for 16bit integers. */
-#define PDSP_MASK5 0x001F
-/** Bit mask 0x003F for 16bit integers. */
-#define PDSP_MASK6 0x003F
-/** Bit mask 0x007F for 16bit integers. */
-#define PDSP_MASK7 0x007F
-/** Bit mask 0x00FF for 16bit integers. */
-#define PDSP_MASK8 0x00FF
-/** Bit mask 0x01FF for 16bit integers. */
-#define PDSP_MASK9 0x01FF
-/** Bit mask 0x03FF for 16bit integers. */
-#define PDSP_MASK10 0x03FF
-/** Bit mask 0x07FF for 16bit integers. */
-#define PDSP_MASK11 0x07FF
-/** Bit mask 0x0FFF for 16bit integers. */
-#define PDSP_MASK12 0x0FFF
-/** Bit mask 0x1FFF for 16bit integers. */
-#define PDSP_MASK13 0x1FFF
-/** Bit mask 0x3FFF for 16bit integers. */
-#define PDSP_MASK14 0x3FFF
-/** Bit mask 0x7FFF for 16bit integers. */
-#define PDSP_MASK15 0x7FFF
-/** Bit mask 0xFFFF for 16bit integers. */
-#define PDSP_MASK16 0xFFFF
-
 /** Gain to convert a value to DAC voltage (corresponding integer). */
 #define PDSP_3V3_12BIT_F (3.3f / 4096.0f)
 
-/** @} const */
+/* Fixed and floating point types */
+#if defined(_WIN64)
+/** Floating point minimum function macro */
+#define pdsp_fmin(x, y) fminf((x), (y))
+/** Floating point maximum function macro */
+#define pdsp_fmax(x, y) fmaxf((x), (y))
+/** Floating point division */
+#define pdsp_div(x, y) ((x) / (y))
+/** Sine function macro */
+#define pdsp_sin(x) sinf((x))
+/** Sine function macro PU */
+#define pdsp_sinpu(x) sinf((x) / PDSP_2_PI_F)
+/** Cosine function macro */
+#define pdsp_cos(x) cosf((x))
+/** Cosine function macro PU */
+#define pdsp_cospu(x) cosf((x) / PDSP_2_PI_F)
+/** Square root function */
+#define pdsp_sqrt(x) sqrtf((x))
+#elif defined(__TMS320C2000__)
+#define pdsp_fmin(x, y) __fmin((x), (y))
+#define pdsp_fmax(x, y) __fmax((x), (y))
+#define pdsp_div(x, y) __divf32((x), (y))
+#define pdsp_sin(x) __sin((x))
+#define pdsp_sinpu(x) __sinpuf32((x))
+#define pdsp_cos(x) __cos((x))
+#define pdsp_cospu(x) __cospuf32((x))
+#define pdsp_sqrt(x) __sqrt((x))
+#elif defined(__TMS320C28XX_CLA__)
+
+#endif
+
+/** @} math */
 
 /*==============================================================================
  PUBLIC TYPEDEFS
@@ -189,11 +181,9 @@ typedef size_t pdsp_size_t;
 /** 16bit signed integer type. */
 typedef char pdsp_char_t;
 #elif defined(__TMS320C2000__)
-/** Defined if cross compiling for MCU */
 #define PDSP_MCU
-/** Floating point rounding behavior is set to round towards zero. */
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
-typedef unsigned long pdsp_u64_t;
+typedef unsigned long long pdsp_u64_t;
 typedef float pdsp_f32_t;
 typedef long pdsp_i32_t;
 typedef unsigned long pdsp_u32_t;
@@ -203,19 +193,7 @@ typedef int pdsp_bool_t;
 typedef size_t pdsp_size_t;
 typedef char pdsp_char_t;
 #elif defined(__TMS320C28XX_CLA__)
-/** Defined if cross compiling for CLA */
 #define PDSP_CLA
-/** Floating point rounding behavior is set to round towards zero. */
-#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
-typedef unsigned long pdsp_u64_t;
-typedef float pdsp_f32_t;
-typedef int pdsp_i32_t;
-typedef unsigned int pdsp_u32_t;
-typedef short pdsp_i16_t;
-typedef unsigned short pdsp_u16_t;
-typedef int pdsp_bool_t;
-typedef size_t pdsp_size_t;
-typedef char pdsp_char_t;
 #endif
 
 /** PDSP status for function return value. */
@@ -248,8 +226,6 @@ typedef struct pdsp_signal_prop_tag
     pdsp_u16_t u16_start;
     /** Data length. */
     pdsp_u16_t u16_length;
-    /** Bit mask covering data length. Use macros PDSP_MASK[1-16] */
-    pdsp_u16_t u16_mask;
 } pdsp_signal_prop_t;
 
 /** Stopwatch variable struct. */
@@ -902,25 +878,25 @@ typedef struct pdsp_fault_tag
  *  @{
  */
 
-// /** Data logger variable struct */
-// typedef struct pdsp_logger_var_tag
-// {
-//     /** User setting: Trigger condition function. */
-//     pdsp_bool_t (*pdsp_pb_func_t)(void);
-//     /** Sample countdown counter. Counts down when b_triggered is PDSP_TRUE
-//     */ pdsp_u32_t u23_counter;
-//     /** Triggered state. PDSP_TRUE when trigger condition was met. */
-//     pdsp_bool_t b_triggered;
-// } pdsp_logger_var_t;
+/** Data logger variable struct */
+typedef struct pdsp_logger_var_tag
+{
+    /** User setting: Trigger condition function. */
+    pdsp_bool_t (*pdsp_pb_func_t)(void);
+    /** Sample countdown counter. Counts down when b_triggered is PDSP_TRUE
+    */ pdsp_u32_t u23_counter;
+    /** Triggered state. PDSP_TRUE when trigger condition was met. */
+    pdsp_bool_t b_triggered;
+} pdsp_logger_var_t;
 
-// /** Data logger variable struct. */
-// typedef struct pdsp_logger_tag
-// {
-//     /** Logger variable struct. */
-//     pdsp_logger_var_t *ps_var;
-//     /** Logging history queue. */
-//     pdsp_queue_t *ps_u64_queue;
-// } pdsp_logger_t;
+/** Data logger struct. */
+typedef struct pdsp_logger_tag
+{
+    /** Logger variable struct. */
+    pdsp_logger_var_t *ps_var;
+    /** Logging history queue. */
+    pdsp_queue_t *ps_u64_queue;
+} pdsp_logger_t;
 
 // /** Software frequency response analyzer parameters. */
 // typedef struct pdsp_sfra_tag
@@ -1082,7 +1058,7 @@ pdsp_extern pdsp_char_t *pdsp_u64_to_hex(pdsp_u64_t u64_in,
  * @brief Map a value from one range to another (Uses division).
  * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
  * to implement the mapping (interpollation). The output for (x1 - x0) == 0 is y
- * = (y1 - y0) * 0.5. 
+ * = (y1 - y0) * 0.5.
  * @param f32_in Input value.
  * @param f32_in_lo Input range low value.
  * @param f32_in_hi Input range high value.
@@ -1098,7 +1074,7 @@ pdsp_extern pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
  * @brief Map a value to an index (Uses division, uses float to int conversion).
  * @details It uses the formula y = y1 / (x1 - x0) * (x - x0) to
  * to implement the mapping (interpollation). The output for (x1 - x0) == 0 is y
- * = y1 * 0.5. 
+ * = y1 * 0.5.
  * @param f32_in Input value (must be greater than zero).
  * @param f32_in_lo Input range low value.
  * @param f32_in_hi Input range high value (must be greater than f32_in_lo).
@@ -1745,9 +1721,8 @@ pdsp_extern void pdsp_pi4_set(pdsp_pi4_t *ps_data, pdsp_f32_t f32_out);
 /**
  * @brief Initialize set point processor struct.
  * @param ps_state Set point state memory struct.
- * @returns pdsp_status_t PDSP_OK
  */
-pdsp_extern pdsp_status_t pdsp_setp_init(pdsp_setp_t *ps_state);
+pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_state);
 
 /**
  * @brief Calculate simple set point processor generating a ramp.
@@ -1932,8 +1907,8 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_data);
  * @param b_group Fault group memory.
  * @param pf_callback Fault trip callback.
  */
-pdsp_extern void
-pdsp_fault_process_group(pdsp_bool_t b_group, void pf_callback(void));
+pdsp_extern void pdsp_fault_process_group(pdsp_bool_t b_group,
+                                          void pf_callback(void));
 
 /** @} fault */
 /* ------------------------------------------------------------------------ */

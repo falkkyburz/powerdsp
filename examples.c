@@ -503,18 +503,15 @@ void example_signal_read_write(void)
     const pdsp_signal_prop_t sig1 = {.f32_gain = 2.0f,
                                      .f32_offset = 1.0f,
                                      .u16_start = 0,
-                                     .u16_length = 8,
-                                     .u16_mask = 0xFF};
+                                     .u16_length = 8};
     const pdsp_signal_prop_t sig2 = {.f32_gain = 2.0f,
                                      .f32_offset = 1.0f,
                                      .u16_start = 8,
-                                     .u16_length = 8,
-                                     .u16_mask = 0xFF};
+                                     .u16_length = 8};
     const pdsp_signal_prop_t sig3 = {.f32_gain = NAN,
                                      .f32_offset = NAN,
                                      .u16_start = 63,
-                                     .u16_length = 1,
-                                     .u16_mask = 0x1};
+                                     .u16_length = 1};
     pdsp_signal_write_f32(&sig1, &mem, 11.0);
     PDSP_ASSERT(mem == 23);
     PDSP_ASSERT(pdsp_signal_read_u16(&sig1, &mem) == 23);

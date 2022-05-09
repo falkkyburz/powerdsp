@@ -41,6 +41,9 @@
 /*==============================================================================
  GLOBAL CONSTANTS
  =============================================================================*/
+static const pdsp_u16_t pdsp_mask_i16[16] = {
+    0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F, 0x00FF,
+    0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF};
 
 /*==============================================================================
  PRIVATE FUNCTIOS PROTOTYPES
@@ -62,7 +65,8 @@ pdsp_extern void pdsp_assert(pdsp_bool_t b_in)
 {
     if (!(b_in))
     {
-        while(1);
+        while (1)
+            ;
     }
 }
 #endif
@@ -77,19 +81,15 @@ pdsp_extern void pdsp_stopwatch_start(const pdsp_stopwatch_t *ps_data,
 pdsp_extern pdsp_u32_t pdsp_stopwatch_stop(const pdsp_stopwatch_t *ps_data,
                                            pdsp_u32_t u32_hw_now)
 {
-    static pdsp_stopwatch_var_t *ps_var;
-    static pdsp_u32_t u32_out;
     PDSP_ASSERT(ps_data && ps_data->ps_var);
-    ps_var = ps_data->ps_var;
-    if (ps_var->u32_time_mem < u32_hw_now)
+    if (ps_data->ps_var->u32_time_mem < u32_hw_now)
     {
-        u32_out = u32_hw_now - ps_var->u32_time_mem;
+        return u32_hw_now - ps_data->ps_var->u32_time_mem;
     }
     else
     {
-        u32_out = u32_hw_now - ps_var->u32_time_mem + ps_data->u32_hw_max;
+        return u32_hw_now - ps_data->ps_var->u32_time_mem + ps_data->u32_hw_max;
     }
-    return u32_out;
 }
 
 pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
@@ -97,14 +97,13 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
                                           pdsp_i16_t i16_idx,
                                           pdsp_i16_t *i16_out)
 {
-    pdsp_i16_t status = PDSP_ILLEGAL;
     PDSP_ASSERT(apf_list && i16_out && s_size);
     if ((apf_list[i16_idx] != PDSP_NULL) && (i16_idx < s_size))
     {
         *i16_out = apf_list[i16_idx]();
-        status = PDSP_OK;
+        return PDSP_OK;
     }
-    return status;
+    return PDSP_ILLEGAL;
 }
 
 pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
@@ -198,25 +197,23 @@ pdsp_extern pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
                                 pdsp_f32_t f32_in_hi, pdsp_f32_t f32_out_lo,
                                 pdsp_f32_t f32_out_hi)
 {
-    pdsp_f32_t f32_out;
     if ((f32_in_hi - f32_in_lo) == 0.0f)
     {
-        f32_out = (f32_out_hi + f32_out_lo) * 0.5f;
+        return (f32_out_hi + f32_out_lo) * 0.5f;
     }
     else
     {
-        f32_out = ((f32_out_hi - f32_out_lo) / (f32_in_hi - f32_in_lo) *
-                       (f32_in - f32_in_lo) +
-                   f32_out_lo);
+        return (pdsp_div((f32_out_hi - f32_out_lo), (f32_in_hi - f32_in_lo)) *
+                    (f32_in - f32_in_lo) +
+                f32_out_lo);
     }
-    return f32_out;
 }
 
 pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
                                     pdsp_f32_t f32_in_hi, pdsp_f32_t f32_idx_hi)
 {
     pdsp_f32_t f32_index;
-    f32_in = fminf(fmaxf(f32_in, f32_in_lo), f32_in_hi);
+    f32_in = pdsp_fmin(pdsp_fmax(f32_in, f32_in_lo), f32_in_hi);
     if ((f32_in_hi - f32_in_lo) == 0.0f)
     {
         f32_index = f32_idx_hi * 0.5f;
@@ -224,7 +221,7 @@ pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
     else
     {
         f32_index =
-            (f32_idx_hi / (f32_in_hi - f32_in_lo) * (f32_in - f32_in_lo));
+            pdsp_div(f32_idx_hi, f32_in_hi - f32_in_lo) * (f32_in - f32_in_lo);
     }
     /* Float to int conversion is implementation specific. */
 #if defined(F32_TO_INT_ROUNDS_TO_NEAREST)
@@ -466,8 +463,9 @@ pdsp_extern void pdsp_signal_write_f32(const pdsp_signal_prop_t *ps_prop,
 pdsp_extern pdsp_f32_t pdsp_signal_read_f32(const pdsp_signal_prop_t *ps_prop,
                                             pdsp_u64_t *pu64_mem)
 {
-    return (((pdsp_f32_t)pdsp_signal_read_u16(ps_prop, pu64_mem) - ps_prop->f32_offset) /
-             ps_prop->f32_gain);
+    return pdsp_div(((pdsp_f32_t)pdsp_signal_read_u16(ps_prop, pu64_mem) -
+                     ps_prop->f32_offset),
+                    ps_prop->f32_gain);
 }
 
 pdsp_extern void pdsp_signal_write_u16(const pdsp_signal_prop_t *ps_prop,
@@ -475,8 +473,8 @@ pdsp_extern void pdsp_signal_write_u16(const pdsp_signal_prop_t *ps_prop,
                                        pdsp_u16_t u16_data)
 {
     PDSP_ASSERT(ps_prop && (ps_prop->u16_start < 64));
-    *pu64_mem |=
-        ((pdsp_u64_t)(u16_data & ps_prop->u16_mask) << ps_prop->u16_start);
+    *pu64_mem |= ((pdsp_u64_t)(u16_data & pdsp_mask_i16[ps_prop->u16_length])
+                  << ps_prop->u16_start);
 }
 
 pdsp_extern pdsp_u16_t pdsp_signal_read_u16(const pdsp_signal_prop_t *ps_prop,
@@ -484,7 +482,7 @@ pdsp_extern pdsp_u16_t pdsp_signal_read_u16(const pdsp_signal_prop_t *ps_prop,
 {
     PDSP_ASSERT(ps_prop && (ps_prop->u16_start < 64));
     return (pdsp_u16_t)((*pu64_mem >> ps_prop->u16_start) &
-                        (pdsp_u64_t)ps_prop->u16_mask);
+                        (pdsp_u64_t)pdsp_mask_i16[ps_prop->u16_length]);
 }
 
 pdsp_extern pdsp_f32_t pdsp_mean2w_f32(pdsp_f32_t f32_in0, pdsp_f32_t f32_in1,
@@ -648,10 +646,14 @@ SIGNAL
 pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw)
 {
     PDSP_ASSERT(ps_data);
-    static pdsp_f32_t af32_ret[2];
-    af32_ret[0] = ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset);
-    af32_ret[1] = ps_data->ps_ovr->f32_value;
-    return af32_ret[ps_data->ps_ovr->u32_enable];
+    if (ps_data->ps_ovr->u32_enable)
+    {
+        return ps_data->ps_ovr->f32_value;
+    }
+    else
+    {
+        return ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset);
+    }
 }
 
 pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data,
@@ -675,7 +677,7 @@ pdsp_extern pdsp_f32_t pdsp_ain_calibrate_gain(pdsp_f32_t f32_gain_old,
     {
         f32_raw = f32_ref;
     }
-    return f32_gain_old * f32_ref / f32_raw;
+    return pdsp_div(f32_gain_old * f32_ref, f32_raw);
 }
 
 pdsp_extern pdsp_f32_t pdsp_ain_calibrate_offset(pdsp_f32_t f32_offset_old,
@@ -696,8 +698,8 @@ pdsp_extern void pdsp_minmax_clear(pdsp_minmax_var_t *ps_var)
 pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_var);
-    ps_var->f32_min = fminf(ps_var->f32_min, f32_in);
-    ps_var->f32_max = fmaxf(ps_var->f32_max, f32_in);
+    ps_var->f32_min = pdsp_fmin(ps_var->f32_min, f32_in);
+    ps_var->f32_max = pdsp_fmax(ps_var->f32_max, f32_in);
     ps_var->f32_delta = ps_var->f32_max - ps_var->f32_min;
 }
 
@@ -749,8 +751,8 @@ pdsp_extern pdsp_f32_t pdsp_med3(pdsp_med3_var_t *ps_var, pdsp_f32_t f32_in)
     static pdsp_f32_t out;
     PDSP_ASSERT(ps_var);
     out = ((ps_var->f32_x2 + ps_var->f32_x1 + f32_in) -
-           fminf(ps_var->f32_x2, fminf(ps_var->f32_x1, f32_in)) -
-           fmaxf(ps_var->f32_x2, fmaxf(ps_var->f32_x1, f32_in)));
+           pdsp_fmin(ps_var->f32_x2, pdsp_fmin(ps_var->f32_x1, f32_in)) -
+           pdsp_fmax(ps_var->f32_x2, pdsp_fmax(ps_var->f32_x1, f32_in)));
     /* store history x[k-2] = x[k-1] */
     ps_var->f32_x2 = ps_var->f32_x1;
     /* store history x[k-1] = x[k] */
@@ -776,12 +778,14 @@ pdsp_extern void pdsp_rollsum_init(const pdsp_rollsum_t *ps_data,
     if (i16_win_size <= ps_queue->i16_size)
     {
         ps_queue_var->i16_tail = ps_queue->i16_size - i16_win_size;
-        ps_roll_var->f32_win_size_inv = 1.0f / (pdsp_f32_t)i16_win_size;
+        ps_roll_var->f32_win_size_inv =
+            pdsp_div(1.0f, (pdsp_f32_t)i16_win_size);
     }
     else
     {
         ps_queue_var->i16_tail = 0;
-        ps_roll_var->f32_win_size_inv = 1.0f / (pdsp_f32_t)ps_queue->i16_size;
+        ps_roll_var->f32_win_size_inv =
+            pdsp_div(1.0f, (pdsp_f32_t)ps_queue->i16_size);
     }
     pdsp_array_set_f32(ps_queue->pav_data, ps_queue->i16_size, 0.0f);
 }
@@ -789,16 +793,14 @@ pdsp_extern void pdsp_rollsum_init(const pdsp_rollsum_t *ps_data,
 pdsp_extern pdsp_f32_t pdsp_rollsum(const pdsp_rollsum_t *ps_data,
                                     pdsp_f32_t f32_in)
 {
-    static pdsp_rollsum_var_t *ps_var;
     PDSP_ASSERT(ps_data);
-    ps_var = ps_data->ps_var;
     /* Subtract tail and advance  */
-    ps_var->f32_sum -= pdsp_queue_pop_f32(ps_data->ps_queue);
+    ps_data->ps_var->f32_sum -= pdsp_queue_pop_f32(ps_data->ps_queue);
+    /* Add the head value to the sum state variable. */
+    ps_data->ps_var->f32_sum += f32_in;
     /* Place new scaled value to head position. */
     pdsp_queue_push_f32(ps_data->ps_queue, f32_in);
-    /* Add the head value to the sum state variable. */
-    ps_var->f32_sum += f32_in;
-    return ps_var->f32_sum;
+    return ps_data->ps_var->f32_sum;
 }
 
 pdsp_extern void pdsp_rollavg_init(const pdsp_rollsum_t *ps_data,
@@ -826,8 +828,8 @@ pdsp_extern pdsp_f32_t pdsp_rollrms(const pdsp_rollsum_t *ps_data,
                                     pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_data);
-    return sqrtf(pdsp_rollsum(ps_data, f32_in * f32_in *
-                                           ps_data->ps_var->f32_win_size_inv));
+    return pdsp_sqrt(pdsp_rollsum(
+        ps_data, f32_in * f32_in * ps_data->ps_var->f32_win_size_inv));
 }
 
 /*-----------------------------------------------------------------------------
@@ -948,7 +950,7 @@ pdsp_extern pdsp_f32_t pdsp_pi(pdsp_pi_t *ps_data, pdsp_f32_t f32_error)
     /* Calculate the sum of integral and proportional part. */
     f32_sum = f32_error * ps_param->f32_kp + ps_var->f32_x0;
     /* Apply saturation. */
-    f32_out = fmaxf(ps_data->f32_min, fminf(ps_data->f32_max, f32_sum));
+    f32_out = pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
     ps_var->f32_x1 = f32_out - f32_sum;
     return f32_out;
@@ -959,42 +961,35 @@ pdsp_extern pdsp_f32_t pdsp_pi2(pdsp_pi2_t *ps_data, pdsp_f32_t f32_error0,
 {
     static pdsp_f32_t f32_out;
     static pdsp_f32_t f32_sum;
-    static pdsp_pi2_var_t *ps_var;
     static pdsp_pi_err_param_t *ps_param0;
     static pdsp_pi_err_param_t *ps_param1;
     PDSP_ASSERT(ps_data && ps_data->ps_var && ps_data->pas_param0 &&
                 ps_data->pas_param1);
-    ps_var = ps_data->ps_var;
-    ps_param0 = &ps_data->pas_param0[ps_var->i16_param_idx0];
-    ps_param1 = &ps_data->pas_param1[ps_var->i16_param_idx1];
-    /* Active decision */
-    ps_var->i16_active =
-        (f32_error0 * ps_param0->f32_ka) > (f32_error1 * ps_param1->f32_ka);
+    ps_param0 = &ps_data->pas_param0[ps_data->ps_var->i16_param_idx0];
+    ps_param1 = &ps_data->pas_param1[ps_data->ps_var->i16_param_idx1];
     /* Run controller */
-    if (ps_var->i16_active == 0)
+    if ((f32_error0 * ps_param0->f32_ka) < (f32_error1 * ps_param1->f32_ka))
     {
+        ps_data->ps_var->i16_active = 0;
         /* Calculate integral path, including saturation delta. */
-        ps_var->f32_x0 +=
-            f32_error0 * ps_param0->f32_ki + ps_var->f32_x1 * ps_param0->f32_ks;
+        ps_data->ps_var->f32_x0 += f32_error0 * ps_param0->f32_ki +
+                                   ps_data->ps_var->f32_x1 * ps_param0->f32_ks;
         /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error0 * ps_param0->f32_kp + ps_var->f32_x0;
-    }
-    else if (ps_var->i16_active == 1)
-    {
-        /* Calculate integral path, including saturation delta. */
-        ps_var->f32_x0 +=
-            f32_error1 * ps_param1->f32_ki + ps_var->f32_x1 * ps_param1->f32_ks;
-        /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error1 * ps_param1->f32_kp + ps_var->f32_x0;
+        f32_sum = f32_error0 * ps_param0->f32_kp + ps_data->ps_var->f32_x0;
     }
     else
     {
-        /* Error, nothing to do */
+        ps_data->ps_var->i16_active = 1;
+        /* Calculate integral path, including saturation delta. */
+        ps_data->ps_var->f32_x0 += f32_error1 * ps_param1->f32_ki +
+                                   ps_data->ps_var->f32_x1 * ps_param1->f32_ks;
+        /* Calculate the sum of integral and proportional part. */
+        f32_sum = f32_error1 * ps_param1->f32_kp + ps_data->ps_var->f32_x0;
     }
     /* Apply saturation. */
-    f32_out = fmaxf(ps_data->f32_min, fminf(ps_data->f32_max, f32_sum));
+    f32_out = pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
-    ps_var->f32_x1 = f32_out - f32_sum;
+    ps_data->ps_var->f32_x1 = f32_out - f32_sum;
     return f32_out;
 }
 
@@ -1034,7 +1029,7 @@ pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
         /* Calculate the sum of integral and proportional part. */
         f32_sum = f32_error0 * ps_param0->f32_kp + ps_var->f32_x0;
     }
-    else if (ps_var->i16_active == 1)
+    if (ps_var->i16_active == 1)
     {
         /* Calculate integral path, including saturation delta. */
         ps_var->f32_x0 +=
@@ -1042,7 +1037,7 @@ pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
         /* Calculate the sum of integral and proportional part. */
         f32_sum = f32_error1 * ps_param1->f32_kp + ps_var->f32_x0;
     }
-    else if (ps_var->i16_active == 2)
+    if (ps_var->i16_active == 2)
     {
         /* Calculate integral path, including saturation delta. */
         ps_var->f32_x0 +=
@@ -1050,7 +1045,7 @@ pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
         /* Calculate the sum of integral and proportional part. */
         f32_sum = f32_error2 * ps_param2->f32_kp + ps_var->f32_x0;
     }
-    else if (ps_var->i16_active == 3)
+    if (ps_var->i16_active == 3)
     {
         /* Calculate integral path, including saturation delta. */
         ps_var->f32_x0 +=
@@ -1058,12 +1053,8 @@ pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
         /* Calculate the sum of integral and proportional part. */
         f32_sum = f32_error3 * ps_param3->f32_kp + ps_var->f32_x0;
     }
-    else
-    {
-        /* Error, nothing to do */
-    }
     /* Apply saturation. */
-    f32_out = fmaxf(ps_data->f32_min, fminf(ps_data->f32_max, f32_sum));
+    f32_out = pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
     ps_var->f32_x1 = f32_out - f32_sum;
     return f32_out;
@@ -1074,7 +1065,7 @@ pdsp_extern void pdsp_pi_set(pdsp_pi_t *ps_data, pdsp_f32_t f32_out)
     PDSP_ASSERT(ps_data && ps_data->ps_var);
     /* Set integral value to out_value. */
     ps_data->ps_var->f32_x0 =
-        fmaxf(ps_data->f32_min, fminf(ps_data->f32_max, f32_out));
+        pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_out));
     /* Set saturation memory to 0. */
     ps_data->ps_var->f32_x1 = 0.0f;
 }
@@ -1084,7 +1075,7 @@ pdsp_extern void pdsp_pi2_set(pdsp_pi2_t *ps_data, pdsp_f32_t f32_out)
     PDSP_ASSERT(ps_data && ps_data->ps_var);
     /* Set integral value to out_value. */
     ps_data->ps_var->f32_x0 =
-        fmaxf(ps_data->f32_min, fminf(ps_data->f32_max, f32_out));
+        pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_out));
     /* Set saturation memory to 0. */
     ps_data->ps_var->f32_x1 = 0.0f;
 }
@@ -1094,17 +1085,16 @@ pdsp_extern void pdsp_pi4_set(pdsp_pi4_t *ps_data, pdsp_f32_t f32_out)
     PDSP_ASSERT(ps_data && ps_data->ps_var);
     /* Set integral value to out_value. */
     ps_data->ps_var->f32_x0 =
-        fmaxf(ps_data->f32_min, fminf(ps_data->f32_max, f32_out));
+        pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_out));
     /* Set saturation memory to 0. */
     ps_data->ps_var->f32_x1 = 0.0f;
 }
 
-pdsp_extern pdsp_status_t pdsp_setp_init(pdsp_setp_t *ps_state)
+pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_state)
 {
     PDSP_ASSERT(ps_state);
     ps_state->f32_x1 = 0.0f;
     ps_state->f32_dest = 0.0f;
-    return PDSP_OK;
 }
 
 pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_state,
@@ -1113,8 +1103,9 @@ pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_state,
     PDSP_ASSERT(ps_state && ps_param);
     ps_state->f32_x1 =
         ps_state->f32_x1 +
-        fmaxf(fminf(ps_state->f32_dest - ps_state->f32_x1, ps_param->f32_step),
-              -ps_param->f32_step);
+        pdsp_fmax(pdsp_fmin(ps_state->f32_dest - ps_state->f32_x1,
+                            ps_param->f32_step),
+                  -ps_param->f32_step);
     return ps_state->f32_x1;
 }
 
@@ -1134,7 +1125,7 @@ pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_state,
 {
     PDSP_ASSERT(ps_state && ps_param);
     ps_state->f32_dest =
-        fmaxf(fminf(f32_dest, ps_param->f32_max), ps_param->f32_min);
+        pdsp_fmax(pdsp_fmin(f32_dest, ps_param->f32_max), ps_param->f32_min);
     return PDSP_OK;
 }
 
@@ -1151,7 +1142,7 @@ pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_state,
 {
     PDSP_ASSERT(ps_state && ps_param);
     ps_state->f32_x1 =
-        fmaxf(fminf(f32_value, ps_param->f32_max), ps_param->f32_min);
+        pdsp_fmax(pdsp_fmin(f32_value, ps_param->f32_max), ps_param->f32_min);
     return ps_state->f32_x1;
 }
 
@@ -1174,11 +1165,16 @@ pdsp_extern pdsp_f32_t pdsp_saw(pdsp_saw_t *ps_state,
                                 const pdsp_saw_param_t *ps_param)
 {
     PDSP_ASSERT(ps_state && ps_param);
-    pdsp_f32_t af32_out[2] = {ps_state->f32_x0 + ps_param->f32_step,
-                              ps_param->f32_out_low};
-    /* result of comparison operation is 0 or 1 */
-    ps_state->f32_x0 = af32_out[(af32_out[0] > ps_param->f32_out_high)];
-    return ps_state->f32_x0;
+    ps_state->f32_x0 += ps_param->f32_step;
+    if (ps_state->f32_x0 > ps_param->f32_out_high)
+    {
+        ps_state->f32_x0 = 0.0f;
+        return 0.0f;
+    }
+    else
+    {
+        return ps_state->f32_x0;
+    }
 }
 
 pdsp_extern pdsp_f32_t pdsp_saw_shift(pdsp_f32_t f32_in,
@@ -1186,10 +1182,16 @@ pdsp_extern pdsp_f32_t pdsp_saw_shift(pdsp_f32_t f32_in,
                                       pdsp_f32_t f32_phase)
 {
     PDSP_ASSERT(ps_param);
-    pdsp_f32_t af32_out[2] = {f32_in + f32_phase,
-                              f32_in + f32_phase - ps_param->f32_out_high};
-    /* result of comparison operation is 0 or 1 */
-    return af32_out[(af32_out[0] >= ps_param->f32_out_high)];
+    f32_in += f32_phase;
+    if (f32_in > ps_param->f32_out_high)
+    {
+        f32_in -= ps_param->f32_out_high;
+        return f32_in;
+    }
+    else
+    {
+        return f32_in;
+    }
 }
 
 pdsp_extern pdsp_status_t
@@ -1259,8 +1261,8 @@ pdsp_extern pdsp_status_t pdsp_dpll_1ph_notch(pdsp_dpll_1ph_notch_t *ps_state,
     {
         ps_state->theta = ps_state->theta - PDSP_2_PI_F;
     }
-    ps_state->sine = (pdsp_f32_t)sinf(ps_state->theta);
-    ps_state->cosine = (pdsp_f32_t)cosf(ps_state->theta);
+    ps_state->sine = (pdsp_f32_t)pdsp_sin(ps_state->theta);
+    ps_state->cosine = (pdsp_f32_t)pdsp_cos(ps_state->theta);
     return PDSP_OK;
 }
 
@@ -1335,8 +1337,8 @@ pdsp_extern pdsp_status_t pdsp_dpll_1ph_sogi(pdsp_dpll_1ph_sogi_t *ps_state,
         ps_state->theta = ps_state->theta - PDSP_2_PI_F;
         // ps_state->theta=0;
     }
-    ps_state->sine = (pdsp_f32_t)sinf(ps_state->theta);
-    ps_state->cosine = (pdsp_f32_t)cosf(ps_state->theta);
+    ps_state->sine = (pdsp_f32_t)pdsp_sin(ps_state->theta);
+    ps_state->cosine = (pdsp_f32_t)pdsp_cos(ps_state->theta);
     return PDSP_OK;
 }
 
@@ -1421,8 +1423,8 @@ pdsp_dpll_1ph_sogi_fll(pdsp_dpll_1ph_sogi_fll_t *ps_state, pdsp_f32_t f32_in)
     {
         ps_state->theta = ps_state->theta - PDSP_2_PI_F;
     }
-    ps_state->sine = sinf(ps_state->theta);
-    ps_state->cosine = cosf(ps_state->theta);
+    ps_state->sine = pdsp_sin(ps_state->theta);
+    ps_state->cosine = pdsp_cos(ps_state->theta);
     /* FLL */
     ps_state->ef2 =
         ((ps_state->u[0] - ps_state->osg_u[0]) * ps_state->osg_qu[0]) *
@@ -1543,8 +1545,8 @@ pdsp_extern pdsp_status_t pdsp_dpll_3ph_ddsrf(pdsp_dpll_3ph_ddsrf_t *ps_state,
             ps_state->theta[0] - (pdsp_f32_t)(2.0f * 3.1415926f);
     }
     ps_state->theta[1] = ps_state->theta[0];
-    ps_state->cos_2theta = cosf(ps_state->theta[1] * 2.0f);
-    ps_state->sin_2theta = sinf(ps_state->theta[1] * 2.0f);
+    ps_state->cos_2theta = pdsp_cos(ps_state->theta[1] * 2.0f);
+    ps_state->sin_2theta = pdsp_sin(ps_state->theta[1] * 2.0f);
     return PDSP_OK;
 }
 
@@ -1608,8 +1610,8 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_data,
 {
     static pdsp_bool_t b_status_out;
     PDSP_ASSERT(ps_data);
-    b_status_out = pdsp_hysteresis_time(ps_data->ps_hyst,
-                                        f32_in > ps_data->f32_value);
+    b_status_out =
+        pdsp_hysteresis_time(ps_data->ps_hyst, f32_in > ps_data->f32_value);
     pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
     return b_status_out;
 }
@@ -1619,8 +1621,8 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_data,
 {
     static pdsp_bool_t b_status_out;
     PDSP_ASSERT(ps_data);
-    b_status_out = pdsp_hysteresis_time(ps_data->ps_hyst,
-                                        f32_in < ps_data->f32_value);
+    b_status_out =
+        pdsp_hysteresis_time(ps_data->ps_hyst, f32_in < ps_data->f32_value);
     pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
     return b_status_out;
 }
@@ -1630,8 +1632,8 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_data,
 {
     static pdsp_bool_t b_status_out;
     PDSP_ASSERT(ps_data);
-    b_status_out = pdsp_hysteresis_time(ps_data->ps_hyst,
-                                        f32_in == ps_data->f32_value);
+    b_status_out =
+        pdsp_hysteresis_time(ps_data->ps_hyst, f32_in == ps_data->f32_value);
     pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
     return b_status_out;
 }
@@ -1654,8 +1656,8 @@ pdsp_extern pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_data)
     return b_status_out;
 }
 
-pdsp_extern void
-pdsp_fault_process_group(pdsp_bool_t b_group, void pf_callback(void))
+pdsp_extern void pdsp_fault_process_group(pdsp_bool_t b_group,
+                                          void pf_callback(void))
 {
     PDSP_ASSERT(pf_callback);
     if (b_group)
@@ -1697,11 +1699,6 @@ pdsp_fault_process_group(pdsp_bool_t b_group, void pf_callback(void))
 //     ps_data->ps_var->e_trig_mode = e_mode;
 // }
 
-// pdsp_extern pdsp_u64_t * pdsp_log_get_head_ptr(pdsp_logger_t *ps_data)
-// {
-//     return (pdsp_u64_t *)ps_data->ps_u64_queue->pav_data;
-// }
-
 // pdsp_extern pdsp_status_t pdsp_sfra_init(pdsp_sfra_t *ps_state)
 // {
 //     PDSP_ASSERT(ps_state);
@@ -1736,21 +1733,26 @@ pdsp_fault_process_group(pdsp_bool_t b_group, void pf_callback(void))
 
 pdsp_extern pdsp_u16_t pdsp_aout(const pdsp_aout_t *sp_data)
 {
-    static pdsp_f32_t f32_data;
     PDSP_ASSERT(sp_data && sp_data->pv_data);
     if (sp_data->e_type == PDSP_AOUT_F32)
     {
-        f32_data = *(pdsp_f32_t *)sp_data->pv_data;
+        return (pdsp_u16_t)(*(pdsp_f32_t *)sp_data->pv_data *
+                                sp_data->f32_gain +
+                            sp_data->f32_offset);
     }
-    else if (sp_data->e_type == PDSP_AOUT_I16)
+    if (sp_data->e_type == PDSP_AOUT_I16)
     {
-        f32_data = (pdsp_f32_t)(*(pdsp_i16_t *)sp_data->pv_data);
+        return (pdsp_u16_t)((pdsp_f32_t)(*(pdsp_i16_t *)sp_data->pv_data) *
+                                sp_data->f32_gain +
+                            sp_data->f32_offset);
     }
-    else if (sp_data->e_type == PDSP_AOUT_U16)
+    if (sp_data->e_type == PDSP_AOUT_U16)
     {
-        f32_data = (pdsp_f32_t)(*(pdsp_u16_t *)sp_data->pv_data);
+        return (pdsp_u16_t)((pdsp_f32_t)(*(pdsp_u16_t *)sp_data->pv_data) *
+                                sp_data->f32_gain +
+                            sp_data->f32_offset);
     }
-    return (pdsp_u16_t)(f32_data * sp_data->f32_gain + sp_data->f32_offset);
+    return 0;
 }
 
 /*==============================================================================
