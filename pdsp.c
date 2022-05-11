@@ -106,6 +106,84 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
     return PDSP_ILLEGAL;
 }
 
+/* TODO */
+pdsp_extern pdsp_char_t *pdsp_srec_encode(pdsp_char_t *ac_start,
+                                             pdsp_srec_t *ps_data)
+{
+    // pdsp_u16_t checksum = 0;
+    // pdsp_u16_t data_idx = 0;
+    
+    // if (ps_data->e_type == PDSP_SREC_S0_HEADER)
+    // {
+    //     PDSP_ASSERT(ps_data->u32_address == 0);
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '0';
+
+    //     (*ac_start++) = '0';
+    //     (*ac_start++) = '0';
+    //     (*ac_start++) = '0';
+    //     (*ac_start++) = '0';
+
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S1_DATA16)
+    // {
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '1';
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S2_DATA24)
+    // {
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '2';
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S3_DATA32)
+    // {
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '3';
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S5_COUNT16)
+    // {
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '5';
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S6_COUNT32)
+    // {
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '6';
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S7_TERM16)
+    // {
+    //     PDSP_ASSERT(ps_data->u16_size == 0);
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '7';
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S8_TERM24)
+    // {
+    //      PDSP_ASSERT(ps_data->u16_size == 0);
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '8';
+    //     return ac_start;
+    // }
+    // else if (ps_data->e_type == PDSP_SREC_S9_TERM32)
+    // {
+    //      PDSP_ASSERT(ps_data->u16_size == 0);
+    //     (*ac_start++) = 'S';
+    //     (*ac_start++) = '9';
+    //     return ac_start;
+    // }
+    // else
+    // {
+    //     return ac_start;
+    // }
+    return ac_start;
+}
+
 pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
                                             pdsp_char_t *a6c_out)
 {
@@ -646,27 +724,45 @@ SIGNAL
 pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw)
 {
     PDSP_ASSERT(ps_data);
-    if (ps_data->ps_ovr->u32_enable)
+    if (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_OFF)
+    {
+        return ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset);
+    }
+    else if (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_ON)
     {
         return ps_data->ps_ovr->f32_value;
     }
-    else
+    else if (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_INJECT)
     {
-        return ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset);
+        return ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset) +
+               ps_data->ps_ovr->f32_value;
+    }
+    else /* (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_RAW) */
+    {
+        return f32_raw;
     }
 }
 
 pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data,
-                                     pdsp_f32_t f32_raw)
+                                     pdsp_f32_t f32_value)
 {
     PDSP_ASSERT(ps_data && ps_data->ps_ovr);
-    ps_data->ps_ovr->u32_enable = PDSP_TRUE;
-    ps_data->ps_ovr->f32_value = f32_raw;
+    ps_data->ps_ovr->u23_ovr_mode = PDSP_OVERRIDE_ON;
+    ps_data->ps_ovr->f32_value = f32_value;
 }
 
 pdsp_extern void pdsp_ain_ovr_disable(const pdsp_ain_t *ps_data)
 {
-    ps_data->ps_ovr->u32_enable = PDSP_FALSE;
+    PDSP_ASSERT(ps_data && ps_data->ps_ovr);
+    ps_data->ps_ovr->u23_ovr_mode = PDSP_OVERRIDE_OFF;
+}
+
+pdsp_extern void pdsp_ain_ovr_inject(const pdsp_ain_t *ps_data,
+                                     pdsp_f32_t f32_value)
+{
+    PDSP_ASSERT(ps_data && ps_data->ps_ovr);
+    ps_data->ps_ovr->u23_ovr_mode = PDSP_OVERRIDE_INJECT;
+    ps_data->ps_ovr->f32_value = f32_value;
 }
 
 pdsp_extern pdsp_f32_t pdsp_ain_calibrate_gain(pdsp_f32_t f32_gain_old,
@@ -712,12 +808,10 @@ pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data)
 pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
                                    pdsp_f32_t f32_in)
 {
-    pdsp_expavg_var_t *ps_var;
     PDSP_ASSERT(ps_data && ps_data->ps_var);
-    ps_var = ps_data->ps_var;
-    ps_var->f32_x1 =
-        ps_var->f32_x1 + ps_data->f32_tau * (f32_in - ps_var->f32_x1);
-    return ps_var->f32_x1;
+    ps_data->ps_var->f32_x1 +=
+        ps_data->f32_tau * (f32_in - ps_data->ps_var->f32_x1);
+    return ps_data->ps_var->f32_x1;
 }
 
 pdsp_extern void pdsp_df22_clear(pdsp_df22_var_t *ps_var)

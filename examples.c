@@ -322,6 +322,9 @@ void example_ain(void)
     pdsp_ain_ovr_disable(&vin_ain);
     vin = pdsp_ain(&vin_ain, -2.0f);
     PDSP_ASSERT(vin == 6.0f);
+    pdsp_ain_ovr_inject(&vin_ain, 4.0f);
+    vin = pdsp_ain(&vin_ain, -2.0f);
+    PDSP_ASSERT(vin == 10.0f);
 }
 
 void example_ain_calibrate(void)

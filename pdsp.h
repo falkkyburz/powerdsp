@@ -318,17 +318,69 @@ typedef struct pdsp_queue_tag
     pdsp_i16_t i16_size;
 } pdsp_queue_t;
 
+/** SREC record types */
+typedef enum pdsp_srec_type_tag
+{
+    /** SREC header record with info string. */
+    PDSP_SREC_S0_HEADER,
+    /** SREC data record with 16bit address. */
+    PDSP_SREC_S1_DATA16,
+    /** SREC data record with 24bit address. */
+    PDSP_SREC_S2_DATA24,
+    /** SREC data record with 32bit address. */
+    PDSP_SREC_S3_DATA32,
+    /** SREC reserved record. Do not use! */
+    PDSP_SREC_S4_RESERVED,
+    /** SREC count record with 16bit counter size. */
+    PDSP_SREC_S5_COUNT16,
+    /** SREC count record with 16bit counter size. */
+    PDSP_SREC_S6_COUNT32,
+    /** SREC termination record with 16bit start address. */
+    PDSP_SREC_S7_TERM16,
+    /** SREC termination record with 24bit start address. */
+    PDSP_SREC_S8_TERM24,
+    /** SREC termination record with 32bit start address. */
+    PDSP_SREC_S9_TERM32
+} pdsp_srec_type_t;
+
+/** SREC record data struct */
+typedef struct pdsp_srec_tag
+{
+    /** SREC record address field. */
+    pdsp_u32_t u32_address;
+    /** Pointer to binary data to be written to the record. */
+    pdsp_i16_t *ai16_data;
+    /** Size of the data array. */
+    pdsp_u16_t u16_size;
+    /** SREC record type. */
+    pdsp_srec_type_t e_type;
+} pdsp_srec_t;
+
 /** @} util */
 /* ------------------------------------------------------------------------ */
 /** @addtogroup signal Signal
  *  @{
  */
 
+/** Analog input override mode. */
+typedef enum pdsp_ain_override_mode_tag
+{
+    /** Override is turned off, raw * gain + offset is returned. */
+    PDSP_OVERRIDE_OFF,
+    /** Override is turned on, the override value is returned. */
+    PDSP_OVERRIDE_ON,
+    /** Injection is turned on, the override value is added to the result. */
+    PDSP_OVERRIDE_INJECT,
+    /** Override is turned on, the raw value is returned without modification.
+     */
+    PDSP_OVERRIDE_RAW,
+} pdsp_ain_override_mode_t;
+
 /** DAQ Override struct. */
 typedef struct pdsp_ain_override_tag
 {
     /** Override disable. Normally 0.0f, set to 1.0f to override. */
-    pdsp_u32_t u32_enable;
+    pdsp_ain_override_mode_t u23_ovr_mode;
     /** Override value. */
     pdsp_f32_t f32_value;
 } pdsp_ain_override_t;
@@ -884,7 +936,8 @@ typedef struct pdsp_logger_var_tag
     /** User setting: Trigger condition function. */
     pdsp_bool_t (*pdsp_pb_func_t)(void);
     /** Sample countdown counter. Counts down when b_triggered is PDSP_TRUE
-    */ pdsp_u32_t u23_counter;
+     */
+    pdsp_u32_t u23_counter;
     /** Triggered state. PDSP_TRUE when trigger condition was met. */
     pdsp_bool_t b_triggered;
 } pdsp_logger_var_t;
@@ -1025,6 +1078,14 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
                                           pdsp_size_t s_size,
                                           pdsp_i16_t i16_idx,
                                           pdsp_i16_t *i16_out);
+
+/**
+ * @brief Put a SREC header into the string buffer.
+ * @param ac_start String pointer to the start of the string.
+ * @param ps_data Pointer to record data struct.
+ * @return Pointer to the next element in the sring.
+ */
+pdsp_extern pdsp_char_t *pdsp_srec_encode(pdsp_char_t *ac_start, pdsp_srec_t *ps_data);
 
 /**
  * @brief Convert the number i16_in to a 6 character fixed length string.
@@ -1441,16 +1502,25 @@ pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw);
 /**
  * @brief Set and enable override.
  * @param ps_data Signal data struct.
- * @param f32_raw Raw input signal.
+ * @param f32_value Override value.
  */
 pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data,
-                                     pdsp_f32_t f32_raw);
+                                     pdsp_f32_t f32_value);
 
 /**
  * @brief Enable disable.
  * @param ps_data Signal data struct.
  */
 pdsp_extern void pdsp_ain_ovr_disable(const pdsp_ain_t *ps_data);
+
+/**
+ * @brief Signal injection function to be used with SFRA or other testing
+ * functions.
+ * @param ps_data Signal data struct.
+ * @param f32_value Override value.
+ */
+pdsp_extern void pdsp_ain_ovr_inject(const pdsp_ain_t *ps_data,
+                                     pdsp_f32_t f32_value);
 
 /**
  * @brief Calibrate analog input gain value.
