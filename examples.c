@@ -268,6 +268,23 @@ void example_hysteresis_time(void)
     PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
 }
 
+void example_status(void)
+{
+    printf("-- void example_status(void) --\n");
+    pdsp_u32_t u32_status = 0U;
+    pdsp_u32_t *pu32_status = &u32_status;
+    PDSP_ASSERT(u32_status == 0x0);
+    pdsp_status_set(pu32_status, 0x1);
+    PDSP_ASSERT(u32_status == 0x1U);
+    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x1, 0x0) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x0, 0xFFFFFFFE) == PDSP_TRUE);
+    pdsp_status_clear(pu32_status, 0xFFFFFFFF);
+    PDSP_ASSERT(u32_status == 0x0);
+    pdsp_status_set(pu32_status, 0x1000);
+    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x1000, 0x0) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x0, 0xFFFFEFFF) == PDSP_TRUE);
+}
+
 void example_mean(void)
 {
     printf("-- void example_mean(void) --\n");
@@ -612,6 +629,7 @@ int main()
     example_interpollate_2d();
     example_hysteresis_value();
     example_hysteresis_time();
+    example_status();
     example_mean();
     example_queue();
     example_ain();

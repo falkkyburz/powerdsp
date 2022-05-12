@@ -12,11 +12,11 @@ $(TARGET): pdsp.o examples.o
 
 pdsp.o: pdsp.c
 	$(info Compile pdsp.c:)
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -c -O3 -o $@ $<
 
 examples.o: examples.c
 	$(info Compile examples.c:)
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -c -O0 -o $@ $<
 
 .PHONY: clean
 clean:

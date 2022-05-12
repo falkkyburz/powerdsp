@@ -1314,6 +1314,33 @@ pdsp_extern pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
                                           pdsp_u16_t u16_bit);
 
 /**
+ * @brief Write to status register. Set bits in mask.
+ * @param pu32_mem Memory pointer to the variable.
+ * @param u32_mask Status bits to set.
+ */
+pdsp_extern void pdsp_status_set(pdsp_u32_t *pu32_mem,
+                                          pdsp_u32_t u32_mask);
+
+/**
+ * @brief Write to status register. Clear bits in mask.
+ * @param pu32_mem Memory pointer to the variable.
+ * @param u32_mask Status bits to clear.
+ */
+pdsp_extern void pdsp_status_clear(pdsp_u32_t *pu32_mem,
+                                          pdsp_u32_t u32_mask);
+
+/**
+ * @brief Read status according to true and false masks.
+ * @param pu32_mem Memory pointer to the variable.
+ * @param u32_mask_true Mask for bits that must be true, can be 0 if only false mask is used.
+ * @param u32_mask_false Mask for bits that must be false, can be 0 if only true mask is used.
+ * @return pdsp_bool_t Compare result.
+ */
+pdsp_extern pdsp_bool_t pdsp_status_get(pdsp_u32_t *pu32_mem,
+                                          pdsp_u32_t u32_mask_true, pdsp_u32_t u32_mask_false);
+
+
+/**
  * @brief Convert (gain/offset) f32 to i16 and write signal into a 64bit word
  * (big endian)
  * @param ps_prop Pointer to signal property struct.

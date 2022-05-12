@@ -108,11 +108,11 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
 
 /* TODO */
 pdsp_extern pdsp_char_t *pdsp_srec_encode(pdsp_char_t *ac_start,
-                                             pdsp_srec_t *ps_data)
+                                          pdsp_srec_t *ps_data)
 {
     // pdsp_u16_t checksum = 0;
     // pdsp_u16_t data_idx = 0;
-    
+
     // if (ps_data->e_type == PDSP_SREC_S0_HEADER)
     // {
     //     PDSP_ASSERT(ps_data->u32_address == 0);
@@ -526,6 +526,26 @@ pdsp_extern pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
 {
     PDSP_ASSERT(pu32_mem && (u16_bit < 32));
     return (pdsp_bool_t)((*pu32_mem >> u16_bit) & 1U);
+}
+
+pdsp_extern void pdsp_status_set(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask)
+{
+    PDSP_ASSERT(pu32_mem);
+    (*pu32_mem) |= u32_mask;
+}
+
+pdsp_extern void pdsp_status_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask)
+{
+    PDSP_ASSERT(pu32_mem);
+    (*pu32_mem) &= ~u32_mask;
+}
+
+pdsp_extern pdsp_bool_t pdsp_status_get(pdsp_u32_t *pu32_mem,
+                                        pdsp_u32_t u32_mask_true,
+                                        pdsp_u32_t u32_mask_false)
+{
+    PDSP_ASSERT(pu32_mem);
+    return ((*pu32_mem) & u32_mask_true) | ((~(*pu32_mem)) & u32_mask_false);
 }
 
 pdsp_extern void pdsp_signal_write_f32(const pdsp_signal_prop_t *ps_prop,
