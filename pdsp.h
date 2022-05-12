@@ -52,6 +52,12 @@
 /** Uncomment to set all functions to static and include them in this file. */
 // #define PDSP_STATIC_FUNCTIONS
 
+/** Place PRAGMAs for DSP optimization here */
+#if defined(__TMS320C2000__)
+#pragma CODE_SECTION(pdsp_stopwatch_start, ".TI.ramfunc")
+#pragma CODE_SECTION(pdsp_stopwatch_stop, ".TI.ramfunc")
+#endif
+
 /*==============================================================================
  CONFIGURATION
  =============================================================================*/
@@ -93,6 +99,8 @@
 #define PDSP_PI_4_F (0.78539816339f)
 /** Float literal holding 2*PI. */
 #define PDSP_2_PI_F (6.28318530718f)
+/** Float literal holding 1/(2*PI). */
+#define PDSP_2_PI_INV_F (1.0f / 6.28318530718f)
 /** Float literal holding 2*PI/3. */
 #define PDSP_2_PI_3_F (2.09439510239f)
 /** Float literal holding 4*PI/3. */
@@ -114,34 +122,40 @@
 /** Gain to convert a value to DAC voltage (corresponding integer). */
 #define PDSP_3V3_12BIT_F (3.3f / 4096.0f)
 
-/* Fixed and floating point types */
+/* Floating point functions with intrinsics on MCU. */
 #if defined(_WIN64)
 /** Floating point minimum function macro */
-#define pdsp_fmin(x, y) fminf((x), (y))
+#define pdsp_minf(x, y) fminf((x), (y))
 /** Floating point maximum function macro */
-#define pdsp_fmax(x, y) fmaxf((x), (y))
+#define pdsp_maxf(x, y) fmaxf((x), (y))
 /** Floating point division */
-#define pdsp_div(x, y) ((x) / (y))
+#define pdsp_divf(x, y) ((x) / (y))
 /** Sine function macro */
-#define pdsp_sin(x) sinf((x))
+#define pdsp_sinf(x) sinf((x))
 /** Sine function macro PU */
-#define pdsp_sinpu(x) sinf((x) / PDSP_2_PI_F)
+#define pdsp_sinpuf(x) sinf((x) / PDSP_2_PI_F)
 /** Cosine function macro */
-#define pdsp_cos(x) cosf((x))
+#define pdsp_cosf(x) cosf((x))
 /** Cosine function macro PU */
-#define pdsp_cospu(x) cosf((x) / PDSP_2_PI_F)
+#define pdsp_cospuf(x) cosf((x) / PDSP_2_PI_F)
 /** Square root function */
-#define pdsp_sqrt(x) sqrtf((x))
+#define pdsp_sqrtf(x) sqrtf((x))
+
+/* Specific intrinsics for C28x */
 #elif defined(__TMS320C2000__)
-#define pdsp_fmin(x, y) __fmin((x), (y))
-#define pdsp_fmax(x, y) __fmax((x), (y))
-#define pdsp_div(x, y) __divf32((x), (y))
-#define pdsp_sin(x) __sin((x))
-#define pdsp_sinpu(x) __sinpuf32((x))
-#define pdsp_cos(x) __cos((x))
-#define pdsp_cospu(x) __cospuf32((x))
-#define pdsp_sqrt(x) __sqrt((x))
+#define pdsp_minf(x, y) __fmin((x), (y))
+#define pdsp_maxf(x, y) __fmax((x), (y))
+#define pdsp_divf(x, y) __divf32((x), (y))
+#define pdsp_sinf(x) __sin((x))
+#define pdsp_sinpuf(x) __sinpuf32((x))
+#define pdsp_cosf(x) __cos((x))
+#define pdsp_cospuf(x) __cospuf32((x))
+#define pdsp_sqrtf(x) __sqrt((x))
 #elif defined(__TMS320C28XX_CLA__)
+/* Specific intrinsics for CLA */
+
+#elif defined(__arm__)
+/* Specific intrinsics for ARM */
 
 #endif
 
@@ -194,6 +208,8 @@ typedef size_t pdsp_size_t;
 typedef char pdsp_char_t;
 #elif defined(__TMS320C28XX_CLA__)
 #define PDSP_CLA
+#elif defined(__arm__)
+#define PDSP_ARM
 #endif
 
 /** PDSP status for function return value. */
@@ -1085,7 +1101,8 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
  * @param ps_data Pointer to record data struct.
  * @return Pointer to the next element in the sring.
  */
-pdsp_extern pdsp_char_t *pdsp_srec_encode(pdsp_char_t *ac_start, pdsp_srec_t *ps_data);
+pdsp_extern pdsp_char_t *pdsp_srec_encode(pdsp_char_t *ac_start,
+                                          pdsp_srec_t *ps_data);
 
 /**
  * @brief Convert the number i16_in to a 6 character fixed length string.
@@ -1318,27 +1335,27 @@ pdsp_extern pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
  * @param pu32_mem Memory pointer to the variable.
  * @param u32_mask Status bits to set.
  */
-pdsp_extern void pdsp_status_set(pdsp_u32_t *pu32_mem,
-                                          pdsp_u32_t u32_mask);
+pdsp_extern void pdsp_status_set(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
 
 /**
  * @brief Write to status register. Clear bits in mask.
  * @param pu32_mem Memory pointer to the variable.
  * @param u32_mask Status bits to clear.
  */
-pdsp_extern void pdsp_status_clear(pdsp_u32_t *pu32_mem,
-                                          pdsp_u32_t u32_mask);
+pdsp_extern void pdsp_status_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
 
 /**
  * @brief Read status according to true and false masks.
  * @param pu32_mem Memory pointer to the variable.
- * @param u32_mask_true Mask for bits that must be true, can be 0 if only false mask is used.
- * @param u32_mask_false Mask for bits that must be false, can be 0 if only true mask is used.
+ * @param u32_mask_true Mask for bits that must be true, can be 0 if only false
+ * mask is used.
+ * @param u32_mask_false Mask for bits that must be false, can be 0 if only true
+ * mask is used.
  * @return pdsp_bool_t Compare result.
  */
 pdsp_extern pdsp_bool_t pdsp_status_get(pdsp_u32_t *pu32_mem,
-                                          pdsp_u32_t u32_mask_true, pdsp_u32_t u32_mask_false);
-
+                                        pdsp_u32_t u32_mask_true,
+                                        pdsp_u32_t u32_mask_false);
 
 /**
  * @brief Convert (gain/offset) f32 to i16 and write signal into a 64bit word

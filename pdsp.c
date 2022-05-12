@@ -281,7 +281,7 @@ pdsp_extern pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
     }
     else
     {
-        return (pdsp_div((f32_out_hi - f32_out_lo), (f32_in_hi - f32_in_lo)) *
+        return (pdsp_divf((f32_out_hi - f32_out_lo), (f32_in_hi - f32_in_lo)) *
                     (f32_in - f32_in_lo) +
                 f32_out_lo);
     }
@@ -291,7 +291,7 @@ pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
                                     pdsp_f32_t f32_in_hi, pdsp_f32_t f32_idx_hi)
 {
     pdsp_f32_t f32_index;
-    f32_in = pdsp_fmin(pdsp_fmax(f32_in, f32_in_lo), f32_in_hi);
+    f32_in = pdsp_minf(pdsp_maxf(f32_in, f32_in_lo), f32_in_hi);
     if ((f32_in_hi - f32_in_lo) == 0.0f)
     {
         f32_index = f32_idx_hi * 0.5f;
@@ -299,7 +299,7 @@ pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
     else
     {
         f32_index =
-            pdsp_div(f32_idx_hi, f32_in_hi - f32_in_lo) * (f32_in - f32_in_lo);
+            pdsp_divf(f32_idx_hi, f32_in_hi - f32_in_lo) * (f32_in - f32_in_lo);
     }
     /* Float to int conversion is implementation specific. */
 #if defined(F32_TO_INT_ROUNDS_TO_NEAREST)
@@ -561,7 +561,7 @@ pdsp_extern void pdsp_signal_write_f32(const pdsp_signal_prop_t *ps_prop,
 pdsp_extern pdsp_f32_t pdsp_signal_read_f32(const pdsp_signal_prop_t *ps_prop,
                                             pdsp_u64_t *pu64_mem)
 {
-    return pdsp_div(((pdsp_f32_t)pdsp_signal_read_u16(ps_prop, pu64_mem) -
+    return pdsp_divf(((pdsp_f32_t)pdsp_signal_read_u16(ps_prop, pu64_mem) -
                      ps_prop->f32_offset),
                     ps_prop->f32_gain);
 }
@@ -793,7 +793,7 @@ pdsp_extern pdsp_f32_t pdsp_ain_calibrate_gain(pdsp_f32_t f32_gain_old,
     {
         f32_raw = f32_ref;
     }
-    return pdsp_div(f32_gain_old * f32_ref, f32_raw);
+    return pdsp_divf(f32_gain_old * f32_ref, f32_raw);
 }
 
 pdsp_extern pdsp_f32_t pdsp_ain_calibrate_offset(pdsp_f32_t f32_offset_old,
@@ -814,8 +814,8 @@ pdsp_extern void pdsp_minmax_clear(pdsp_minmax_var_t *ps_var)
 pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_var);
-    ps_var->f32_min = pdsp_fmin(ps_var->f32_min, f32_in);
-    ps_var->f32_max = pdsp_fmax(ps_var->f32_max, f32_in);
+    ps_var->f32_min = pdsp_minf(ps_var->f32_min, f32_in);
+    ps_var->f32_max = pdsp_maxf(ps_var->f32_max, f32_in);
     ps_var->f32_delta = ps_var->f32_max - ps_var->f32_min;
 }
 
@@ -865,8 +865,8 @@ pdsp_extern pdsp_f32_t pdsp_med3(pdsp_med3_var_t *ps_var, pdsp_f32_t f32_in)
     static pdsp_f32_t out;
     PDSP_ASSERT(ps_var);
     out = ((ps_var->f32_x2 + ps_var->f32_x1 + f32_in) -
-           pdsp_fmin(ps_var->f32_x2, pdsp_fmin(ps_var->f32_x1, f32_in)) -
-           pdsp_fmax(ps_var->f32_x2, pdsp_fmax(ps_var->f32_x1, f32_in)));
+           pdsp_minf(ps_var->f32_x2, pdsp_minf(ps_var->f32_x1, f32_in)) -
+           pdsp_maxf(ps_var->f32_x2, pdsp_maxf(ps_var->f32_x1, f32_in)));
     /* store history x[k-2] = x[k-1] */
     ps_var->f32_x2 = ps_var->f32_x1;
     /* store history x[k-1] = x[k] */
@@ -893,13 +893,13 @@ pdsp_extern void pdsp_rollsum_init(const pdsp_rollsum_t *ps_data,
     {
         ps_queue_var->i16_tail = ps_queue->i16_size - i16_win_size;
         ps_roll_var->f32_win_size_inv =
-            pdsp_div(1.0f, (pdsp_f32_t)i16_win_size);
+            pdsp_divf(1.0f, (pdsp_f32_t)i16_win_size);
     }
     else
     {
         ps_queue_var->i16_tail = 0;
         ps_roll_var->f32_win_size_inv =
-            pdsp_div(1.0f, (pdsp_f32_t)ps_queue->i16_size);
+            pdsp_divf(1.0f, (pdsp_f32_t)ps_queue->i16_size);
     }
     pdsp_array_set_f32(ps_queue->pav_data, ps_queue->i16_size, 0.0f);
 }
@@ -942,7 +942,7 @@ pdsp_extern pdsp_f32_t pdsp_rollrms(const pdsp_rollsum_t *ps_data,
                                     pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_data);
-    return pdsp_sqrt(pdsp_rollsum(
+    return pdsp_sqrtf(pdsp_rollsum(
         ps_data, f32_in * f32_in * ps_data->ps_var->f32_win_size_inv));
 }
 
@@ -1064,7 +1064,7 @@ pdsp_extern pdsp_f32_t pdsp_pi(pdsp_pi_t *ps_data, pdsp_f32_t f32_error)
     /* Calculate the sum of integral and proportional part. */
     f32_sum = f32_error * ps_param->f32_kp + ps_var->f32_x0;
     /* Apply saturation. */
-    f32_out = pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_sum));
+    f32_out = pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
     ps_var->f32_x1 = f32_out - f32_sum;
     return f32_out;
@@ -1101,7 +1101,7 @@ pdsp_extern pdsp_f32_t pdsp_pi2(pdsp_pi2_t *ps_data, pdsp_f32_t f32_error0,
         f32_sum = f32_error1 * ps_param1->f32_kp + ps_data->ps_var->f32_x0;
     }
     /* Apply saturation. */
-    f32_out = pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_sum));
+    f32_out = pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
     ps_data->ps_var->f32_x1 = f32_out - f32_sum;
     return f32_out;
@@ -1168,7 +1168,7 @@ pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
         f32_sum = f32_error3 * ps_param3->f32_kp + ps_var->f32_x0;
     }
     /* Apply saturation. */
-    f32_out = pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_sum));
+    f32_out = pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
     ps_var->f32_x1 = f32_out - f32_sum;
     return f32_out;
@@ -1179,7 +1179,7 @@ pdsp_extern void pdsp_pi_set(pdsp_pi_t *ps_data, pdsp_f32_t f32_out)
     PDSP_ASSERT(ps_data && ps_data->ps_var);
     /* Set integral value to out_value. */
     ps_data->ps_var->f32_x0 =
-        pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_out));
+        pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_out));
     /* Set saturation memory to 0. */
     ps_data->ps_var->f32_x1 = 0.0f;
 }
@@ -1189,7 +1189,7 @@ pdsp_extern void pdsp_pi2_set(pdsp_pi2_t *ps_data, pdsp_f32_t f32_out)
     PDSP_ASSERT(ps_data && ps_data->ps_var);
     /* Set integral value to out_value. */
     ps_data->ps_var->f32_x0 =
-        pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_out));
+        pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_out));
     /* Set saturation memory to 0. */
     ps_data->ps_var->f32_x1 = 0.0f;
 }
@@ -1199,7 +1199,7 @@ pdsp_extern void pdsp_pi4_set(pdsp_pi4_t *ps_data, pdsp_f32_t f32_out)
     PDSP_ASSERT(ps_data && ps_data->ps_var);
     /* Set integral value to out_value. */
     ps_data->ps_var->f32_x0 =
-        pdsp_fmax(ps_data->f32_min, pdsp_fmin(ps_data->f32_max, f32_out));
+        pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_out));
     /* Set saturation memory to 0. */
     ps_data->ps_var->f32_x1 = 0.0f;
 }
@@ -1217,7 +1217,7 @@ pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_state,
     PDSP_ASSERT(ps_state && ps_param);
     ps_state->f32_x1 =
         ps_state->f32_x1 +
-        pdsp_fmax(pdsp_fmin(ps_state->f32_dest - ps_state->f32_x1,
+        pdsp_maxf(pdsp_minf(ps_state->f32_dest - ps_state->f32_x1,
                             ps_param->f32_step),
                   -ps_param->f32_step);
     return ps_state->f32_x1;
@@ -1239,7 +1239,7 @@ pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_state,
 {
     PDSP_ASSERT(ps_state && ps_param);
     ps_state->f32_dest =
-        pdsp_fmax(pdsp_fmin(f32_dest, ps_param->f32_max), ps_param->f32_min);
+        pdsp_maxf(pdsp_minf(f32_dest, ps_param->f32_max), ps_param->f32_min);
     return PDSP_OK;
 }
 
@@ -1256,7 +1256,7 @@ pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_state,
 {
     PDSP_ASSERT(ps_state && ps_param);
     ps_state->f32_x1 =
-        pdsp_fmax(pdsp_fmin(f32_value, ps_param->f32_max), ps_param->f32_min);
+        pdsp_maxf(pdsp_minf(f32_value, ps_param->f32_max), ps_param->f32_min);
     return ps_state->f32_x1;
 }
 
@@ -1375,8 +1375,8 @@ pdsp_extern pdsp_status_t pdsp_dpll_1ph_notch(pdsp_dpll_1ph_notch_t *ps_state,
     {
         ps_state->theta = ps_state->theta - PDSP_2_PI_F;
     }
-    ps_state->sine = (pdsp_f32_t)pdsp_sin(ps_state->theta);
-    ps_state->cosine = (pdsp_f32_t)pdsp_cos(ps_state->theta);
+    ps_state->sine = (pdsp_f32_t)pdsp_sinf(ps_state->theta);
+    ps_state->cosine = (pdsp_f32_t)pdsp_cosf(ps_state->theta);
     return PDSP_OK;
 }
 
@@ -1451,8 +1451,8 @@ pdsp_extern pdsp_status_t pdsp_dpll_1ph_sogi(pdsp_dpll_1ph_sogi_t *ps_state,
         ps_state->theta = ps_state->theta - PDSP_2_PI_F;
         // ps_state->theta=0;
     }
-    ps_state->sine = (pdsp_f32_t)pdsp_sin(ps_state->theta);
-    ps_state->cosine = (pdsp_f32_t)pdsp_cos(ps_state->theta);
+    ps_state->sine = (pdsp_f32_t)pdsp_sinf(ps_state->theta);
+    ps_state->cosine = (pdsp_f32_t)pdsp_cosf(ps_state->theta);
     return PDSP_OK;
 }
 
@@ -1537,8 +1537,8 @@ pdsp_dpll_1ph_sogi_fll(pdsp_dpll_1ph_sogi_fll_t *ps_state, pdsp_f32_t f32_in)
     {
         ps_state->theta = ps_state->theta - PDSP_2_PI_F;
     }
-    ps_state->sine = pdsp_sin(ps_state->theta);
-    ps_state->cosine = pdsp_cos(ps_state->theta);
+    ps_state->sine = pdsp_sinf(ps_state->theta);
+    ps_state->cosine = pdsp_cosf(ps_state->theta);
     /* FLL */
     ps_state->ef2 =
         ((ps_state->u[0] - ps_state->osg_u[0]) * ps_state->osg_qu[0]) *
@@ -1548,11 +1548,11 @@ pdsp_dpll_1ph_sogi_fll(pdsp_dpll_1ph_sogi_fll_t *ps_state, pdsp_f32_t f32_in)
     // ps_state->x3[0]= (ps_state->x3[0]<-1.0)?-1.0:ps_state->x3[0];
     ps_state->x3[1] = ps_state->x3[0];
     ps_state->w_dash = ps_state->wc + ps_state->x3[0];
-    ps_state->fn = ps_state->w_dash / PDSP_2_PI_F;
+    ps_state->fn = ps_state->w_dash * PDSP_2_PI_INV_F;
     osgx = (2.0f * ps_state->k * ps_state->w_dash * ps_state->delta_t);
     osgy = (ps_state->w_dash * ps_state->delta_t * ps_state->w_dash *
             ps_state->delta_t);
-    temp = 1.0f / (osgx + osgy + 4.0f);
+    temp = pdsp_divf(1.0f, (osgx + osgy + 4.0f));
     ps_state->osg_coeff.osg_b0 = osgx * temp;
     ps_state->osg_coeff.osg_b2 = -1.0f * ps_state->osg_coeff.osg_b0;
     ps_state->osg_coeff.osg_a1 = ((2.0f * (4.0f - osgy)) * temp);
@@ -1659,8 +1659,8 @@ pdsp_extern pdsp_status_t pdsp_dpll_3ph_ddsrf(pdsp_dpll_3ph_ddsrf_t *ps_state,
             ps_state->theta[0] - (pdsp_f32_t)(2.0f * 3.1415926f);
     }
     ps_state->theta[1] = ps_state->theta[0];
-    ps_state->cos_2theta = pdsp_cos(ps_state->theta[1] * 2.0f);
-    ps_state->sin_2theta = pdsp_sin(ps_state->theta[1] * 2.0f);
+    ps_state->cos_2theta = pdsp_cosf(ps_state->theta[1] * 2.0f);
+    ps_state->sin_2theta = pdsp_sinf(ps_state->theta[1] * 2.0f);
     return PDSP_OK;
 }
 
