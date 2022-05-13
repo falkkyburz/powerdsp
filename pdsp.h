@@ -446,10 +446,12 @@ typedef struct pdsp_df22_var_tag
     pdsp_f32_t f32_x1;
     /** df22 filter x1 state variable */
     pdsp_f32_t f32_x2;
+    /** df22 filter output */
+    pdsp_f32_t f32_out;
 } pdsp_df22_var_t;
 
-/** DF22 filter parameter struct. */
-typedef struct pdsp_df22_param_tag
+/** DF22 memory struct. */
+typedef struct pdsp_df22_tag
 {
     /** df22 filter b0 coefficient. */
     pdsp_f32_t f32_b0;
@@ -461,19 +463,19 @@ typedef struct pdsp_df22_param_tag
     pdsp_f32_t f32_a1;
     /** df22 filter a2 coefficient. */
     pdsp_f32_t f32_a2;
-} pdsp_df22_param_t;
+} pdsp_df22_t;
 
 /** DF11 filter state memory struct. */
-typedef struct pdsp_df11_tag
+typedef struct pdsp_df11_var_tag
 {
     /** df22 filter x0 state variable */
     pdsp_f32_t f32_x1;
     /** df22 filter x1 state variable */
     pdsp_f32_t f32_x2;
-} pdsp_df11_t;
+} pdsp_df11_var_t;
 
 /** DF11 filter data struct. */
-typedef struct pdsp_df11_param_tag
+typedef struct pdsp_df11_tag
 {
     /** df11 filter b0 coefficient. */
     pdsp_f32_t f32_b0;
@@ -481,7 +483,7 @@ typedef struct pdsp_df11_param_tag
     pdsp_f32_t f32_b1;
     /** df11 filter a1 coefficient. */
     pdsp_f32_t f32_a1;
-} pdsp_df11_param_t;
+} pdsp_df11_t;
 
 /** Median memory struct. */
 typedef struct pdsp_med3_var_tag
@@ -730,9 +732,9 @@ typedef struct pdsp_dpll_1ph_notch_tag
     /** Inverse of the ISR rate at which module is called */
     pdsp_f32_t delta_t;
     /** Notch filter coeffcient structure */
-    pdsp_df22_param_t notch_coeff;
+    pdsp_df22_t notch_coeff;
     /** Loop filter coeffcient structure */
-    pdsp_df11_param_t lpf_coeff;
+    pdsp_df11_t lpf_coeff;
 } pdsp_dpll_1ph_notch_t;
 
 /** Orthogonal signal generator variables. */
@@ -790,7 +792,7 @@ typedef struct pdsp_dpll_1ph_sogi_tag
     /** Orthogonal signal generator coefficient */
     pdsp_osg_param_t osg_coeff;
     /** Loop filter coeffcient structure */
-    pdsp_df11_param_t lpf_coeff;
+    pdsp_df11_t lpf_coeff;
 } pdsp_dpll_1ph_sogi_t;
 
 /** Single phase sogi dpll fll structure. */
@@ -835,7 +837,7 @@ typedef struct pdsp_dpll_1ph_sogi_fll_tag
     /** Orthogonal signal generator coefficient */
     pdsp_osg_param_t osg_coeff;
     /** Loop filter coeffcient structure */
-    pdsp_df11_param_t lpf_coeff;
+    pdsp_df11_t lpf_coeff;
 } pdsp_dpll_1ph_sogi_fll_t;
 
 /** Three phase ddsrf dpll structure. */
@@ -890,7 +892,7 @@ typedef struct pdsp_dpll_3ph_ddsrf_tag
     /** 1/Frequency of calling the PLL routine */
     pdsp_f32_t delta_t;
     /** todo */
-    pdsp_df11_param_t lpf_coeff;
+    pdsp_df11_t lpf_coeff;
 } pdsp_dpll_3ph_ddsrf_t;
 
 /** Three phase srf dpll structure. */
@@ -909,7 +911,7 @@ typedef struct pdsp_dpll_3ph_srf_tag
     /** Inverse of the ISR rate at which module is called */
     pdsp_f32_t delta_t;
     /** Loop filter coefficients */
-    pdsp_df11_param_t lpf_coeff;
+    pdsp_df11_t lpf_coeff;
 } pdsp_dpll_3ph_srf_t;
 
 /** @} control */
@@ -1624,13 +1626,33 @@ pdsp_extern void pdsp_df22_clear(pdsp_df22_var_t *ps_var);
 
 /**
  * @brief Calculate DF22 biquad filter.
- * @param ps_var Filter state memory struct.
- * @param ps_param Filter parameter struct.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-pdsp_extern pdsp_f32_t pdsp_df22(pdsp_df22_var_t *ps_var,
-                                 const pdsp_df22_param_t *ps_param,
+pdsp_extern pdsp_f32_t pdsp_df22(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
+                                 pdsp_f32_t f32_in);
+
+/**
+ * @brief Pre-calculate DF22 biquad filter. Must be used in combination with
+ * pdsp_df22_post.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
+                                 pdsp_f32_t f32_in);
+
+/**
+ * @brief Post-calculate DF22 biquad filter. Must be used in combination with
+ * pdsp_df22_pre.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ */
+pdsp_extern void pdsp_df22_post(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
                                  pdsp_f32_t f32_in);
 
 /**
@@ -2083,10 +2105,10 @@ pdsp_extern void pdsp_fault_process_group(pdsp_bool_t b_group,
  * 1.65f * PDSP_3V3_12BIT_F}, {&u16_state, PDSP_AOUT_U16, 1.0f, 0.0f}};
  * HWREG(DACA_BASE) = pdsp_data_to_aout(&aout[u16_idx]);
  * @endcode
- * @param sp_data Pointer to aout data struct.
+ * @param ps_data Pointer to aout data struct.
  * @return pdsp_extern DAV value to be convertetd to analog.
  */
-pdsp_extern pdsp_u16_t pdsp_aout(const pdsp_aout_t *sp_data);
+pdsp_extern pdsp_u16_t pdsp_aout(const pdsp_aout_t *ps_data);
 
 /** @} debug */
 
