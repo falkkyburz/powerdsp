@@ -834,15 +834,93 @@ pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
     return ps_data->ps_var->f32_x1;
 }
 
-pdsp_extern void pdsp_df22_clear(pdsp_df22_var_t *ps_var)
+pdsp_extern void pdsp_1p1z_c2d(pdsp_1p1z_t *ps_coeff_in,
+                               pdsp_1p1z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts)
+{
+    pdsp_f32_t f32_K = pdsp_divf(2.0f, f32_ts);
+    pdsp_f32_t f32_a0_inv =
+        pdsp_divf(1.0f, ps_coeff_in->f32_a1 * f32_K + ps_coeff_in->f32_a0);
+    ps_coeff_out->f32_b0 =
+        f32_a0_inv * (ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
+    ps_coeff_out->f32_b1 =
+        f32_a0_inv * (ps_coeff_in->f32_b0 - ps_coeff_in->f32_b1 * f32_K);
+    ps_coeff_out->f32_a1 =
+        f32_a0_inv * (ps_coeff_in->f32_a0 - ps_coeff_in->f32_a1 * f32_K);
+}
+
+pdsp_extern void pdsp_2p2z_c2d(pdsp_2p2z_t *ps_coeff_in,
+                               pdsp_2p2z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts)
+{
+    pdsp_f32_t f32_K = pdsp_divf(2.0f, f32_ts);
+    pdsp_f32_t f32_K2 = f32_K * f32_K;
+    pdsp_f32_t f32_a0_inv =
+        pdsp_divf(1.0f, ps_coeff_in->f32_a2 * f32_K2 +
+                           ps_coeff_in->f32_a1 * f32_K + ps_coeff_in->f32_a0);
+    /* coeff b0 */
+    ps_coeff_out->f32_b0 =
+        f32_a0_inv * (ps_coeff_in->f32_b2 * f32_K2 +
+                      ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
+    /* coeff b1 */
+    ps_coeff_out->f32_b1 = f32_a0_inv * (2.0f * ps_coeff_in->f32_b0 -
+                                         2.0f * ps_coeff_in->f32_b2 * f32_K2);
+    /* coeff b2 */
+    ps_coeff_out->f32_b2 =
+        f32_a0_inv * (ps_coeff_in->f32_b2 * f32_K2 -
+                      ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
+    /* coeff a1 */
+    ps_coeff_out->f32_a1 = f32_a0_inv * (2.0f * ps_coeff_in->f32_a0 -
+                                         2.0f * ps_coeff_in->f32_a2 * f32_K2);
+    /* coeff a2 */
+    ps_coeff_out->f32_a2 =
+        f32_a0_inv * (ps_coeff_in->f32_a2 * f32_K2 +
+                      ps_coeff_in->f32_a1 * f32_K + ps_coeff_in->f32_a0);
+}
+
+pdsp_extern void pdsp_3p3z_c2d(pdsp_3p3z_t *ps_coeff_in,
+                               pdsp_3p3z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts)
+{
+    pdsp_f32_t f32_K = pdsp_divf(2.0f, f32_ts);
+    pdsp_f32_t f32_K2 = f32_K * f32_K;
+    pdsp_f32_t f32_K3 = f32_K * f32_K * f32_K;
+    pdsp_f32_t f32_a0_inv = pdsp_divf(
+        1.0f, ps_coeff_in->f32_a3 * f32_K3 + ps_coeff_in->f32_a2 * f32_K2 +
+                  ps_coeff_in->f32_a1 * f32_K + ps_coeff_in->f32_a0);
+    /* coeff b0 */
+    ps_coeff_out->f32_b0 =
+        f32_a0_inv *
+        (ps_coeff_in->f32_b3 * f32_K3 + ps_coeff_in->f32_b2 * f32_K2 +
+         ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
+    /* coeff b1 */
+    ps_coeff_out->f32_b1 =
+        f32_a0_inv * (-3.0f * ps_coeff_in->f32_b3 * f32_K3 -
+                      2.0f * ps_coeff_in->f32_b2 * f32_K2 -
+                      ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
+    /* coeff b2 */
+    ps_coeff_out->f32_b2 = f32_a0_inv * (3.0f * ps_coeff_in->f32_b3 * f32_K3 +
+                                         ps_coeff_in->f32_b2 * f32_K2);
+    /* coeff b3 */
+    ps_coeff_out->f32_b3 = f32_a0_inv * (-3.0f * ps_coeff_in->f32_b3 * f32_K3);
+    /* coeff a1 */
+    ps_coeff_out->f32_a1 =
+        f32_a0_inv * (-3.0f * ps_coeff_in->f32_a3 * f32_K3 -
+                      2.0f * ps_coeff_in->f32_a2 * f32_K2 -
+                      ps_coeff_in->f32_a1 * f32_K + ps_coeff_in->f32_a0);
+    /* coeff a2 */
+    ps_coeff_out->f32_a2 = f32_a0_inv * (3.0f * ps_coeff_in->f32_a3 * f32_K3 +
+                                         ps_coeff_in->f32_a2 * f32_K2);
+    /* coeff a3 */
+    ps_coeff_out->f32_a3 = f32_a0_inv * (-3.0f * ps_coeff_in->f32_a3 * f32_K3);
+}
+
+pdsp_extern void pdsp_df22_clear(pdsp_2p2z_var_t *ps_var)
 {
     PDSP_ASSERT(ps_var != NULL);
     ps_var->f32_x1 = 0.0f;
     ps_var->f32_x2 = 0.0f;
 }
 
-pdsp_extern pdsp_f32_t pdsp_df22(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
-                                 pdsp_f32_t f32_in)
+pdsp_extern pdsp_f32_t pdsp_df22(pdsp_2p2z_inv_t *ps_data,
+                                 pdsp_2p2z_var_t *ps_var, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT((ps_data != NULL) && (ps_var != NULL));
     ps_var->f32_out = (f32_in * ps_data->f32_b0) + ps_var->f32_x1;
@@ -853,16 +931,16 @@ pdsp_extern pdsp_f32_t pdsp_df22(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
     return ps_var->f32_out;
 }
 
-pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_df22_t *ps_data,
-                                     pdsp_df22_var_t *ps_var, pdsp_f32_t f32_in)
+pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_2p2z_inv_t *ps_data,
+                                     pdsp_2p2z_var_t *ps_var, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT((ps_data != NULL) && (ps_var != NULL));
     ps_var->f32_out = (f32_in * ps_data->f32_b0) + ps_var->f32_x1;
     return ps_var->f32_out;
 }
 
-pdsp_extern void pdsp_df22_post(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
-                                pdsp_f32_t f32_in)
+pdsp_extern void pdsp_df22_post(pdsp_2p2z_inv_t *ps_data,
+                                pdsp_2p2z_var_t *ps_var, pdsp_f32_t f32_in)
 {
     PDSP_ASSERT((ps_data != NULL) && (ps_var != NULL));
     ps_var->f32_x1 = (f32_in * ps_data->f32_b1) +

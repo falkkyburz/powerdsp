@@ -36,10 +36,10 @@
 /*==============================================================================
  INCLUDE FILES
  =============================================================================*/
+#include "pdsp_cfg.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "pdsp_cfg.h"
 
 /*==============================================================================
  CONFIGURATION
@@ -422,51 +422,133 @@ typedef struct pdsp_expavg_tag
     pdsp_f32_t f32_tau;
 } pdsp_expavg_t;
 
-/** DF22 filter state memory struct. */
-typedef struct pdsp_df22_var_tag
+/** 1P1Z filter state memory struct. */
+typedef struct pdsp_1p1z_var_tag
 {
-    /** df22 filter x0 state variable */
+    /** 1P1Z filter x0 state variable */
     pdsp_f32_t f32_x1;
-    /** df22 filter x1 state variable */
+} pdsp_1p1z_var_t;
+
+/** 1P1Z coefficient struct for 1/s or 1/z transfer function. */
+typedef struct pdsp_1p1z_inv_tag
+{
+    /** 1P1Z filter b0 coefficient. */
+    pdsp_f32_t f32_b0;
+    /** 1P1Z filter b1 coefficient. */
+    pdsp_f32_t f32_b1;
+    /** 1P1Z filter a1 coefficient. */
+    pdsp_f32_t f32_a1;
+} pdsp_1p1z_inv_t;
+
+/** 1P1Z coefficient struct for s or z transfer function. */
+typedef struct pdsp_1p1z_tag
+{
+    /** 1P1Z filter b0 coefficient. */
+    pdsp_f32_t f32_b0;
+    /** 1P1Z filter b1 coefficient. */
+    pdsp_f32_t f32_b1;
+    /** 1P1Z filter a0 coefficient. */
+    pdsp_f32_t f32_a0;
+    /** 1P1Z filter a1 coefficient. */
+    pdsp_f32_t f32_a1;
+} pdsp_1p1z_t;
+
+/** 2P2Z filter state memory struct. */
+typedef struct pdsp_2p2z_var_tag
+{
+    /** 2P2Z filter x0 state variable */
+    pdsp_f32_t f32_x1;
+    /** 2P2Z filter x1 state variable */
     pdsp_f32_t f32_x2;
-    /** df22 filter output */
+    /** 2P2Z filter output */
     pdsp_f32_t f32_out;
-} pdsp_df22_var_t;
+} pdsp_2p2z_var_t;
 
-/** DF22 memory struct. */
-typedef struct pdsp_df22_tag
+/** 2P2Z coefficient struct for 1/s or 1/z transfer function. */
+typedef struct pdsp_2p2z_inv_tag
 {
-    /** df22 filter b0 coefficient. */
+    /** 2P2Z filter b0 coefficient. */
     pdsp_f32_t f32_b0;
-    /** df22 filter b1 coefficient. */
+    /** 2P2Z filter b1 coefficient. */
     pdsp_f32_t f32_b1;
-    /** df22 filter b2 coefficient. */
+    /** 2P2Z filter b2 coefficient. */
     pdsp_f32_t f32_b2;
-    /** df22 filter a1 coefficient. */
+    /** 2P2Z filter a1 coefficient. */
     pdsp_f32_t f32_a1;
-    /** df22 filter a2 coefficient. */
+    /** 2P2Z filter a2 coefficient. */
     pdsp_f32_t f32_a2;
-} pdsp_df22_t;
+} pdsp_2p2z_inv_t;
 
-/** DF11 filter state memory struct. */
-typedef struct pdsp_df11_var_tag
+/** 2P2Z coefficient struct for s or z transfer function. */
+typedef struct pdsp_2p2z_tag
 {
-    /** df22 filter x0 state variable */
-    pdsp_f32_t f32_x1;
-    /** df22 filter x1 state variable */
-    pdsp_f32_t f32_x2;
-} pdsp_df11_var_t;
-
-/** DF11 filter data struct. */
-typedef struct pdsp_df11_tag
-{
-    /** df11 filter b0 coefficient. */
+    /** 2P2Z filter b0 coefficient. */
     pdsp_f32_t f32_b0;
-    /** df11 filter b1 coefficient. */
+    /** 2P2Z filter b1 coefficient. */
     pdsp_f32_t f32_b1;
-    /** df11 filter a1 coefficient. */
+    /** 2P2Z filter b2 coefficient. */
+    pdsp_f32_t f32_b2;
+    /** 2P2Z filter a0 coefficient. */
+    pdsp_f32_t f32_a0;
+    /** 2P2Z filter a1 coefficient. */
     pdsp_f32_t f32_a1;
-} pdsp_df11_t;
+    /** 2P2Z filter a2 coefficient. */
+    pdsp_f32_t f32_a2;
+} pdsp_2p2z_t;
+
+/** 3P3Z filter state memory struct. */
+typedef struct pdsp_3p3z_var_tag
+{
+    /** 3P3Z filter x0 state variable */
+    pdsp_f32_t f32_x1;
+    /** 3P3Z filter x1 state variable */
+    pdsp_f32_t f32_x2;
+    /** 3P3Z filter x1 state variable */
+    pdsp_f32_t f32_x3;
+    /** 3P3Z filter output */
+    pdsp_f32_t f32_out;
+} pdsp_3p3z_var_t;
+
+/** 3P3Z coefficient struct for 1/s or 1/z transfer function. */
+typedef struct pdsp_3p3z_inv_tag
+{
+    /** 3P3Z filter b0 coefficient. */
+    pdsp_f32_t f32_b0;
+    /** 3P3Z filter b1 coefficient. */
+    pdsp_f32_t f32_b1;
+    /** 3P3Z filter b2 coefficient. */
+    pdsp_f32_t f32_b2;
+    /** 3P3Z filter b3 coefficient. */
+    pdsp_f32_t f32_b3;
+
+    /** 3P3Z filter a1 coefficient. */
+    pdsp_f32_t f32_a1;
+    /** 3P3Z filter a2 coefficient. */
+    pdsp_f32_t f32_a2;
+    /** 3P3Z filter a2 coefficient. */
+    pdsp_f32_t f32_a3;
+} pdsp_3p3z_inv_t;
+
+/** 3P3Z coefficient struct for s or z transfer function. */
+typedef struct pdsp_3p3z_tag
+{
+    /** 3P3Z filter b0 coefficient. */
+    pdsp_f32_t f32_b0;
+    /** 3P3Z filter b1 coefficient. */
+    pdsp_f32_t f32_b1;
+    /** 3P3Z filter b2 coefficient. */
+    pdsp_f32_t f32_b2;
+    /** 3P3Z filter b3 coefficient. */
+    pdsp_f32_t f32_b3;
+    /** 3P3Z filter a0 coefficient. */
+    pdsp_f32_t f32_a0;
+    /** 3P3Z filter a1 coefficient. */
+    pdsp_f32_t f32_a1;
+    /** 3P3Z filter a2 coefficient. */
+    pdsp_f32_t f32_a2;
+    /** 3P3Z filter a3 coefficient. */
+    pdsp_f32_t f32_a3;
+} pdsp_3p3z_t;
 
 /** Median memory struct. */
 typedef struct pdsp_med3_var_tag
@@ -715,9 +797,9 @@ typedef struct pdsp_dpll_1ph_notch_tag
     /** Inverse of the ISR rate at which module is called */
     pdsp_f32_t delta_t;
     /** Notch filter coeffcient structure */
-    pdsp_df22_t notch_coeff;
+    pdsp_2p2z_inv_t notch_coeff;
     /** Loop filter coeffcient structure */
-    pdsp_df11_t lpf_coeff;
+    pdsp_1p1z_inv_t lpf_coeff;
 } pdsp_dpll_1ph_notch_t;
 
 /** Orthogonal signal generator variables. */
@@ -775,7 +857,7 @@ typedef struct pdsp_dpll_1ph_sogi_tag
     /** Orthogonal signal generator coefficient */
     pdsp_osg_param_t osg_coeff;
     /** Loop filter coeffcient structure */
-    pdsp_df11_t lpf_coeff;
+    pdsp_1p1z_inv_t lpf_coeff;
 } pdsp_dpll_1ph_sogi_t;
 
 /** Single phase sogi dpll fll structure. */
@@ -820,7 +902,7 @@ typedef struct pdsp_dpll_1ph_sogi_fll_tag
     /** Orthogonal signal generator coefficient */
     pdsp_osg_param_t osg_coeff;
     /** Loop filter coeffcient structure */
-    pdsp_df11_t lpf_coeff;
+    pdsp_1p1z_inv_t lpf_coeff;
 } pdsp_dpll_1ph_sogi_fll_t;
 
 /** Three phase ddsrf dpll structure. */
@@ -875,7 +957,7 @@ typedef struct pdsp_dpll_3ph_ddsrf_tag
     /** 1/Frequency of calling the PLL routine */
     pdsp_f32_t delta_t;
     /** todo */
-    pdsp_df11_t lpf_coeff;
+    pdsp_1p1z_inv_t lpf_coeff;
 } pdsp_dpll_3ph_ddsrf_t;
 
 /** Three phase srf dpll structure. */
@@ -894,7 +976,7 @@ typedef struct pdsp_dpll_3ph_srf_tag
     /** Inverse of the ISR rate at which module is called */
     pdsp_f32_t delta_t;
     /** Loop filter coefficients */
-    pdsp_df11_t lpf_coeff;
+    pdsp_1p1z_inv_t lpf_coeff;
 } pdsp_dpll_3ph_srf_t;
 
 /** @} control */
@@ -1081,13 +1163,22 @@ pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
                                           pdsp_i16_t *i16_out);
 
 /**
- * @brief Put a SREC header into the string buffer.
+ * @brief Encode data into an srecord.
  * @param ac_start String pointer to the start of the string.
  * @param ps_data Pointer to record data struct.
  * @return Pointer to the next element in the sring.
  */
 pdsp_extern pdsp_char_t *pdsp_srec_encode(pdsp_char_t *ac_start,
                                           pdsp_srec_t *ps_data);
+
+// /**
+//  * @brief Decode data from an srecord.
+//  * @param ac_start String pointer to the start of the string.
+//  * @param ps_data Pointer to record data struct.
+//  * @return Pointer to the next element in the sring.
+//  */
+// pdsp_extern pdsp_char_t *pdsp_srec_decode(pdsp_char_t *ac_start,
+//                                           pdsp_srec_t *ps_data);
 
 /**
  * @brief Convert the number i16_in to a 6 character fixed length string.
@@ -1602,10 +1693,79 @@ pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
                                    pdsp_f32_t f32_in);
 
 /**
+ * @brief Convert continuous H(s) to H(1/z) for 1P1Z transfer function using
+ * bilinear transform.
+ * @details Transfer function:
+ *        b1*s + b0
+ * H(s) = ---------
+ *        a1*s + a0
+ *
+ *        2  (1 - z^-1)
+ * >> s = -- ----------
+ *        ts (1 + z^-1)
+ *
+ *           B1*z^-1 + B0
+ * H(z^-1) = ------------
+ *           A1*z^-1 + 1
+ * @param ps_coeff_in Input transfer function H(s) coefficients.
+ * @param ps_coeff_out Input transfer function H(s) coefficients.
+ * @param f32_ts Sampling time
+ */
+pdsp_extern void pdsp_1p1z_c2d(pdsp_1p1z_t *ps_coeff_in,
+                               pdsp_1p1z_inv_t *ps_coeff_out,
+                               pdsp_f32_t f32_ts);
+
+/**
+ * @brief Convert continuous H(s) to H(1/z) for 2P2Z transfer function using
+ * bilinear transform.
+ * @details Transfer function:
+ *        b2*s^2 + b1*s + b0
+ * H(s) = ------------------
+ *        a2*s^2 + a1*s + a0
+ *
+ *        2  (1 - z^-1)
+ * >> s = -- ----------
+ *        ts (1 + z^-1)
+ *
+ *           B2*z^-1 + B1*z^-1 + B0
+ * H(z^-1) = ----------------------
+ *           A2*z^-1 + A1*z^-1 + 1
+ * @param ps_coeff_in Input transfer function H(s) coefficients.
+ * @param ps_coeff_out Input transfer function H(s) coefficients.
+ * @param f32_ts Sampling time
+ */
+pdsp_extern void pdsp_2p2z_c2d(pdsp_2p2z_t *ps_coeff_in,
+                               pdsp_2p2z_inv_t *ps_coeff_out,
+                               pdsp_f32_t f32_ts);
+
+/**
+ * @brief Convert continuous H(s) to H(1/z) for 3P3Z transfer function using
+ * bilinear transform.
+ * @details Transfer function:
+ *        b3*s^3 + b2*s^2 + b1*s + b0
+ * H(s) = ---------------------------
+ *        a3*s^3 + a2*s^2 + a1*s + a0
+ *
+ *        2  (1 - z^-1)
+ * >> s = -- ----------
+ *        ts (1 + z^-1)
+ *
+ *           B3*z^-1 + B2*z^-1 + B1*z^-1 + B0
+ * H(z^-1) = --------------------------------
+ *           A3*z^-1 + A2*z^-1 + A1*z^-1 + 1
+ * @param ps_coeff_in Input transfer function H(s) coefficients.
+ * @param ps_coeff_out Input transfer function H(s) coefficients.
+ * @param f32_ts Sampling time
+ */
+pdsp_extern void pdsp_3p3z_c2d(pdsp_3p3z_t *ps_coeff_in,
+                               pdsp_3p3z_inv_t *ps_coeff_out,
+                               pdsp_f32_t f32_ts);
+
+/**
  * @brief Initialize / Clear DF22 biquad filter struct.
  * @param ps_var Filter state variable struct.
  */
-pdsp_extern void pdsp_df22_clear(pdsp_df22_var_t *ps_var);
+pdsp_extern void pdsp_df22_clear(pdsp_2p2z_var_t *ps_var);
 
 /**
  * @brief Calculate DF22 biquad filter.
@@ -1614,8 +1774,8 @@ pdsp_extern void pdsp_df22_clear(pdsp_df22_var_t *ps_var);
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-pdsp_extern pdsp_f32_t pdsp_df22(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
-                                 pdsp_f32_t f32_in);
+pdsp_extern pdsp_f32_t pdsp_df22(pdsp_2p2z_inv_t *ps_data,
+                                 pdsp_2p2z_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
  * @brief Pre-calculate DF22 biquad filter. Must be used in combination with
@@ -1625,8 +1785,9 @@ pdsp_extern pdsp_f32_t pdsp_df22(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
-                                 pdsp_f32_t f32_in);
+pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_2p2z_inv_t *ps_data,
+                                     pdsp_2p2z_var_t *ps_var,
+                                     pdsp_f32_t f32_in);
 
 /**
  * @brief Post-calculate DF22 biquad filter. Must be used in combination with
@@ -1635,8 +1796,8 @@ pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_v
  * @param ps_var Filter variable memory struct.
  * @param f32_in Filter input signal.
  */
-pdsp_extern void pdsp_df22_post(pdsp_df22_t *ps_data, pdsp_df22_var_t *ps_var,
-                                 pdsp_f32_t f32_in);
+pdsp_extern void pdsp_df22_post(pdsp_2p2z_inv_t *ps_data,
+                                pdsp_2p2z_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
  * @brief Initialize / Clear median filter struct.
@@ -2071,12 +2232,11 @@ pdsp_extern void pdsp_fault_process_group(pdsp_bool_t b_group,
 //  */
 // pdsp_extern pdsp_u64_t * pdsp_log_get_head_ptr(pdsp_logger_t *ps_data);
 
-// pdsp_extern pdsp_status_t pdsp_sfra_init(pdsp_sfra_t *ps_state);
-// pdsp_extern pdsp_status_t pdsp_sfra_start(pdsp_sfra_t *ps_state,
+// pdsp_extern pdsp_status_t pdsp_sfra_clear(pdsp_sfra_t *ps_state);
+// pdsp_extern pdsp_status_t pdsp_sfra_enable(pdsp_sfra_t *ps_state,
 //                                           pdsp_f32_t f32_amp,
 //                                           pdsp_f32_t f32_freq);
 // pdsp_extern pdsp_bool_t pdsp_sfra_finished(pdsp_sfra_t *ps_state);
-// pdsp_extern pdsp_f32_t pdsp_sfra_perturb(pdsp_sfra_t *ps_state);
 // pdsp_extern pdsp_status_t pdsp_sfra_collect(pdsp_sfra_t *ps_state);
 
 /**
