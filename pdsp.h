@@ -427,6 +427,8 @@ typedef struct pdsp_1p1z_var_tag
 {
     /** 1P1Z filter x0 state variable */
     pdsp_f32_t f32_x1;
+    /** 1P1Z filter output */
+    pdsp_f32_t f32_out;
 } pdsp_1p1z_var_t;
 
 /** 1P1Z coefficient struct for 1/s or 1/z transfer function. */
@@ -1762,6 +1764,44 @@ pdsp_extern void pdsp_3p3z_c2d(pdsp_3p3z_t *ps_coeff_in,
                                pdsp_f32_t f32_ts);
 
 /**
+ * @brief Initialize / Clear DF21 filter struct.
+ * @param ps_var Filter state variable struct.
+ */
+pdsp_extern void pdsp_df21_clear(pdsp_1p1z_var_t *ps_var);
+
+/**
+ * @brief Calculate DF21 filter.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+pdsp_extern pdsp_f32_t pdsp_df21(pdsp_1p1z_inv_t *ps_data,
+                                 pdsp_1p1z_var_t *ps_var, pdsp_f32_t f32_in);
+
+/**
+ * @brief Pre-calculate DF21 filter. Must be used in combination with
+ * pdsp_df21_post.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+pdsp_extern pdsp_f32_t pdsp_df21_pre(pdsp_1p1z_inv_t *ps_data,
+                                     pdsp_1p1z_var_t *ps_var,
+                                     pdsp_f32_t f32_in);
+
+/**
+ * @brief Post-calculate DF21 filter. Must be used in combination with
+ * pdsp_df21_pre.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ */
+pdsp_extern void pdsp_df21_post(pdsp_1p1z_inv_t *ps_data,
+                                pdsp_1p1z_var_t *ps_var, pdsp_f32_t f32_in);
+
+/**
  * @brief Initialize / Clear DF22 biquad filter struct.
  * @param ps_var Filter state variable struct.
  */
@@ -1798,6 +1838,44 @@ pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_2p2z_inv_t *ps_data,
  */
 pdsp_extern void pdsp_df22_post(pdsp_2p2z_inv_t *ps_data,
                                 pdsp_2p2z_var_t *ps_var, pdsp_f32_t f32_in);
+
+/**
+ * @brief Initialize / Clear DF23 filter struct.
+ * @param ps_var Filter state variable struct.
+ */
+pdsp_extern void pdsp_df23_clear(pdsp_3p3z_var_t *ps_var);
+
+/**
+ * @brief Calculate DF23 filter.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+pdsp_extern pdsp_f32_t pdsp_df23(pdsp_3p3z_inv_t *ps_data,
+                                 pdsp_3p3z_var_t *ps_var, pdsp_f32_t f32_in);
+
+/**
+ * @brief Pre-calculate DF23 filter. Must be used in combination with
+ * pdsp_df23_post.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+pdsp_extern pdsp_f32_t pdsp_df23_pre(pdsp_3p3z_inv_t *ps_data,
+                                     pdsp_3p3z_var_t *ps_var,
+                                     pdsp_f32_t f32_in);
+
+/**
+ * @brief Post-calculate DF23 biquad filter. Must be used in combination with
+ * pdsp_df23_pre.
+ * @param ps_data Filter data memory struct.
+ * @param ps_var Filter variable memory struct.
+ * @param f32_in Filter input signal.
+ */
+pdsp_extern void pdsp_df23_post(pdsp_3p3z_inv_t *ps_data,
+                                pdsp_3p3z_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
  * @brief Initialize / Clear median filter struct.
