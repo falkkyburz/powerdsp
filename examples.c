@@ -106,16 +106,22 @@ void example_u16_to_hex(void)
     pdsp_char_t out[16] = {0};
     pdsp_char_t *pos = &out[0];
     *pos++ = ':';
-    pos = pdsp_u16_to_hex(0x1337, pos);
+    pos = pdsp_u16_to_hex(0x1337, pos, PDSP_FALSE);
     *pos++ = ',';
-    pos = pdsp_u16_to_hex(0xB00B, pos);
+    pos = pdsp_u16_to_hex(0xB00B, pos, PDSP_FALSE);
+    *pos++ = ',';
+    pos = pdsp_u16_to_hex(0xB, pos, PDSP_FALSE);
+    *pos++ = ',';
+    pos = pdsp_u16_to_hex(0xBB, pos, PDSP_FALSE);
+    *pos++ = ',';
+    pos = pdsp_u16_to_hex(0xB0B, pos, PDSP_FALSE);
     *pos++ = ':';
-    PDSP_ASSERT(strcmp(out, ":1337,B00B:") == 0);
+    PDSP_ASSERT(strcmp(out, ":1337,B00B,B,BB,B0B:") == 0);
 }
 
 void example_u64_to_hex(void)
 {
-    printf("-- void example_u16_to_hex(void) --\n");
+    printf("-- void example_u64_to_hex(void) --\n");
     pdsp_char_t out[64] = {0};
     pdsp_char_t *pos = &out[0];
     *pos++ = ':';

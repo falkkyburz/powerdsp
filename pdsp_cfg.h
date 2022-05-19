@@ -1,7 +1,8 @@
 /** @file pdsp_cfg.h
  *
  * @author Falk Kyburz
- * @brief Power electronics digital signal processing module.
+ * @brief Configuration for pdsp module. This file is meant to be edited by the
+ * user.
  *
  * @copyright
  * This is free and unencumbered software released into the public domain.
@@ -39,13 +40,13 @@
 /** Uncomment to disable assert */
 // #define PDSP_DISABLE_ASSERT
 
-/** Uncomment to custom assert function defined elsewhere. */
+/** Uncomment to define custom assert function elsewhere. */
 #define PDSP_CUSTOM_ASSERT
 
-/** Uncomment to set all functions to static and include them in this file. */
+/** Uncomment to set all functions to static and include them in the psdp.h file. */
 // #define PDSP_STATIC_FUNCTIONS
 
-/** Place PRAGMAs for DSP optimization here */
+/** Place PRAGMAs for TMS320 DSP optimization here */
 #if defined(__TMS320C2000__)
 #pragma CODE_SECTION(pdsp_stopwatch_start, ".TI.ramfunc")
 #pragma CODE_SECTION(pdsp_stopwatch_stop, ".TI.ramfunc")

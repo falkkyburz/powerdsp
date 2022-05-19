@@ -1193,13 +1193,15 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
                                             pdsp_char_t *a6c_out);
 
 /**
- * @brief Convert the number u16_in to a length 4 hex string.
+ * @brief Convert the number u16_in to a hex string.
  * @param u16_in Input number.
  * @param ach_out Output string.
+ * @param b_len4 Fixed length string of length 4 is returned, minimum required
+ * length otherwise.
  * @return Pointer to the next element in the sring.
  */
 pdsp_extern pdsp_char_t *pdsp_u16_to_hex(pdsp_u16_t u16_in,
-                                         pdsp_char_t *ach_out);
+                                         pdsp_char_t *ach_out, pdsp_bool_t b_len4);
 
 /**
  * @brief Convert the number u64_in to a length 16 hex string.
