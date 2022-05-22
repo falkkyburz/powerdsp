@@ -35,9 +35,6 @@
 #include <string.h>
 #include <time.h>
 
-#define pdsp_assert(b_in)                                    \
-    if (!(b_in)) printf("Assert failed: %s:%i\n", __FILE__, __LINE__)
-
 void example_assert_true(void)
 {
     printf("-- void example_assert_true(void) --\n");

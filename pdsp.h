@@ -49,8 +49,14 @@
 /** Empty assert macro in case assert is disabled. */
 #define PDSP_ASSERT(x)
 #else
-/** Assert macro */
-#define PDSP_ASSERT(x) pdsp_assert(x)
+#ifndef PDSP_CUSTOM_ASSERT
+#define PDSP_ASSERT(b_in)                                                      \
+    if (!(b_in))                                                               \
+    {                                                                          \
+        while (1)                                                              \
+            ;                                                                  \
+    }
+#endif
 #endif
 
 #ifdef PDSP_STATIC_FUNCTIONS
@@ -984,43 +990,59 @@ typedef struct pdsp_dpll_3ph_srf_tag
 /** Software frequency response analyzer variable struct. */
 typedef struct pdsp_sfra_var_tag
 {
-    /** Pre computed value for next injection step. */
-    pdsp_f32_t f32_inject;
-    /** Phase of current acquisition step. Used to generate sin and cos
-     * reference. */
+    /** SFRA running */
+    pdsp_bool_t b_running;
+    /** Pre computed sine value. */
+    pdsp_f32_t f32_sin_val;
+    /** Pre computed sine value. */
+    pdsp_f32_t f32_cos_val;
+    /** Phase of quadrature values. */
     pdsp_f32_t f32_phase;
-    /** Phase step. */    
+    /** Phase step. */
     pdsp_f32_t f32_phase_step;
     /** Cycle counter. Abort if number of averaging cycles is reached. */
     pdsp_u16_t u16_cycle_cnt;
+    /** Index in the bode array. */
+    pdsp_u16_t u16_bode_cnt;
     /** Tau of exponential averaging filter. */
-    pdsp_f32_t f32_expavg_tau;
-    /** Average of sine values. */
-    pdsp_f32_t f32_expavg_sin;
-    /** Average of cos values */
-    pdsp_f32_t f32_expavg_cos;
+    pdsp_f32_t f32_avg_tau;
+    /** Average of input sine values. */
+    pdsp_f32_t f32_avg_in_sin;
+    /** Average of input cos values */
+    pdsp_f32_t f32_avg_in_cos;
+    /** Average of input sine values. */
+    pdsp_f32_t f32_avg_out_sin;
+    /** Average of input cos values */
+    pdsp_f32_t f32_avg_out_cos;
 } pdsp_sfra_var_t;
+
+/** Bode frequency , real, imaginary array */
+typedef struct pdsp_sfra_bode_tag
+{
+/** Period array (1/frequency array). */
+    pdsp_f32_t *f32_bode_per;
+    /** Complex result array for real part. */
+    pdsp_f32_t *f32_bode_re;
+    /** Complex result array for imaginary part. */
+    pdsp_f32_t *f32_bode_im;
+    /** Size of period and complex array (they must have the same length). */
+    pdsp_u16_t u16_bode_size;
+}pdsp_sfra_bode_t;
 
 /** Software frequency response analyzer transfer function pair */
 typedef struct pdsp_sfra_tag
 {
     /** Poniter to variable struct. */
     pdsp_sfra_var_t *ps_var;
-    /** Period array (1/frequency array). */
-    pdsp_f32_t *f32_per;
-    /** Complex result array for real part. */
-    pdsp_f32_t *f32_re;
-    /** Complex result array for imaginary part. */
-    pdsp_f32_t *f32_im;
-    /** Size of period and complex array (they must have the same length). */
-    pdsp_u16_t *u16_size;
+    /** Poniter to bode array struct. */
+    pdsp_sfra_bode_t *ps_bode;
     /** Flaoting point transfer function injection destination signal. */
     pdsp_f32_t *f32_inject;
     /** Flaoting point transfer function input signal. */
     pdsp_f32_t *f32_input;
     /** Flaoting point transfer function output signal. */
     pdsp_f32_t *f32_output;
-    /** Number of averaging cycles per frequency. */
+    /** Number of averaging cycles count-down per frequency. */
     pdsp_f32_t f32_avg_cyc;
 } pdsp_sfra_t;
 
@@ -1116,12 +1138,6 @@ typedef struct pdsp_aout_tag
 /** @addtogroup util
  *  @{
  */
-
-/**
- * @brief Assert function to check validity of function parameters.
- * @param b_in Assert comparison input.
- */
-pdsp_extern void pdsp_assert(pdsp_bool_t b_in);
 
 /**
  * @brief Start the stopwatch with 32bit HW counter.
@@ -2241,13 +2257,54 @@ pdsp_extern pdsp_status_t pdsp_dpll_3ph_srf(pdsp_dpll_3ph_srf_t *ps_state,
                                             pdsp_f32_t f32_vq);
 
 /**
+ * @brief Clear all data in the SFRA struct.
+ * @param ps_data Pointer to SFRA data struct.
+ */
+pdsp_extern void pdsp_sfra_clear(pdsp_sfra_t *ps_data);
+
+/**
+ * @brief Start SFRA bode sweep.
+ * @param ps_data Pointer to SFRA data struct.
+ */
+pdsp_extern void pdsp_sfra_start(pdsp_sfra_t *ps_data);
+
+/**
+ * @brief Chech if SFRA processing is running.
+ * @param ps_data Pointer to SFRA data struct.
+ */
+pdsp_extern pdsp_bool_t pdsp_sfra_running(pdsp_sfra_t *ps_data);
+
+/**
  * @brief Software frequency response analysis injection function.
- * 
+ * @details Use pdsp_sfra_running guard when executing this function.
+ * Example:
+ * @code
+ * // [...]
+ * if(pdsp_sfra_running(&mySFRA))
+ * {
+ *      pdsp_sfra_inject(&mySFRA)
+ * }
+ * // [...]
+ * @endcode
  * @param ps_data Pointer to SFRA data struct.
  */
 pdsp_extern void pdsp_sfra_inject(pdsp_sfra_t *ps_data);
 
-/** todo */
+/**
+ * @brief Software frequency response analysis processing function.
+ * @details Use pdsp_sfra_running guard when executing this function.
+ * Example:
+ * @code
+ * // [...]
+ * if(pdsp_sfra_running(&mySFRA))
+ * {
+ *      pdsp_sfra_process(&mySFRA)
+ * }
+ * // [...]
+ * @endcode
+ *
+ * @param ps_data Pointer to SFRA data struct.
+ */
 pdsp_extern void pdsp_sfra_process(pdsp_sfra_t *ps_data);
 
 /** @} control */

@@ -60,16 +60,6 @@ static const pdsp_u16_t pdsp_mask_i16[16] = {
 /*-----------------------------------------------------------------------------
 UTIL
 -----------------------------------------------------------------------------*/
-#ifndef PDSP_CUSTOM_ASSERT
-pdsp_extern void pdsp_assert(pdsp_bool_t b_in)
-{
-    if (!(b_in))
-    {
-        while (1)
-            ;
-    }
-}
-#endif
 
 pdsp_extern void pdsp_stopwatch_start(const pdsp_stopwatch_t *ps_data,
                                       pdsp_u32_t u32_hw_now)
@@ -1912,6 +1902,85 @@ pdsp_extern pdsp_status_t pdsp_dpll_3ph_srf(pdsp_dpll_3ph_srf_t *ps_state,
     }
     ps_state->theta[1] = ps_state->theta[0];
     return PDSP_OK;
+}
+
+pdsp_extern void pdsp_sfra_clear(pdsp_sfra_t *ps_data)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_data->ps_var->b_running = PDSP_FALSE;
+    ps_data->ps_var->f32_sin_val = 0.0f;
+    ps_data->ps_var->f32_cos_val = 0.0f;
+    ps_data->ps_var->f32_phase = 0.0f;
+    ps_data->ps_var->f32_phase_step = 0.0f;
+    ps_data->ps_var->u16_cycle_cnt = 0.0f;
+    ps_data->ps_var->u16_bode_cnt = 0.0f;
+    ps_data->ps_var->f32_avg_tau = 0.0f;
+    ps_data->ps_var->f32_avg_in_sin = 0.0f;
+    ps_data->ps_var->f32_avg_in_cos = 0.0f;
+    ps_data->ps_var->f32_avg_out_sin = 0.0f;
+    ps_data->ps_var->f32_avg_out_cos = 0.0f;
+}
+
+pdsp_extern void pdsp_sfra_start(pdsp_sfra_t *ps_data)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    pdsp_sfra_clear(ps_data);
+    ps_data->ps_var->b_running = PDSP_TRUE;
+}
+
+pdsp_extern pdsp_bool_t pdsp_sfra_running(pdsp_sfra_t *ps_data)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    return ps_data->ps_var->b_running;
+}
+
+pdsp_extern void pdsp_sfra_inject(pdsp_sfra_t *ps_data)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    *ps_data->f32_inject += ps_data->ps_var->f32_sin_val;
+}
+
+pdsp_extern void pdsp_sfra_process(pdsp_sfra_t *ps_data)
+{
+    pdsp_sfra_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_var = ps_data->ps_var;
+    /* ----- Calculate result for current cycle: ----- */
+    /* Add input results to filter. */
+    ps_var->f32_avg_in_sin +=
+        ps_var->f32_avg_tau *
+        ((*ps_data->f32_input * ps_var->f32_sin_val) - ps_var->f32_avg_in_sin);
+    ps_var->f32_avg_in_cos +=
+        ps_var->f32_avg_tau *
+        ((*ps_data->f32_input * ps_var->f32_cos_val) - ps_var->f32_avg_in_cos);
+    /* Add output results to filter. */
+    ps_var->f32_avg_out_sin +=
+        ps_var->f32_avg_tau *
+        ((*ps_data->f32_output * ps_var->f32_sin_val) - ps_var->f32_avg_in_sin);
+    ps_var->f32_avg_out_cos +=
+        ps_var->f32_avg_tau *
+        ((*ps_data->f32_output * ps_var->f32_cos_val) - ps_var->f32_avg_in_cos);
+    /* ----------- Updates for next cycle: ----------- */
+    /* Update sin / cos */
+    ps_var->f32_sin_val = pdsp_sinf(ps_var->f32_phase);
+    ps_var->f32_cos_val = pdsp_cosf(ps_var->f32_phase);
+    /* Update and wrap phase */
+    ps_var->f32_phase += ps_var->f32_phase_step;
+    if (ps_var->f32_phase > PDSP_2_PI_F)
+    {
+        ps_var->f32_phase = 0.0f;
+        ps_var->u16_cycle_cnt++;
+        /* Increment bode index */
+        if (ps_var->u16_cycle_cnt > ps_data->f32_avg_cyc)
+        {
+            ps_var->u16_bode_cnt++;
+        }
+        /* Stop once all bode steps are done */
+        if (ps_var->u16_bode_cnt >= ps_data->ps_bode->u16_bode_size)
+        {
+            ps_data->ps_var->b_running = PDSP_FALSE;
+        }
+    }
 }
 
 /*-----------------------------------------------------------------------------

@@ -40,8 +40,11 @@
 /** Uncomment to disable assert */
 // #define PDSP_DISABLE_ASSERT
 
-/** Uncomment to define custom assert function elsewhere. */
+/** Uncomment to define custom assert function. */
 #define PDSP_CUSTOM_ASSERT
+#include <stdio.h>
+#define PDSP_ASSERT(b_in) \
+    if (!(b_in)) printf("Assert failed: %s:%i\n", __FILE__, __LINE__)
 
 /** Uncomment to set all functions to static and include them in the psdp.h file. */
 // #define PDSP_STATIC_FUNCTIONS
