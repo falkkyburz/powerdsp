@@ -35,13 +35,8 @@
 #include <string.h>
 #include <time.h>
 
-void pdsp_assert(pdsp_bool_t b_in)
-{
-    if (!(b_in))
-    {
-        printf("Assert failed: %s:%i\n", __FILE__, __LINE__);
-    }
-}
+#define pdsp_assert(b_in)                                    \
+    if (!(b_in)) printf("Assert failed: %s:%i\n", __FILE__, __LINE__)
 
 void example_assert_true(void)
 {
@@ -421,6 +416,62 @@ void example_expavg(void)
     PDSP_ASSERT(out >= 0.999f);
 }
 
+void example_df2x(void)
+{
+    pdsp_1p1z_inv_t p1 = {.f32_b1 = 1.0f, .f32_b0 = 2.0f, .f32_a1 = 1.0f};
+    pdsp_2p2z_inv_t p2 = {.f32_b2 = 1.0f,
+                          .f32_b1 = 2.0f,
+                          .f32_b0 = 3.0f,
+                          .f32_a2 = 1.0f,
+                          .f32_a1 = 2.0f};
+    pdsp_3p3z_inv_t p3 = {.f32_b3 = 1.0f,
+                          .f32_b2 = 2.0f,
+                          .f32_b1 = 3.0f,
+                          .f32_b0 = 4.0f,
+                          .f32_a3 = 1.0f,
+                          .f32_a2 = 2.0f,
+                          .f32_a1 = 3.0f};
+    pdsp_1p1z_var_t f1 = {0};
+    pdsp_2p2z_var_t f2 = {0};
+    pdsp_3p3z_var_t f3 = {0};
+    pdsp_df21_clear(&f1);
+    PDSP_ASSERT(f1.f32_out == 0.0f);
+    PDSP_ASSERT(f1.f32_x1 == 0.0f);
+    pdsp_df22_clear(&f2);
+    PDSP_ASSERT(f2.f32_out == 0.0f);
+    PDSP_ASSERT(f2.f32_x1 == 0.0f);
+    PDSP_ASSERT(f2.f32_x2 == 0.0f);
+    pdsp_df23_clear(&f3);
+    PDSP_ASSERT(f3.f32_out == 0.0f);
+    PDSP_ASSERT(f3.f32_x1 == 0.0f);
+    PDSP_ASSERT(f3.f32_x2 == 0.0f);
+    PDSP_ASSERT(f3.f32_x3 == 0.0f);
+    pdsp_df21(&p1, &f1, 1.0f);
+    PDSP_ASSERT(f1.f32_out == 2.0f);
+    PDSP_ASSERT(f1.f32_x1 == 3.0f);
+    pdsp_df21(&p1, &f1, 10.0f);
+    PDSP_ASSERT(f1.f32_out == 23.0f);
+    PDSP_ASSERT(f1.f32_x1 == 33.0f);
+    pdsp_df22(&p2, &f2, 1.0f);
+    PDSP_ASSERT(f2.f32_out == 3.0f);
+    PDSP_ASSERT(f2.f32_x1 == 8.0f);
+    PDSP_ASSERT(f2.f32_x2 == 4.0f);
+    pdsp_df22(&p2, &f2, 10.0f);
+    PDSP_ASSERT(f2.f32_out == 38.0f);
+    PDSP_ASSERT(f2.f32_x1 == 100.0f);
+    PDSP_ASSERT(f2.f32_x2 == 48.0f);
+    pdsp_df23(&p3, &f3, 1.0f);
+    PDSP_ASSERT(f3.f32_out == 4.0f);
+    PDSP_ASSERT(f3.f32_x1 == 15.0f);
+    PDSP_ASSERT(f3.f32_x2 == 10.0f);
+    PDSP_ASSERT(f3.f32_x3 == 5.0f);
+    pdsp_df23(&p3, &f3, 10.0f);
+    PDSP_ASSERT(f3.f32_out == 55.0f);
+    PDSP_ASSERT(f3.f32_x1 == 205.0f);
+    PDSP_ASSERT(f3.f32_x2 == 135.0f);
+    PDSP_ASSERT(f3.f32_x3 == 65.0f);
+}
+
 void example_med3(void)
 {
     printf("-- void example_med3(void) --\n");
@@ -548,18 +599,12 @@ void example_signal_read_write(void)
 {
     printf("-- void example_signal_read_write(void) --\n");
     pdsp_u64_t mem = 0;
-    const pdsp_signal_prop_t sig1 = {.f32_gain = 2.0f,
-                                     .f32_offset = 1.0f,
-                                     .u16_start = 0,
-                                     .u16_length = 8};
-    const pdsp_signal_prop_t sig2 = {.f32_gain = 2.0f,
-                                     .f32_offset = 1.0f,
-                                     .u16_start = 8,
-                                     .u16_length = 8};
-    const pdsp_signal_prop_t sig3 = {.f32_gain = NAN,
-                                     .f32_offset = NAN,
-                                     .u16_start = 63,
-                                     .u16_length = 1};
+    const pdsp_signal_prop_t sig1 = {
+        .f32_gain = 2.0f, .f32_offset = 1.0f, .u16_start = 0, .u16_length = 8};
+    const pdsp_signal_prop_t sig2 = {
+        .f32_gain = 2.0f, .f32_offset = 1.0f, .u16_start = 8, .u16_length = 8};
+    const pdsp_signal_prop_t sig3 = {
+        .f32_gain = NAN, .f32_offset = NAN, .u16_start = 63, .u16_length = 1};
     pdsp_signal_write_f32(&sig1, &mem, 11.0);
     PDSP_ASSERT(mem == 23);
     PDSP_ASSERT(pdsp_signal_read_u16(&sig1, &mem) == 23);
@@ -664,6 +709,7 @@ int main()
     example_ain_calibrate();
     example_minmax();
     example_expavg();
+    example_df2x();
     example_med3();
     example_rollsum();
     example_rollavg();

@@ -981,6 +981,49 @@ typedef struct pdsp_dpll_3ph_srf_tag
     pdsp_1p1z_inv_t lpf_coeff;
 } pdsp_dpll_3ph_srf_t;
 
+/** Software frequency response analyzer variable struct. */
+typedef struct pdsp_sfra_var_tag
+{
+    /** Pre computed value for next injection step. */
+    pdsp_f32_t f32_inject;
+    /** Phase of current acquisition step. Used to generate sin and cos
+     * reference. */
+    pdsp_f32_t f32_phase;
+    /** Phase step. */    
+    pdsp_f32_t f32_phase_step;
+    /** Cycle counter. Abort if number of averaging cycles is reached. */
+    pdsp_u16_t u16_cycle_cnt;
+    /** Tau of exponential averaging filter. */
+    pdsp_f32_t f32_expavg_tau;
+    /** Average of sine values. */
+    pdsp_f32_t f32_expavg_sin;
+    /** Average of cos values */
+    pdsp_f32_t f32_expavg_cos;
+} pdsp_sfra_var_t;
+
+/** Software frequency response analyzer transfer function pair */
+typedef struct pdsp_sfra_tag
+{
+    /** Poniter to variable struct. */
+    pdsp_sfra_var_t *ps_var;
+    /** Period array (1/frequency array). */
+    pdsp_f32_t *f32_per;
+    /** Complex result array for real part. */
+    pdsp_f32_t *f32_re;
+    /** Complex result array for imaginary part. */
+    pdsp_f32_t *f32_im;
+    /** Size of period and complex array (they must have the same length). */
+    pdsp_u16_t *u16_size;
+    /** Flaoting point transfer function injection destination signal. */
+    pdsp_f32_t *f32_inject;
+    /** Flaoting point transfer function input signal. */
+    pdsp_f32_t *f32_input;
+    /** Flaoting point transfer function output signal. */
+    pdsp_f32_t *f32_output;
+    /** Number of averaging cycles per frequency. */
+    pdsp_f32_t f32_avg_cyc;
+} pdsp_sfra_t;
+
 /** @} control */
 /* ------------------------------------------------------------------------ */
 /** @addtogroup fault Fault
@@ -1035,20 +1078,6 @@ typedef struct pdsp_logger_tag
     /** Logging history queue. */
     pdsp_queue_t *ps_u64_queue;
 } pdsp_logger_t;
-
-// /** Software frequency response analyzer parameters. */
-// typedef struct pdsp_sfra_tag
-// {
-//     /* Under construction */
-//     pdsp_saw_param_t s_saw_param;
-//     pdsp_saw_t s_saw;
-//     pdsp_status_t e_status;
-//     pdsp_f32_t f32_sum_sin;
-//     pdsp_f32_t f32_sum_cos;
-//     pdsp_f32_t f32_sum_num;
-//     pdsp_f32_t f32_result_re;
-//     pdsp_f32_t f32_result_im;
-// } pdsp_sfra_t;
 
 /** Analog out data type enum. */
 typedef enum pdsp_aout_enum
@@ -1196,12 +1225,12 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
  * @brief Convert the number u16_in to a hex string.
  * @param u16_in Input number.
  * @param ach_out Output string.
- * @param b_len4 Fixed length string of length 4 is returned, minimum required
- * length otherwise.
+ * @param b_len4 Fixed length string of length 4 is returned if PDSP_TRUE,
+ * minimum required length is returned otherwise.
  * @return Pointer to the next element in the sring.
  */
-pdsp_extern pdsp_char_t *pdsp_u16_to_hex(pdsp_u16_t u16_in,
-                                         pdsp_char_t *ach_out, pdsp_bool_t b_len4);
+pdsp_extern pdsp_char_t *
+pdsp_u16_to_hex(pdsp_u16_t u16_in, pdsp_char_t *ach_out, pdsp_bool_t b_len4);
 
 /**
  * @brief Convert the number u64_in to a length 16 hex string.
@@ -1289,7 +1318,8 @@ pdsp_extern void pdsp_array_set_i16(pdsp_i16_t ai16_array[], pdsp_size_t s_size,
                                     pdsp_i16_t i16_value);
 
 /**
- * @brief Apply a given function to each element.
+ * @brief Apply a given function to each element in af32_in array and write the
+ * return value to af32_out.
  * @param af32_in Inpurt array.
  * @param af32_out Out array.
  * @param u32_size Size of input / output array.
@@ -1301,7 +1331,8 @@ pdsp_extern void pdsp_array_apply_f32(const pdsp_f32_t af32_in[],
                                       pdsp_f32_t p_func(pdsp_f32_t));
 
 /**
- * @brief Apply a given function to each element.
+ * @brief Apply a given function to each element in ai16_in array and write the
+ * return value to ai16_out.
  * @param ai16_in Inpurt array.
  * @param ai16_out Out array.
  * @param u32_size Size of input / output array.
@@ -1313,7 +1344,7 @@ pdsp_extern void pdsp_array_apply_i16(const pdsp_i16_t ai16_in[],
                                       pdsp_i16_t p_func(pdsp_i16_t));
 
 /**
- * @brief Create linerarly spaced values.
+ * @brief Create linerarly spaced values, including start and end.
  * @param af32_out Output array.
  * @param u32_size Output array size.
  * @param f32_start Start value.
@@ -1325,7 +1356,7 @@ pdsp_extern void pdsp_array_linspace_f32(pdsp_f32_t af32_out[],
                                          pdsp_f32_t f32_end);
 
 /**
- * @brief Create logarithmically spaced values.
+ * @brief Create logarithmically spaced values, including start and end.
  * @param af32_out Output array.
  * @param u32_size Output array size.
  * @param f32_start Start exponent.
@@ -1393,7 +1424,7 @@ pdsp_extern void pdsp_bit_write_u32(pdsp_u32_t *pu32_mem, pdsp_u16_t u16_bit,
                                     pdsp_bool_t b_value);
 
 /**
- * @brief Read bit in pdsp_u32_t variable.
+ * @brief Read bit in pdsp_u16_t variable.
  * @param pu16_mem Memory pointer to the variable.
  * @param u16_bit Bit number in memory variable.
  * @returns pdsp_bool_t Value of bit at position u16_bit.
@@ -2208,6 +2239,16 @@ pdsp_extern pdsp_status_t pdsp_dpll_3ph_srf_init(pdsp_dpll_3ph_srf_t *ps_state);
 /** todo */
 pdsp_extern pdsp_status_t pdsp_dpll_3ph_srf(pdsp_dpll_3ph_srf_t *ps_state,
                                             pdsp_f32_t f32_vq);
+
+/**
+ * @brief Software frequency response analysis injection function.
+ * 
+ * @param ps_data Pointer to SFRA data struct.
+ */
+pdsp_extern void pdsp_sfra_inject(pdsp_sfra_t *ps_data);
+
+/** todo */
+pdsp_extern void pdsp_sfra_process(pdsp_sfra_t *ps_data);
 
 /** @} control */
 /* ------------------------------------------------------------------------ */
