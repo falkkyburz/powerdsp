@@ -446,20 +446,51 @@ pdsp_extern pdsp_bool_t pdsp_hysteresis_value(const pdsp_hyst_t *ps_data,
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_var = ps_data->ps_var;
     /* PDSP_FALSE or OFF state */
-    if (!(ps_var->b_state) && (f32_in > ps_data->f32_high))
+    if (f32_in > ps_data->f32_high)
     {
         ps_var->b_state = PDSP_TRUE;
     }
     /* PDSP_TRUE or ON state */
-    else if (ps_var->b_state && (f32_in < ps_data->f32_low))
+    else if (f32_in < ps_data->f32_low)
     {
         ps_var->b_state = PDSP_FALSE;
     }
-    else
-    {
-        /* do nothing */
-    }
+    /* else: state does not change */
     return ps_var->b_state;
+}
+
+pdsp_extern void pdsp_hysteresis_list_clear(const pdsp_hyst_list_t *ps_data)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->ps_var->u16_state = 0U;
+}
+
+pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
+                                            pdsp_f32_t f32_in)
+{
+    static pdsp_hyst_list_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_var = ps_data->ps_var;
+    /* upper boundary breached --> */
+    if (f32_in >
+        (ps_data->af32_thres[ps_var->u16_state + 1] + ps_data->f32_hyst))
+    {
+        if (ps_var->u16_state < ps_data->u16_size - 2)
+        {
+            ps_var->u16_state++;
+        }
+    }
+    /* <-- lower boundary breached */
+    else if (f32_in <
+             (ps_data->af32_thres[ps_var->u16_state] - ps_data->f32_hyst))
+    {
+        if (ps_var->u16_state > 0U)
+        {
+            ps_var->u16_state--;
+        }
+    }
+    /* else: state does not change */
+    return ps_var->u16_state;
 }
 
 pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_hyst_time_t *ps_data)

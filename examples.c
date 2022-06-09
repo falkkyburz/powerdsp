@@ -264,6 +264,34 @@ void example_hysteresis_value(void)
     PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
 }
 
+void example_hysteresis_list(void)
+{
+    printf("-- void example_hysteresis_list(void) --\n");
+    pdsp_f32_t af32_steps[4] = {0.0f, 1.0f, 2.0f, 3.0f};
+    pdsp_hyst_list_var_t hyst_var = {0};
+    pdsp_hyst_list_t hyst = {.ps_var = &hyst_var,
+                             .f32_hyst = 0.2f,
+                             .af32_thres = af32_steps,
+                             .u16_size = 4};
+    pdsp_hysteresis_list_clear(&hyst);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 0.0f) == 0U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 1.0f) == 0U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 1.3f) == 1U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 1.0f) == 1U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 2.0f) == 1U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 2.3f) == 2U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 4.0f) == 2U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 0.0f) == 1U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 0.0f) == 0U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 1.3f) == 1U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 0.7f) == 0U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 10.0f) == 1U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 1.7f) == 1U);
+
+}
+
 void example_hysteresis_time(void)
 {
     printf("-- void example_hysteresis_time(void) --\n");
@@ -698,6 +726,7 @@ int main()
     example_array_linlogspace();
     example_interpollate_2d();
     example_hysteresis_value();
+    example_hysteresis_list();
     example_hysteresis_time();
     example_status();
     example_mean();

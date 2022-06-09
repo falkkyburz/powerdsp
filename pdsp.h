@@ -261,14 +261,14 @@ typedef pdsp_i32_t (*pdsp_pi32_func_t)(void);
 /** Funtion pointer (pointer to f32 function) */
 typedef pdsp_f32_t (*pdsp_pf32_func_t)(void);
 
-/** Stopwatch variable struct. */
+/** Hysteresis variable struct. */
 typedef struct pdsp_hyst_var_tag
 {
     /** Hysteresis state variable. */
     pdsp_bool_t b_state;
 } pdsp_hyst_var_t;
 
-/** Stopwatch struct. */
+/** Hysteresis struct. */
 typedef struct pdsp_hyst_tag
 {
     /** Pointer to hysteresis variable struct. */
@@ -278,6 +278,26 @@ typedef struct pdsp_hyst_tag
     /** Higher hysteresis threshold. */
     pdsp_f32_t f32_high;
 } pdsp_hyst_t;
+
+/** Hysteresis list variable struct. */
+typedef struct pdsp_hyst_list_var_tag
+{
+    /** Hysteresis state variable. */
+    pdsp_u16_t u16_state;
+} pdsp_hyst_list_var_t;
+
+/** Hysteresis list struct. */
+typedef struct pdsp_hyst_list_tag
+{
+    /** Pointer to hysteresis variable struct. */
+    pdsp_hyst_list_var_t *ps_var;
+    /** Hysteresis value, applied left/right of the threshold. */
+    pdsp_f32_t f32_hyst;
+    /** Hysteresis threshold list. */
+    pdsp_f32_t *af32_thres;
+    /** Hysteresis threshold list length. */
+    pdsp_u16_t u16_size;
+} pdsp_hyst_list_t;
 
 /** Hysteresis status struct */
 typedef struct pdsp_hyst_time_var_tag
@@ -1019,7 +1039,7 @@ typedef struct pdsp_sfra_var_tag
 /** Bode frequency , real, imaginary array */
 typedef struct pdsp_sfra_bode_tag
 {
-/** Period array (1/frequency array). */
+    /** Period array (1/frequency array). */
     pdsp_f32_t *f32_bode_per;
     /** Complex result array for real part. */
     pdsp_f32_t *f32_bode_re;
@@ -1027,7 +1047,7 @@ typedef struct pdsp_sfra_bode_tag
     pdsp_f32_t *f32_bode_im;
     /** Size of period and complex array (they must have the same length). */
     pdsp_u16_t u16_bode_size;
-}pdsp_sfra_bode_t;
+} pdsp_sfra_bode_t;
 
 /** Software frequency response analyzer transfer function pair */
 typedef struct pdsp_sfra_tag
@@ -1384,7 +1404,7 @@ pdsp_extern void pdsp_array_logspace_f32(pdsp_f32_t af32_out[],
                                          pdsp_f32_t f32_end);
 
 /**
- * @brief Condition/time hysteresis function clear.
+ * @brief Value hysteresis function clear.
  * @param ps_data Hysteresis state struct.
  */
 pdsp_extern void pdsp_hysteresis_value_clear(const pdsp_hyst_t *ps_data);
@@ -1398,7 +1418,6 @@ pdsp_extern void pdsp_hysteresis_value_clear(const pdsp_hyst_t *ps_data);
  *                |<------|------- f32_high
  *              dn|       |up
  * f32_low -------|------>|
- * Content of the function can also be copied and used as a prototype.
  * @param ps_data Data struct.
  * @param f32_in Value input.
  * @return pdsp_bool_t State output.
@@ -1407,7 +1426,34 @@ pdsp_extern pdsp_bool_t pdsp_hysteresis_value(const pdsp_hyst_t *ps_data,
                                               pdsp_f32_t f32_in);
 
 /**
- * @brief Condition/time hysteresis function clear.
+ * @brief Value list hysteresis function clear.
+ * @param ps_data Hysteresis state struct.
+ */
+pdsp_extern void pdsp_hysteresis_list_clear(const pdsp_hyst_list_t *ps_data);
+
+/**
+ * @brief Value list hysteresis function.
+ * @details Changes to higher state if input is greater than the current
+ * threshold plus hysteresis. Changes to lower state if input is less than the
+ * current threshold minus hysteresis. No action if value is between the low and
+ * high threshold. There are size - 2 states. This design will only jump 1 state
+ * per call. Example with threshold array V size equal to four (lower bound,
+ * first threshold, second threhold, upper bound):
+ * "V0"       "V1-th"    "V1+th"   "V2-th"    "V2+th"        "V3"
+ *                                    |<---------|---"S2"----->
+ *                                  dn|          |up
+ *              |<---------|---"S1"---|--------->|
+ *            dn|          |up
+ * <-----"S0"---|--------->|
+ * @param ps_data Data struct.
+ * @param f32_in Value input.
+ * @return pdsp_bool_t State output.
+ */
+pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
+                                            pdsp_f32_t f32_in);
+
+/**
+ * @brief Time hysteresis function clear.
  * @param ps_data Hysteresis state struct.
  */
 pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_hyst_time_t *ps_data);
