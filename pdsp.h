@@ -261,14 +261,14 @@ typedef pdsp_i32_t (*pdsp_pi32_func_t)(void);
 /** Funtion pointer (pointer to f32 function) */
 typedef pdsp_f32_t (*pdsp_pf32_func_t)(void);
 
-/** Hysteresis variable struct. */
+/** Hysteresis value variable struct. */
 typedef struct pdsp_hyst_var_tag
 {
     /** Hysteresis state variable. */
     pdsp_bool_t b_state;
 } pdsp_hyst_var_t;
 
-/** Hysteresis struct. */
+/** Hysteresis value struct. */
 typedef struct pdsp_hyst_tag
 {
     /** Pointer to hysteresis variable struct. */
@@ -299,27 +299,55 @@ typedef struct pdsp_hyst_list_tag
     pdsp_u16_t u16_size;
 } pdsp_hyst_list_t;
 
-/** Hysteresis status struct */
-typedef struct pdsp_hyst_time_var_tag
+/** Debounce status struct */
+typedef struct pdsp_debounce_var_tag
 {
-    /** Hysteresis status state variable. */
+    /** Debounce status state variable. */
     pdsp_bool_t b_state;
-    /** Hysteresis time state variable. */
+    /** Debounce time state variable. */
     pdsp_f32_t f32_time;
-} pdsp_hyst_time_var_t;
+} pdsp_debounce_var_t;
 
-/** Hysteresis parameter struct */
-typedef struct pdsp_hyst_time_tag
+/** Debounce parameter struct */
+typedef struct pdsp_debounce_tag
 {
-    /** Pointer to pdsp_hyst_time_t struct. */
-    pdsp_hyst_time_var_t *ps_var;
-    /** Hysteresis time step. */
+    /** Pointer to pdsp_debounce_var_t struct. */
+    pdsp_debounce_var_t *ps_var;
+    /** Debounce time step. */
     pdsp_f32_t f32_t_step;
-    /** Hysteresis detection time. High transition. */
+    /** Debounce detection time. High transition. */
     pdsp_f32_t f32_t_high;
-    /** Hysteresis recovery time. Low transition. */
+    /** Debounce recovery time. Low transition. */
     pdsp_f32_t f32_t_low;
-} pdsp_hyst_time_t;
+} pdsp_debounce_t;
+
+/** Robust status struct */
+typedef struct pdsp_robust_var_tag
+{
+    /** Robust status state variable and list index. */
+    pdsp_u16_t u16_state;
+    /** Robust time state variable. */
+    pdsp_f32_t f32_time;
+} pdsp_robust_var_t;
+
+/** Robust parameter struct */
+typedef struct pdsp_robust_tag
+{
+    /** Pointer to pdsp_robust_var_t struct. */
+    pdsp_robust_var_t *ps_var;
+    /** Robust time step. */
+    pdsp_f32_t f32_t_step;
+    /** Robust state threshold up list. */
+    pdsp_f32_t *af32_thres_up;
+    /** Robust state threshold down list. */
+    pdsp_f32_t *af32_thres_dn;
+    /** Robust state debounce time up list. */
+    pdsp_f32_t *af32_time_up;
+    /** Robust state debounce time down list. */
+    pdsp_f32_t *af32_time_dn;
+    /** Robust state list length. */
+    pdsp_u16_t u16_size;
+} pdsp_robust_t;
 
 /** Integer queue struct */
 typedef struct pdsp_queue_var_tag
@@ -1085,7 +1113,7 @@ typedef struct pdsp_fault_tag
     /** Pointer to fault variable struct. */
     pdsp_fault_var_t *ps_var;
     /** Time hysteresis parameters. */
-    pdsp_hyst_time_t *ps_hyst;
+    pdsp_debounce_t *ps_hyst;
     /** Fault trip value. */
     pdsp_f32_t f32_value;
     /** Fault group status */
@@ -1439,15 +1467,16 @@ pdsp_extern void pdsp_hysteresis_list_clear(const pdsp_hyst_list_t *ps_data);
  * high threshold. There are size - 2 states. This design will only jump 1 state
  * per call. Example with threshold array V size equal to four (lower bound,
  * first threshold, second threhold, upper bound):
- * "V0"       "V1-th"    "V1+th"   "V2-th"    "V2+th"        "V3"
- *                                    |<---------|---"S2"----->
+ * "V0"       "V1-th"    "V1+th"   "V2-th"    "V2+th"      "V3"
+ *                                    |<---------|---"S2"---->
  *                                  dn|          |up
  *              |<---------|---"S1"---|--------->|
  *            dn|          |up
- * <-----"S0"---|--------->|
+ *  <----"S0"---|--------->|
+ * X axis: Input, Y axis: Output (state)
  * @param ps_data Data struct.
  * @param f32_in Value input.
- * @return pdsp_bool_t State output.
+ * @return pdsp_u16_t State output.
  */
 pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
                                             pdsp_f32_t f32_in);
@@ -1456,7 +1485,7 @@ pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
  * @brief Time hysteresis function clear.
  * @param ps_data Hysteresis state struct.
  */
-pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_hyst_time_t *ps_data);
+pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_debounce_t *ps_data);
 
 /**
  * @brief Condition/time hysteresis function with detecting and recovering time.
@@ -1464,8 +1493,39 @@ pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_hyst_time_t *ps_data);
  * @param b_in Input condition.
  * @return pdsp_bool_t Status output.
  */
-pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_hyst_time_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_debounce_t *ps_data,
                                              pdsp_bool_t b_in);
+
+/**
+ * @brief Robust function clear.
+ * @param ps_data Robust state struct.
+ */
+pdsp_extern void pdsp_robust_clear(const pdsp_robust_t *ps_data);
+
+/**
+ * @brief Robust function.
+ * @details Changes to higher state if input is greater than the current
+ * high threshold and the high debounce time is elapsed. Changes to lower
+ * state if input is less than the current low threshold and the low debounce
+ * time is elapsed. No action if value is between the low and
+ * high threshold or the debounce timer is not elapsed. This design will only
+ * jump 1 state per call. Example with threshold array size equal to four
+ * (S0, S1, S2, S3):
+ * "S0L"    "S1L"     "S0H"     "S2L"     "S1H"    "S3L"     "S2H"     "S3H"
+ *                                                   |<--------|--"S3"-->|
+ *                                               tddn|         |tdup
+ *                                |<--------|--"S2"--|-------->|
+ *                            tddn|         |tdup
+ *            |<--------|--"S1"---|-------->|
+ *        tddn|         |tdup
+ *  |<--"S0"--|-------->|
+ * X axis: Input, Y axis: Output (state)
+ * @param ps_data Data struct.
+ * @param f32_in Value input.
+ * @return pdsp_u16_t State output.
+ */
+pdsp_extern pdsp_u16_t pdsp_robust(const pdsp_robust_t *ps_data,
+                                   pdsp_f32_t f32_in);
 
 /**
  * @brief Write bit in pdsp_u16_t variable.

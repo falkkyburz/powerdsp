@@ -493,17 +493,17 @@ pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
     return ps_var->u16_state;
 }
 
-pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_hyst_time_t *ps_data)
+pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_debounce_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
     ps_data->ps_var->b_state = PDSP_FALSE;
     ps_data->ps_var->f32_time = 0.0f;
 }
 
-pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_hyst_time_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_debounce_t *ps_data,
                                              pdsp_bool_t b_in)
 {
-    static pdsp_hyst_time_var_t *ps_var;
+    static pdsp_debounce_var_t *ps_var;
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_var = ps_data->ps_var;
     /* PDSP_FALSE or OFF state */
@@ -514,11 +514,6 @@ pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_hyst_time_t *ps_data,
         {
             ps_var->b_state = PDSP_TRUE;
             ps_var->f32_time = 0.0f;
-            /* State change actions */
-        }
-        else
-        {
-            /* do nothing */
         }
     }
     /* PDSP_TRUE or ON state */
@@ -529,11 +524,6 @@ pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_hyst_time_t *ps_data,
         {
             ps_var->b_state = PDSP_FALSE;
             ps_var->f32_time = 0.0f;
-            /* State change actions */
-        }
-        else
-        {
-            /* do nothing */
         }
     }
     /* PDSP_FALSE && !b_in || PDSP_TRUE && b_in */
@@ -542,6 +532,64 @@ pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_hyst_time_t *ps_data,
         ps_var->f32_time = 0.0f;
     }
     return ps_var->b_state;
+}
+
+pdsp_extern void pdsp_robust_clear(const pdsp_robust_t *ps_data)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->ps_var->u16_state = 0U;
+    ps_data->ps_var->f32_time = 0.0f;
+}
+
+pdsp_extern pdsp_u16_t pdsp_robust(const pdsp_robust_t *ps_data,
+                                   pdsp_f32_t f32_in)
+{
+    static pdsp_robust_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_var = ps_data->ps_var;
+    /* upper boundary breached --> */
+    if (f32_in > ps_data->af32_thres_up[ps_var->u16_state])
+    {
+        /* count up if below last state */
+        if (ps_var->u16_state < ps_data->u16_size - 1)
+        {
+            ps_var->f32_time += ps_data->f32_t_step;
+        }
+        /* upper debounce time elapsed */
+        if (ps_var->f32_time > ps_data->af32_time_up[ps_var->u16_state])
+        {
+            if (ps_var->u16_state < ps_data->u16_size - 1)
+            {
+                ps_var->u16_state++;
+            }
+            ps_var->f32_time = 0.0f;
+        }
+    }
+    /* <-- lower boundary breached */
+    else if (f32_in < ps_data->af32_thres_dn[ps_var->u16_state])
+    {
+        /* count up if above first state */
+        if (ps_var->u16_state > 0U)
+        {
+            ps_var->f32_time += ps_data->f32_t_step;
+        }
+        /* lower debounce time elapsed */
+        if (ps_var->f32_time > ps_data->af32_time_dn[ps_var->u16_state])
+        {
+            if (ps_var->u16_state > 0U)
+            {
+                ps_var->u16_state--;
+            }
+            ps_var->f32_time = 0.0f;
+        }
+    }
+    /* boundaries not breached */
+    else
+    {
+        ps_var->f32_time = 0.0f;
+    }
+
+    return ps_var->u16_state;
 }
 
 pdsp_extern void pdsp_bit_write_u16(pdsp_u16_t *pu16_mem, pdsp_u16_t u16_bit,

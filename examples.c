@@ -289,17 +289,16 @@ void example_hysteresis_list(void)
     PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 10.0f) == 2U);
     PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 10.0f) == 2U);
     PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 1.7f) == 1U);
-
 }
 
 void example_hysteresis_time(void)
 {
     printf("-- void example_hysteresis_time(void) --\n");
-    pdsp_hyst_time_var_t hyst_var = {0};
-    pdsp_hyst_time_t hyst = {.ps_var = &hyst_var,
-                             .f32_t_step = 1.0f,
-                             .f32_t_high = 2.0f,
-                             .f32_t_low = 2.0f};
+    pdsp_debounce_var_t hyst_var = {0};
+    pdsp_debounce_t hyst = {.ps_var = &hyst_var,
+                            .f32_t_step = 1.0f,
+                            .f32_t_high = 2.0f,
+                            .f32_t_low = 2.0f};
     pdsp_hysteresis_time_clear(&hyst);
     PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
@@ -314,6 +313,119 @@ void example_hysteresis_time(void)
     PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
+}
+
+void example_robust(void)
+{
+    printf("-- void example_robust(void) --\n");
+    pdsp_f32_t af32_thres_up[4] = {1.0f, 2.0f, 2.5f, 3.0f};
+    pdsp_f32_t af32_thres_dn[4] = {0.0f, 0.5f, 1.5f, 2.0f};
+    pdsp_f32_t af32_time_up[4] = {2.0f, 2.0f, 2.0f, 2.0f};
+    pdsp_f32_t af32_time_dn[4] = {2.0f, 2.0f, 2.0f, 2.0f};
+    pdsp_robust_var_t rbst_var = {0};
+    pdsp_robust_t rbst = {.ps_var = &rbst_var,
+                          .f32_t_step = 1.0f,
+                          .af32_thres_up = af32_thres_up,
+                          .af32_thres_dn = af32_thres_dn,
+                          .af32_time_up = af32_time_up,
+                          .af32_time_dn = af32_time_dn,
+                          .u16_size = 4U};
+    pdsp_robust_clear(&rbst);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
+    pdsp_robust_clear(&rbst);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    pdsp_robust_clear(&rbst);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 0.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 0.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 1.4f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 1.4f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 1.4f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 1.4f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 1.4f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 1.4f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 2.1f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 1.4f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 0.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 0.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 0.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 0.0f) == 0U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 0.0f) == 0U);
+    pdsp_robust_clear(&rbst);
+    af32_time_up[0] = 0.0;
+    af32_time_up[1] = 0.0;
+    af32_time_up[2] = 0.0;
+    af32_time_up[3] = 0.0;
+    af32_time_dn[0] = 0.0;
+    af32_time_dn[1] = 0.0;
+    af32_time_dn[2] = 0.0;
+    af32_time_dn[3] = 0.0;
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
+    af32_time_up[0] = 0.0;
+    af32_time_up[1] = 1.0;
+    af32_time_up[2] = 2.0;
+    af32_time_up[3] = 0.0;
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, 10.0f) == 3U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 2U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 1U);
+    PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
 }
 
 void example_status(void)
@@ -650,12 +762,12 @@ void example_fault(void)
 {
     printf("-- void example_fault(void) --\n");
     pdsp_u32_t flt_group = 0;
-    pdsp_hyst_time_var_t flt_hyst_var = {0};
+    pdsp_debounce_var_t flt_hyst_var = {0};
     pdsp_fault_var_t flt_var = {0};
-    pdsp_hyst_time_t flt_hyst = {.ps_var = &flt_hyst_var,
-                                 .f32_t_step = 1.0f,
-                                 .f32_t_low = 2.0f,
-                                 .f32_t_high = 2.0f};
+    pdsp_debounce_t flt_hyst = {.ps_var = &flt_hyst_var,
+                                .f32_t_step = 1.0f,
+                                .f32_t_low = 2.0f,
+                                .f32_t_high = 2.0f};
     pdsp_fault_t flt = {.ps_var = &flt_var,
                         .ps_hyst = &flt_hyst,
                         .f32_value = 1.0f,
@@ -728,6 +840,7 @@ int main()
     example_hysteresis_value();
     example_hysteresis_list();
     example_hysteresis_time();
+    example_robust();
     example_status();
     example_mean();
     example_queue();
