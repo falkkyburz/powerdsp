@@ -634,19 +634,19 @@ pdsp_extern pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
     return (pdsp_bool_t)((*pu32_mem >> u16_bit) & 1U);
 }
 
-pdsp_extern void pdsp_status_set(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask)
+pdsp_extern void pdsp_mask_set(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask)
 {
     PDSP_ASSERT(pu32_mem != NULL);
     (*pu32_mem) |= u32_mask;
 }
 
-pdsp_extern void pdsp_status_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask)
+pdsp_extern void pdsp_mask_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask)
 {
     PDSP_ASSERT(pu32_mem != NULL);
     (*pu32_mem) &= ~u32_mask;
 }
 
-pdsp_extern pdsp_bool_t pdsp_status_get(pdsp_u32_t *pu32_mem,
+pdsp_extern pdsp_bool_t pdsp_mask_get(pdsp_u32_t *pu32_mem,
                                         pdsp_u32_t u32_mask_true,
                                         pdsp_u32_t u32_mask_false)
 {
@@ -844,48 +844,55 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data)
 SIGNAL
 -----------------------------------------------------------------------------*/
 
-pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw)
+pdsp_extern pdsp_f32_t pdsp_ain(pdsp_ain_var_t *ps_data, pdsp_f32_t f32_raw)
 {
     PDSP_ASSERT(ps_data != NULL);
-    if (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_OFF)
+    if (ps_data->e_ovr_mode == PDSP_OVERRIDE_OFF)
     {
         return ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset);
     }
-    else if (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_ON)
+    else if (ps_data->e_ovr_mode == PDSP_OVERRIDE_ON)
     {
-        return ps_data->ps_ovr->f32_value;
+        return ps_data->f32_ovr_value;
     }
-    else if (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_INJECT)
+    else if (ps_data->e_ovr_mode == PDSP_OVERRIDE_INJECT)
     {
         return ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset) +
-               ps_data->ps_ovr->f32_value;
+               ps_data->f32_ovr_value;
     }
-    else /* (ps_data->ps_ovr->u23_ovr_mode == PDSP_OVERRIDE_RAW) */
+    else /* (ps_data->e_ovr_mode == PDSP_OVERRIDE_RAW) */
     {
         return f32_raw;
     }
 }
 
-pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data,
-                                     pdsp_f32_t f32_value)
+pdsp_extern pdsp_f32_t pdsp_ain_ovr(pdsp_ain_var_t *ps_data, pdsp_f32_t f32_raw)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_ovr != NULL));
-    ps_data->ps_ovr->u23_ovr_mode = PDSP_OVERRIDE_ON;
-    ps_data->ps_ovr->f32_value = f32_value;
+    PDSP_ASSERT(ps_data != NULL);
+    return ((f32_raw * ps_data->f32_gain) + ps_data->f32_offset) +
+           ps_data->f32_ovr_value;
 }
 
-pdsp_extern void pdsp_ain_ovr_disable(const pdsp_ain_t *ps_data)
-{
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_ovr != NULL));
-    ps_data->ps_ovr->u23_ovr_mode = PDSP_OVERRIDE_OFF;
-}
-
-pdsp_extern void pdsp_ain_ovr_inject(const pdsp_ain_t *ps_data,
+pdsp_extern void pdsp_ain_ovr_enable(pdsp_ain_var_t *ps_data,
                                      pdsp_f32_t f32_value)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_ovr != NULL));
-    ps_data->ps_ovr->u23_ovr_mode = PDSP_OVERRIDE_INJECT;
-    ps_data->ps_ovr->f32_value = f32_value;
+    PDSP_ASSERT((ps_data != NULL));
+    ps_data->e_ovr_mode = PDSP_OVERRIDE_ON;
+    ps_data->f32_ovr_value = f32_value;
+}
+
+pdsp_extern void pdsp_ain_ovr_disable(pdsp_ain_var_t *ps_data)
+{
+    PDSP_ASSERT((ps_data != NULL));
+    ps_data->e_ovr_mode = PDSP_OVERRIDE_OFF;
+}
+
+pdsp_extern void pdsp_ain_ovr_inject(pdsp_ain_var_t *ps_data,
+                                     pdsp_f32_t f32_value)
+{
+    PDSP_ASSERT((ps_data != NULL));
+    ps_data->e_ovr_mode = PDSP_OVERRIDE_INJECT;
+    ps_data->f32_ovr_value = f32_value;
 }
 
 pdsp_extern pdsp_f32_t pdsp_ain_calibrate_gain(pdsp_f32_t f32_gain_old,
@@ -2116,16 +2123,6 @@ pdsp_extern pdsp_bool_t pdsp_fault_check(pdsp_fault_t *ps_data,
         ps_var->f32_time = 0.0f;
     }
     return ps_var->b_state;
-}
-
-pdsp_extern void pdsp_fault_process_group(pdsp_bool_t b_group,
-                                          void pf_callback(void))
-{
-    PDSP_ASSERT(pf_callback != NULL);
-    if (b_group)
-    {
-        pf_callback();
-    }
 }
 
 // pdsp_extern void pdsp_log_init(pdsp_logger_t *ps_data)

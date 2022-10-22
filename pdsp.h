@@ -416,7 +416,7 @@ typedef struct pdsp_srec_tag
  */
 
 /** Analog input override mode. */
-typedef enum pdsp_ain_override_mode_tag
+typedef enum pdsp_ain_override_mode_enum
 {
     /** Override is turned off, raw * gain + offset is returned. */
     PDSP_OVERRIDE_OFF,
@@ -427,27 +427,20 @@ typedef enum pdsp_ain_override_mode_tag
     /** Override is turned on, the raw value is returned without modification.
      */
     PDSP_OVERRIDE_RAW,
-} pdsp_ain_override_mode_t;
-
-/** DAQ Override struct. */
-typedef struct pdsp_ain_override_tag
-{
-    /** Override disable. Normally 0.0f, set to 1.0f to override. */
-    pdsp_ain_override_mode_t u23_ovr_mode;
-    /** Override value. */
-    pdsp_f32_t f32_value;
-} pdsp_ain_override_t;
+} pdsp_ain_override_mode_e;
 
 /** DAQ processing parameter struct. */
-typedef struct pdsp_ain_tag
+typedef struct pdsp_ain_var_tag
 {
-    /** Pointer to override struct. */
-    pdsp_ain_override_t *ps_ovr;
+    /** Override mode. */
+    pdsp_ain_override_mode_e e_ovr_mode;
+    /** Override value. */
+    pdsp_f32_t f32_ovr_value;
     /** DAQ conversion gain. */
     pdsp_f32_t f32_gain;
     /** DAQ conversion offset. */
     pdsp_f32_t f32_offset;
-} pdsp_ain_t;
+} pdsp_ain_var_t;
 
 /** Min-max state variable struct. */
 typedef struct pdsp_minmax_var_tag
@@ -1580,18 +1573,55 @@ pdsp_extern pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
                                           pdsp_u16_t u16_bit);
 
 /**
+ * @brief (Macro) Write bit.
+ * @param v Variable.
+ * @param bit Bit position.
+ * @param val Value to write.
+ */
+#define pdsp_macro_bit_write(v, bit, val) (v) &= ~(1 << bit); (v) |= (((val) & 1U) << (bit))
+
+/**
+ * @brief (Macro) Read bit.
+ * @param v Variable.
+ * @param bit Bit position.
+ */
+#define pdsp_macro_bit_read(v, bit)  (((val) >> (bit)) & 1U)
+
+/**
+ * @brief (Macro) Mask set.
+ * @param v Variable.
+ * @param mask Mask.
+ */
+#define pdsp_macro_mask_set(v, mask)  (v) |= (mask)
+
+/**
+ * @brief (Macro) Mask clear.
+ * @param v Variable.
+ * @param mask Mask.
+ */
+#define pdsp_macro_mask_clear(v, mask)  (v) &= ~(mask)
+
+/**
+ * @brief (Macro) Mask get true and false.
+ * @param v Variable.
+ * @param mtrue Mask for true values.
+ * @param mfalse Mask for false values.
+ */
+#define pdsp_macro_mask_get(v, mtrue, mfalse)  ((v) & (mtrue)) | ((~(v)) & (mfalse))
+
+/**
  * @brief Write to status register. Set bits in mask.
  * @param pu32_mem Memory pointer to the variable.
  * @param u32_mask Status bits to set.
  */
-pdsp_extern void pdsp_status_set(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
+pdsp_extern void pdsp_mask_set(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
 
 /**
  * @brief Write to status register. Clear bits in mask.
  * @param pu32_mem Memory pointer to the variable.
  * @param u32_mask Status bits to clear.
  */
-pdsp_extern void pdsp_status_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
+pdsp_extern void pdsp_mask_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
 
 /**
  * @brief Read status according to true and false masks.
@@ -1602,7 +1632,7 @@ pdsp_extern void pdsp_status_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
  * mask is used.
  * @return pdsp_bool_t Compare result.
  */
-pdsp_extern pdsp_bool_t pdsp_status_get(pdsp_u32_t *pu32_mem,
+pdsp_extern pdsp_bool_t pdsp_mask_get(pdsp_u32_t *pu32_mem,
                                         pdsp_u32_t u32_mask_true,
                                         pdsp_u32_t u32_mask_false);
 
@@ -1785,26 +1815,71 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data);
  */
 
 /**
+ * @brief Apply gain / offset to raw signal with extended override capability.
+ * @param ps_data Signal data struct.
+ * @param f32_raw Raw input signal.
+ * @returns pdsp_f32_t Result = (raw * gain + offset) * enable + override.
+ */
+pdsp_extern pdsp_f32_t pdsp_ain(pdsp_ain_var_t *ps_data, pdsp_f32_t f32_raw);
+
+/**
  * @brief Apply gain / offset to raw signal.
  * @param ps_data Signal data struct.
  * @param f32_raw Raw input signal.
  * @returns pdsp_f32_t Result = (raw * gain + offset) * enable + override.
  */
-pdsp_extern pdsp_f32_t pdsp_ain(const pdsp_ain_t *ps_data, pdsp_f32_t f32_raw);
+pdsp_extern pdsp_f32_t pdsp_ain_ovr(pdsp_ain_var_t *ps_data,
+                                    pdsp_f32_t f32_raw);
+
+/**
+ * @brief (Macro) Apply gain / offset to raw signal.
+ * @param v Signal data struct.
+ * @param raw Raw input signal.
+ */
+#define pdsp_macro_ain(v, raw)                                                 \
+    ((raw)*v.f32_gain + v.f32_offset + v.f32_ovr_value)
+
+/**
+ * @brief (Macro) Apply gain / offset to raw signal with 2x oversampling.
+ * @param v Signal data struct.
+ * @param raw1 Raw input signal.
+ * @param raw2 Raw input signal.
+ */
+#define pdsp_macro_ain2(v, raw1, raw2)                                         \
+    (((raw1) + (raw2)) * v.f32_gain + v.f32_offset + v.f32_ovr_value)
+
+/**
+ * @brief (Macro) Apply gain / offset to raw signal with 4x oversampling.
+ * @param v Signal data struct.
+ * @param raw1 Raw input signal.
+ * @param raw2 Raw input signal.
+ * @param raw3 Raw input signal.
+ * @param raw4 Raw input signal.
+ */
+#define pdsp_macro_ain4(v, raw1, raw2, raw3, raw4)                             \
+    (((raw1) + (raw2) + (raw3) + (raw4)) * v.f32_gain + v.f32_offset +         \
+     v.f32_ovr_value)
+
+/**
+ * @brief (Macro) Set injection value.
+ * @param v Signal data struct.
+ * @param inj Injection signal.
+ */
+#define pdsp_macro_ain_inject(v, inj) v.f32_ovr_value = (inj)
 
 /**
  * @brief Set and enable override.
  * @param ps_data Signal data struct.
  * @param f32_value Override value.
  */
-pdsp_extern void pdsp_ain_ovr_enable(const pdsp_ain_t *ps_data,
+pdsp_extern void pdsp_ain_ovr_enable(pdsp_ain_var_t *ps_data,
                                      pdsp_f32_t f32_value);
 
 /**
  * @brief Enable disable.
  * @param ps_data Signal data struct.
  */
-pdsp_extern void pdsp_ain_ovr_disable(const pdsp_ain_t *ps_data);
+pdsp_extern void pdsp_ain_ovr_disable(pdsp_ain_var_t *ps_data);
 
 /**
  * @brief Signal injection function to be used with SFRA or other testing
@@ -1812,7 +1887,7 @@ pdsp_extern void pdsp_ain_ovr_disable(const pdsp_ain_t *ps_data);
  * @param ps_data Signal data struct.
  * @param f32_value Override value.
  */
-pdsp_extern void pdsp_ain_ovr_inject(const pdsp_ain_t *ps_data,
+pdsp_extern void pdsp_ain_ovr_inject(pdsp_ain_var_t *ps_data,
                                      pdsp_f32_t f32_value);
 
 /**
@@ -1864,6 +1939,14 @@ pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data);
  */
 pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
                                    pdsp_f32_t f32_in);
+
+/**
+ * @brief (Macro) Calculate simplple exponential averaging filter.
+ * @param v Filter state variable struct.
+ * @param in Filter input.
+ */
+#define pdsp_macro_expavg_calc(v, in)                                          \
+    v.ps_var->f32_x1 += v.f32_tau * (in - v.ps_var->f32_x1)
 
 /**
  * @brief Convert continuous H(s) to H(1/z) for 1P1Z transfer function using
@@ -2449,14 +2532,6 @@ pdsp_extern void pdsp_fault_init(pdsp_fault_t *ps_data);
  */
 pdsp_extern pdsp_bool_t pdsp_fault_check(pdsp_fault_t *ps_data,
                                          pdsp_f32_t f32_in);
-
-/**
- * @brief Check fault group and execute group callback.
- * @param b_group Fault group memory.
- * @param pf_callback Fault trip callback.
- */
-pdsp_extern void pdsp_fault_process_group(pdsp_bool_t b_group,
-                                          void pf_callback(void));
 
 /** @} fault */
 /* ------------------------------------------------------------------------ */

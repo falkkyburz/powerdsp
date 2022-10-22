@@ -15,6 +15,7 @@ $(TARGET): pdsp.o examples.o
 pdsp.o: pdsp.c
 	$(info Compile pdsp.c:)
 	$(CC) $(CFLAGS) $(INC) -c -O0 -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -S -fverbose-asm $<
 
 examples.o: examples.c
 	$(info Compile examples.c:)
@@ -31,6 +32,7 @@ clean:
 	del $(TARGET).exe
 	del pdsp.o
 	del pdsp.dis
+	del pdsp.s
 	del pdsp.map
 	del examples.o
 	del doxylog.txt

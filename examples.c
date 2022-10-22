@@ -434,15 +434,15 @@ void example_status(void)
     pdsp_u32_t u32_status = 0U;
     pdsp_u32_t *pu32_status = &u32_status;
     PDSP_ASSERT(u32_status == 0x0);
-    pdsp_status_set(pu32_status, 0x1);
+    pdsp_mask_set(pu32_status, 0x1);
     PDSP_ASSERT(u32_status == 0x1U);
-    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x1, 0x0) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x0, 0xFFFFFFFE) == PDSP_TRUE);
-    pdsp_status_clear(pu32_status, 0xFFFFFFFF);
+    PDSP_ASSERT(pdsp_mask_get(pu32_status, 0x1, 0x0) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_mask_get(pu32_status, 0x0, 0xFFFFFFFE) == PDSP_TRUE);
+    pdsp_mask_clear(pu32_status, 0xFFFFFFFF);
     PDSP_ASSERT(u32_status == 0x0);
-    pdsp_status_set(pu32_status, 0x1000);
-    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x1000, 0x0) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_status_get(pu32_status, 0x0, 0xFFFFEFFF) == PDSP_TRUE);
+    pdsp_mask_set(pu32_status, 0x1000);
+    PDSP_ASSERT(pdsp_mask_get(pu32_status, 0x1000, 0x0) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_mask_get(pu32_status, 0x0, 0xFFFFEFFF) == PDSP_TRUE);
 }
 
 void example_mean(void)
@@ -485,9 +485,10 @@ void example_queue(void)
 void example_ain(void)
 {
     printf("-- void example_ain(void) --\n");
-    pdsp_ain_override_t vin_ovr = {0};
-    const pdsp_ain_t vin_ain = {
-        .ps_ovr = &vin_ovr, .f32_gain = 2.0f, .f32_offset = 10.0f};
+    pdsp_ain_var_t vin_ain = {.e_ovr_mode = PDSP_OVERRIDE_OFF,
+                                    .f32_ovr_value = 0.0f,
+                                    .f32_gain = 2.0f,
+                                    .f32_offset = 10.0f};
     pdsp_f32_t vin;
     vin = pdsp_ain(&vin_ain, 1.0f);
     PDSP_ASSERT(vin == 12.0f);
@@ -507,9 +508,10 @@ void example_ain(void)
 void example_ain_calibrate(void)
 {
     printf("-- void example_ain_calibrate(void) --\n");
-    pdsp_ain_override_t vin_ovr = {0};
-    const pdsp_ain_t vin_ain = {
-        .ps_ovr = &vin_ovr, .f32_gain = 2.0f, .f32_offset = 10.0f};
+    pdsp_ain_var_t vin_ain = {.e_ovr_mode = PDSP_OVERRIDE_OFF,
+                              .f32_ovr_value = 0.0f,
+                              .f32_gain = 2.0f,
+                              .f32_offset = 10.0f};
     pdsp_f32_t vin, new_gain, new_offset;
     vin = pdsp_ain(&vin_ain, 1.0f);
     PDSP_ASSERT(vin == 12.0f);
@@ -756,8 +758,6 @@ void example_signal_read_write(void)
     PDSP_ASSERT(pdsp_signal_read_u16(&sig3, &mem) == 1);
 }
 
-void flt_group_cb(void) { PDSP_ASSERT(PDSP_TRUE); }
-
 void example_fault(void)
 {
     printf("-- void example_fault(void) --\n");
@@ -834,13 +834,10 @@ void example_fault(void)
     flt_ena = 0;
     PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
     PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(flt_status == 1);
-
-    flt_status = 1;
-    pdsp_fault_process_group(flt_status, &flt_group_cb);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_status == 0);
 }
 
 int main()
