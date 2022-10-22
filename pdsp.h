@@ -1103,8 +1103,12 @@ typedef struct pdsp_sfra_tag
 /** Fault state variable struct */
 typedef struct pdsp_fault_var_tag
 {
-    /** Fault enable  */
-    pdsp_bool_t b_ena;
+    /** Debounce status state variable. */
+    pdsp_bool_t b_state;
+    /** Debounce time state variable. */
+    pdsp_f32_t f32_time;
+    /** Fault recovery counter */
+    pdsp_u32_t u16_count;
 } pdsp_fault_var_t;
 
 /** Fault parameter struct */
@@ -1112,14 +1116,26 @@ typedef struct pdsp_fault_tag
 {
     /** Pointer to fault variable struct. */
     pdsp_fault_var_t *ps_var;
-    /** Time hysteresis parameters. */
-    pdsp_debounce_t *ps_hyst;
+    /** Debounce time step. */
+    pdsp_f32_t f32_time_step;
+    /** Debounce detection time. */
+    pdsp_f32_t f32_time_trip;
+    /** Debounce recovery time. */
+    pdsp_f32_t f32_time_rec;
     /** Fault trip value. */
-    pdsp_f32_t f32_value;
-    /** Fault group status */
-    pdsp_u32_t *b_group;
-    /** Fault group bit position */
-    pdsp_u32_t u16_bit;
+    pdsp_f32_t f32_val_trip;
+    /** Fault recovery value. */
+    pdsp_f32_t f32_val_rec;
+    /** Fault recovery limit. Does not recover if limit hit. */
+    pdsp_u32_t u16_rec_limit;
+    /** Fault status register */
+    pdsp_u32_t *u32_status;
+    /** Fault status mask. */
+    pdsp_u32_t u32_status_mask;
+    /** Fault enable register*/
+    pdsp_u32_t *u32_ena;
+    /** Fault enable mask */
+    pdsp_u32_t u32_ena_mask;
 } pdsp_fault_t;
 
 /** @} fault */
@@ -1485,7 +1501,7 @@ pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
  * @brief Time hysteresis function clear.
  * @param ps_data Hysteresis state struct.
  */
-pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_debounce_t *ps_data);
+pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data);
 
 /**
  * @brief Condition/time hysteresis function with detecting and recovering time.
@@ -1493,7 +1509,7 @@ pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_debounce_t *ps_data);
  * @param b_in Input condition.
  * @return pdsp_bool_t Status output.
  */
-pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_debounce_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
                                              pdsp_bool_t b_in);
 
 /**
@@ -2426,45 +2442,13 @@ pdsp_extern void pdsp_sfra_process(pdsp_sfra_t *ps_data);
 pdsp_extern void pdsp_fault_init(pdsp_fault_t *ps_data);
 
 /**
- * @brief Check over value fault.
+ * @brief Check fault.
  * @param ps_data Fault data struct.
  * @param f32_in Fault check input value.
  * @return pdsp_bool_t Fault status.
  */
-pdsp_extern pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_data,
-                                              pdsp_f32_t f32_in);
-
-/**
- * @brief Check under value fault.
- * @param ps_data Fault data struct.
- * @param f32_in Fault check input value.
- * @return pdsp_bool_t Fault status.
- */
-pdsp_extern pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_data,
-                                               pdsp_f32_t f32_in);
-
-/**
- * @brief Check equal value fault.
- * @param ps_data Fault data struct.
- * @param f32_in Fault check input value.
- * @return pdsp_bool_t Fault status.
- */
-pdsp_extern pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_data,
-                                               pdsp_f32_t f32_in);
-
-/**
- * @brief Run fault check with true condition. Can be used for timeout fault.
- * @param ps_data Fault data struct.
- * @return pdsp_bool_t Fault status.
- */
-pdsp_extern pdsp_bool_t pdsp_fault_check_true(pdsp_fault_t *ps_data);
-
-/**
- * @brief Run fault check with false condition.
- * @param ps_data Fault data struct.
- * @return pdsp_bool_t Fault status.
- */
-pdsp_extern pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_data);
+pdsp_extern pdsp_bool_t pdsp_fault_check(pdsp_fault_t *ps_data,
+                                         pdsp_f32_t f32_in);
 
 /**
  * @brief Check fault group and execute group callback.

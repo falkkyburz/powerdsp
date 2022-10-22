@@ -493,14 +493,14 @@ pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
     return ps_var->u16_state;
 }
 
-pdsp_extern void pdsp_hysteresis_time_clear(const pdsp_debounce_t *ps_data)
+pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
     ps_data->ps_var->b_state = PDSP_FALSE;
     ps_data->ps_var->f32_time = 0.0f;
 }
 
-pdsp_extern pdsp_bool_t pdsp_hysteresis_time(const pdsp_debounce_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
                                              pdsp_bool_t b_in)
 {
     static pdsp_debounce_var_t *ps_var;
@@ -2069,60 +2069,54 @@ FAULT
 pdsp_extern void pdsp_fault_init(pdsp_fault_t *ps_data)
 {
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL) &&
-                (ps_data->ps_hyst != NULL));
-    ps_data->ps_var->b_ena = 0U;
-    pdsp_hysteresis_time_clear(ps_data->ps_hyst);
+                (ps_data->u32_status != NULL) && (ps_data->u32_ena != NULL));
+    ps_data->ps_var->b_state = PDSP_FALSE;
+    ps_data->ps_var->f32_time = 0.0f;
+    ps_data->ps_var->u16_count = 0U;
 }
 
-pdsp_extern pdsp_bool_t pdsp_fault_check_over(pdsp_fault_t *ps_data,
-                                              pdsp_f32_t f32_in)
+pdsp_extern pdsp_bool_t pdsp_fault_check(pdsp_fault_t *ps_data,
+                                         pdsp_f32_t f32_in)
 {
-    static pdsp_bool_t b_status_out;
-    PDSP_ASSERT(ps_data != NULL);
-    b_status_out =
-        pdsp_hysteresis_time(ps_data->ps_hyst, f32_in > ps_data->f32_value);
-    pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
-    return b_status_out;
-}
-
-pdsp_extern pdsp_bool_t pdsp_fault_check_under(pdsp_fault_t *ps_data,
-                                               pdsp_f32_t f32_in)
-{
-    static pdsp_bool_t b_status_out;
-    PDSP_ASSERT(ps_data != NULL);
-    b_status_out =
-        pdsp_hysteresis_time(ps_data->ps_hyst, f32_in < ps_data->f32_value);
-    pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
-    return b_status_out;
-}
-
-pdsp_extern pdsp_bool_t pdsp_fault_check_equal(pdsp_fault_t *ps_data,
-                                               pdsp_f32_t f32_in)
-{
-    static pdsp_bool_t b_status_out;
-    PDSP_ASSERT(ps_data != NULL);
-    b_status_out =
-        pdsp_hysteresis_time(ps_data->ps_hyst, f32_in == ps_data->f32_value);
-    pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
-    return b_status_out;
-}
-
-pdsp_extern pdsp_bool_t pdsp_fault_check_true(pdsp_fault_t *ps_data)
-{
-    static pdsp_bool_t b_status_out;
-    PDSP_ASSERT(ps_data != NULL);
-    b_status_out = pdsp_hysteresis_time(ps_data->ps_hyst, PDSP_TRUE);
-    pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
-    return b_status_out;
-}
-
-pdsp_extern pdsp_bool_t pdsp_fault_check_false(pdsp_fault_t *ps_data)
-{
-    static pdsp_bool_t b_status_out;
-    PDSP_ASSERT(ps_data != NULL);
-    b_status_out = pdsp_hysteresis_time(ps_data->ps_hyst, PDSP_FALSE);
-    pdsp_bit_write_u32(ps_data->b_group, ps_data->u16_bit, b_status_out);
-    return b_status_out;
+    static pdsp_fault_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL) &&
+                (ps_data->u32_status != NULL) && (ps_data->u32_ena != NULL));
+    ps_var = ps_data->ps_var;
+    /* trip level breached with inactive fault */
+    if ((f32_in > ps_data->f32_val_trip) && 
+        (ps_var->b_state == PDSP_FALSE) &&
+        (*ps_data->u32_ena & ps_data->u32_ena_mask))
+    {
+        ps_var->f32_time += ps_data->f32_time_step;
+        /* upper debounce time elapsed */
+        if (ps_var->f32_time > ps_data->f32_time_trip)
+        {
+            ps_var->b_state = PDSP_TRUE;
+            *ps_data->u32_status |= ps_data->u32_status_mask;
+            ps_var->f32_time = 0.0f;
+        }
+    }
+    /* recovery level breached with active fault */
+    else if ((f32_in < ps_data->f32_val_rec) && 
+             (ps_var->b_state == PDSP_TRUE) &&
+             (ps_var->u16_count < ps_data->u16_rec_limit))
+    {
+        ps_var->f32_time += ps_data->f32_time_step;
+        /* lower debounce time elapsed */
+        if (ps_var->f32_time > ps_data->f32_time_rec)
+        {
+            ps_var->b_state = PDSP_FALSE;
+            ps_var->u16_count += 1;
+            *ps_data->u32_status &= ~ps_data->u32_status_mask;
+            ps_var->f32_time = 0.0f;
+        }
+    }
+    /* boundaries not breached */
+    else
+    {
+        ps_var->f32_time = 0.0f;
+    }
+    return ps_var->b_state;
 }
 
 pdsp_extern void pdsp_fault_process_group(pdsp_bool_t b_group,

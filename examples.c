@@ -291,28 +291,28 @@ void example_hysteresis_list(void)
     PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 1.7f) == 1U);
 }
 
-void example_hysteresis_time(void)
+void example_debounce(void)
 {
-    printf("-- void example_hysteresis_time(void) --\n");
+    printf("-- void example_debounce(void) --\n");
     pdsp_debounce_var_t hyst_var = {0};
     pdsp_debounce_t hyst = {.ps_var = &hyst_var,
                             .f32_t_step = 1.0f,
                             .f32_t_high = 2.0f,
                             .f32_t_low = 2.0f};
-    pdsp_hysteresis_time_clear(&hyst);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_FALSE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_hysteresis_time(&hyst, PDSP_TRUE) == PDSP_TRUE);
+    pdsp_debounce_clear(&hyst);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_TRUE);
 }
 
 void example_robust(void)
@@ -756,70 +756,74 @@ void example_signal_read_write(void)
     PDSP_ASSERT(pdsp_signal_read_u16(&sig3, &mem) == 1);
 }
 
-void flt_group_cb(void) {}
+void flt_group_cb(void) {
+    PDSP_ASSERT(PDSP_TRUE);
+}
 
 void example_fault(void)
 {
     printf("-- void example_fault(void) --\n");
-    pdsp_u32_t flt_group = 0;
-    pdsp_debounce_var_t flt_hyst_var = {0};
+    pdsp_u32_t flt_status = 0;
+    pdsp_u32_t flt_ena = 0;
     pdsp_fault_var_t flt_var = {0};
-    pdsp_debounce_t flt_hyst = {.ps_var = &flt_hyst_var,
-                                .f32_t_step = 1.0f,
-                                .f32_t_low = 2.0f,
-                                .f32_t_high = 2.0f};
     pdsp_fault_t flt = {.ps_var = &flt_var,
-                        .ps_hyst = &flt_hyst,
-                        .f32_value = 1.0f,
-                        .b_group = &flt_group,
-                        .u16_bit = 0};
+                        .f32_time_step = 1.0f,
+                        .f32_time_trip = 2.0f,
+                        .f32_time_rec = 2.0f,
+                        .f32_val_trip = 1.5f,
+                        .f32_val_rec = 0.5f,
+                        .u16_rec_limit = 1U,
+                        .u32_status = &flt_status,
+                        .u32_status_mask = 1U,
+                        .u32_ena = &flt_ena,
+                        .u32_ena_mask = 1};
+    flt_ena = 1;
     pdsp_fault_init(&flt);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_FALSE);
-    PDSP_ASSERT(flt_group == 0);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_TRUE);
-    PDSP_ASSERT(flt_group == 1);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 2.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_over(&flt, 0.0f) == PDSP_FALSE);
-    PDSP_ASSERT(flt_group == 0);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_status == 0);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_status == 0);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_status == 0);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_status == 1);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 1.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_status == 1);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_status == 1);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_status == 0);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_FALSE);
+    PDSP_ASSERT(flt_status == 0);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_status == 1);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_status == 1);
 
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_FALSE);
-    PDSP_ASSERT(flt_group == 0);
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(flt_group == 1);
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 0.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_under(&flt, 2.0f) == PDSP_FALSE);
-    PDSP_ASSERT(flt_group == 0);
-
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_FALSE);
-    PDSP_ASSERT(flt_group == 0);
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_TRUE);
-    PDSP_ASSERT(flt_group == 1);
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 1.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_equal(&flt, 2.0f) == PDSP_FALSE);
-    PDSP_ASSERT(flt_group == 0);
-
-    PDSP_ASSERT(pdsp_fault_check_true(&flt) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_true(&flt) == PDSP_FALSE);
-    PDSP_ASSERT(pdsp_fault_check_true(&flt) == PDSP_TRUE);
-    PDSP_ASSERT(flt_group == 1);
-    PDSP_ASSERT(pdsp_fault_check_false(&flt) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_false(&flt) == PDSP_TRUE);
-    PDSP_ASSERT(pdsp_fault_check_false(&flt) == PDSP_FALSE);
-    PDSP_ASSERT(flt_group == 0);
-
-    pdsp_fault_process_group(flt_group, &flt_group_cb);
+    flt_status = 1;
+    pdsp_fault_process_group(flt_status, &flt_group_cb);
 }
 
 int main()
@@ -839,7 +843,7 @@ int main()
     example_interpollate_2d();
     example_hysteresis_value();
     example_hysteresis_list();
-    example_hysteresis_time();
+    example_debounce();
     example_robust();
     example_status();
     example_mean();
