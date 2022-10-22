@@ -1510,7 +1510,7 @@ pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data);
  * @return pdsp_bool_t Status output.
  */
 pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
-                                             pdsp_bool_t b_in);
+                                      pdsp_bool_t b_in);
 
 /**
  * @brief Robust function clear.

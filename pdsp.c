@@ -501,7 +501,7 @@ pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data)
 }
 
 pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
-                                             pdsp_bool_t b_in)
+                                      pdsp_bool_t b_in)
 {
     static pdsp_debounce_var_t *ps_var;
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
@@ -2083,8 +2083,7 @@ pdsp_extern pdsp_bool_t pdsp_fault_check(pdsp_fault_t *ps_data,
                 (ps_data->u32_status != NULL) && (ps_data->u32_ena != NULL));
     ps_var = ps_data->ps_var;
     /* trip level breached with inactive fault */
-    if ((f32_in > ps_data->f32_val_trip) && 
-        (ps_var->b_state == PDSP_FALSE) &&
+    if ((f32_in > ps_data->f32_val_trip) && (ps_var->b_state == PDSP_FALSE) &&
         (*ps_data->u32_ena & ps_data->u32_ena_mask))
     {
         ps_var->f32_time += ps_data->f32_time_step;
@@ -2097,7 +2096,7 @@ pdsp_extern pdsp_bool_t pdsp_fault_check(pdsp_fault_t *ps_data,
         }
     }
     /* recovery level breached with active fault */
-    else if ((f32_in < ps_data->f32_val_rec) && 
+    else if ((f32_in < ps_data->f32_val_rec) &&
              (ps_var->b_state == PDSP_TRUE) &&
              (ps_var->u16_count < ps_data->u16_rec_limit))
     {

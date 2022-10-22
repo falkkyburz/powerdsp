@@ -756,9 +756,7 @@ void example_signal_read_write(void)
     PDSP_ASSERT(pdsp_signal_read_u16(&sig3, &mem) == 1);
 }
 
-void flt_group_cb(void) {
-    PDSP_ASSERT(PDSP_TRUE);
-}
+void flt_group_cb(void) { PDSP_ASSERT(PDSP_TRUE); }
 
 void example_fault(void)
 {
@@ -816,6 +814,25 @@ void example_fault(void)
     PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_TRUE);
     PDSP_ASSERT(flt_status == 1);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_status == 1);
+
+    pdsp_fault_init(&flt);
+    flt_ena = 0;
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    flt_ena = 1;
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_fault_check(&flt, 2.0f) == PDSP_TRUE);
+    PDSP_ASSERT(flt_status == 1);
+    flt_ena = 0;
+    PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
     PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
     PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
     PDSP_ASSERT(pdsp_fault_check(&flt, 0.0f) == PDSP_TRUE);
