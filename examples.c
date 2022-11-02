@@ -144,8 +144,6 @@ void example_map(void)
     PDSP_ASSERT(pdsp_macro_map(1.5f, 1.0f, 1.0f, 1.0f, 2.0f) == 1.5f);
     PDSP_ASSERT(pdsp_macro_map(1.5f, 1.0f, 2.0f, 1.0f, 1.0f) == 1.0f);
     PDSP_ASSERT(pdsp_macro_map(-1.0f, 0.0f, 1.0f, 0.0f, 1.0f) == -1.0f);
-
-
 }
 
 void example_map_idx(void)
@@ -278,7 +276,8 @@ void example_hysteresis_value(void)
     PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
     // macro version
-    pdsp_macro_hyst_t mhyst = {.b_state = PDSP_FALSE, .f32_low = -1.0f, .f32_high = 1.0f};
+    pdsp_macro_hyst_t mhyst = {
+        .b_state = PDSP_FALSE, .f32_low = -1.0f, .f32_high = 1.0f};
     pdsp_macro_hysteresis_value_run(mhyst, -2.0f);
     PDSP_ASSERT(mhyst.b_state == PDSP_FALSE);
     pdsp_macro_hysteresis_value_run(mhyst, -2.0f);
@@ -526,6 +525,32 @@ void example_queue(void)
     PDSP_ASSERT(pdsp_queue_is_not_empty(&data));
     PDSP_ASSERT(pdsp_queue_pop_ch(&data) == 't');
     PDSP_ASSERT(!pdsp_queue_is_not_empty(&data));
+    // macro version
+    pdsp_macro_queue_t mdata = {
+        .i16_head = 2, .i16_tail = 4, .i16_count = 4, .i16_size = 4};
+    pdsp_macro_queue_init(mdata);
+    PDSP_ASSERT(mdata.i16_count == 0);
+    PDSP_ASSERT(pdsp_macro_queue_is_not_full(mdata));
+    pdsp_macro_queue_push(mdata, ch, 't');
+    PDSP_ASSERT(mdata.i16_count == 1);
+    PDSP_ASSERT(ch[0] == 't');
+    pdsp_macro_queue_push(mdata, ch, 'e');
+    pdsp_macro_queue_push(mdata, ch, 's');
+    PDSP_ASSERT(pdsp_macro_queue_is_not_full(mdata));
+    pdsp_macro_queue_push(mdata, ch, 't');
+    PDSP_ASSERT(!pdsp_macro_queue_is_not_full(mdata));
+    PDSP_ASSERT(ch[3] == 't');
+    pdsp_char_t temp;
+    temp = pdsp_macro_queue_pop(mdata, ch);
+    PDSP_ASSERT(temp == 't');
+    temp = pdsp_macro_queue_pop(mdata, ch);
+    PDSP_ASSERT(temp == 'e');
+    temp = pdsp_macro_queue_pop(mdata, ch);
+    PDSP_ASSERT(temp == 's');
+    PDSP_ASSERT(pdsp_macro_queue_is_not_empty(mdata));
+    temp = pdsp_macro_queue_pop(mdata, ch);
+    PDSP_ASSERT(temp == 't');
+    PDSP_ASSERT(!pdsp_macro_queue_is_not_empty(mdata));
 }
 
 void example_ain(void)
@@ -809,31 +834,30 @@ void example_pi(void)
     PDSP_ASSERT(pi2_var.i16_param_idx == 0);
     PDSP_ASSERT(pi2_var.f32_x0 == 0.0f);
     PDSP_ASSERT(pi2_var.f32_x1 == 0.0f);
-    f32_error2[0] = 0.0f; 
+    f32_error2[0] = 0.0f;
     f32_error2[1] = 0.0f;
     PDSP_ASSERT(pdsp_pi2(&pi2, f32_error2) == 0.0f);
     PDSP_ASSERT(pi2_var.i16_active == 0);
     PDSP_ASSERT(pi2_var.f32_x0 == 0.0f);
     PDSP_ASSERT(pi2_var.f32_x1 == 0.0f);
-    f32_error2[0] = 1.0f; 
+    f32_error2[0] = 1.0f;
     f32_error2[1] = 2.0f;
     PDSP_ASSERT(pdsp_pi2(&pi2, f32_error2) == 3.0f);
     PDSP_ASSERT(pi2_var.i16_active == 0);
     PDSP_ASSERT(pi2_var.f32_x0 == 2.0f);
     PDSP_ASSERT(pi2_var.f32_x1 == 0.0f);
-    f32_error2[0] = 2.0f; 
+    f32_error2[0] = 2.0f;
     f32_error2[1] = 1.0f;
     PDSP_ASSERT(pdsp_pi2(&pi2, f32_error2) == 6.0f);
     PDSP_ASSERT(pi2_var.i16_active == 1);
     PDSP_ASSERT(pi2_var.f32_x0 == 4.5f);
     PDSP_ASSERT(pi2_var.f32_x1 == 0.0f);
-    f32_error2[0] = 2.0f; 
+    f32_error2[0] = 2.0f;
     f32_error2[1] = -1.0f;
     PDSP_ASSERT(pdsp_pi2(&pi2, f32_error2) == 0.5f);
     PDSP_ASSERT(pi2_var.i16_active == 1);
     PDSP_ASSERT(pi2_var.f32_x0 == 2.0f);
     PDSP_ASSERT(pi2_var.f32_x1 == 0.0f);
-
 }
 
 void example_bit_read_write(void)

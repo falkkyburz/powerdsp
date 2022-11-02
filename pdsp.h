@@ -391,6 +391,19 @@ typedef struct pdsp_queue_tag
     pdsp_i16_t i16_size;
 } pdsp_queue_t;
 
+/** (macro) Char queue parameters. */
+typedef struct pdsp_macro_queue_tag
+{
+    /** Head index of the queue. */
+    pdsp_i16_t i16_head;
+    /** Tail index of the queue. */
+    pdsp_i16_t i16_tail;
+    /** Number of items in the queue. */
+    pdsp_i16_t i16_count;
+    /** Size of the data array. */
+    pdsp_i16_t i16_size;
+} pdsp_macro_queue_t;
+
 /** SREC record types */
 typedef enum pdsp_srec_type_tag
 {
@@ -1834,6 +1847,72 @@ pdsp_extern void pdsp_queue_advance_tail(const pdsp_queue_t *ps_data);
  */
 pdsp_extern void pdsp_queue_push_ch(const pdsp_queue_t *ps_data,
                                     pdsp_char_t ch_in);
+
+/**
+ * @brief (define )Initialize queue.
+ * @param s_data Queue data struct.
+ */
+#define pdsp_macro_queue_init(s_data)                                          \
+    (s_data).i16_count = 0;                                                    \
+    (s_data).i16_head = (s_data).i16_size - 1;                                 \
+    (s_data).i16_tail = 0
+
+/**
+ * @brief (macro) Check if queue is empty.
+ * @param s_data Queue data struct.
+ * @return pdsp_bool_t PDSP_TRUE if queue is not empty, PDSP_FALSE otherwise.
+ */
+#define pdsp_macro_queue_is_not_empty(s_data) ((s_data).i16_count > 0)
+/**
+ * @brief (macro) Check if queue is not full.
+ * @param s_data Queue data struct.
+ * @return pdsp_bool_t PDSP_TRUE if queue is not full, PDSP_FALSE otherwise.
+ */
+#define pdsp_macro_queue_is_not_full(s_data)                                   \
+    ((s_data).i16_count < (s_data).i16_size)
+
+/**
+ * @brief (macro) Advance the head of the queue.
+ * @param s_data Queue data struct.
+ */
+#define pdsp_macro_queue_advance_head(s_data)                                  \
+    (s_data).i16_head++;                                                       \
+    if ((s_data).i16_head >= (s_data).i16_size)                                \
+    {                                                                          \
+        (s_data).i16_head = 0;                                                 \
+    }                                                                          \
+    (s_data).i16_count++
+
+/**
+ * @brief (macro) Advance the tail of the queue.
+ * @param s_data Queue data struct.
+ */
+#define pdsp_macro_queue_advance_tail(s_data)                                  \
+    (s_data).i16_tail++;                                                       \
+    if ((s_data).i16_tail >= (s_data).i16_size)                                \
+    {                                                                          \
+        (s_data).i16_tail = 0;                                                 \
+    }                                                                          \
+    (s_data).i16_count--
+
+/**
+ * @brief (macro) Push data to the queue.
+ * @param s_data Pointer to the queue struct.
+ * @param a_data Queue data array.
+ * @param in Data to push to the queue.
+ */
+#define pdsp_macro_queue_push(s_data, a_data, in)                              \
+    pdsp_macro_queue_advance_head(s_data);                                     \
+    (a_data)[(s_data).i16_head] = in
+
+/**
+ * @brief (macro) Pop data from the queue.
+ * @param s_data Pointer to the queue struct.
+ * @param a_data Queue data array.
+ */
+#define pdsp_macro_queue_pop(s_data, a_data)                                   \
+    (a_data)[(s_data).i16_tail];                                               \
+    pdsp_macro_queue_advance_tail(s_data);
 
 /**
  * @brief Push data to the queue of i16.
