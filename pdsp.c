@@ -647,8 +647,8 @@ pdsp_extern void pdsp_mask_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask)
 }
 
 pdsp_extern pdsp_bool_t pdsp_mask_get(pdsp_u32_t *pu32_mem,
-                                        pdsp_u32_t u32_mask_true,
-                                        pdsp_u32_t u32_mask_false)
+                                      pdsp_u32_t u32_mask_true,
+                                      pdsp_u32_t u32_mask_false)
 {
     PDSP_ASSERT(pu32_mem != NULL);
     return ((*pu32_mem) & u32_mask_true) | ((~(*pu32_mem)) & u32_mask_false);
@@ -1188,7 +1188,7 @@ pdsp_extern pdsp_f32_t pdsp_rollsum(const pdsp_rollsum_t *ps_data,
                                     pdsp_f32_t f32_in)
 {
     PDSP_ASSERT(ps_data != NULL);
-    /* Subtract tail and advance  */
+    /* Subtract tail and advance. */
     ps_data->ps_var->f32_sum -= pdsp_queue_pop_f32(ps_data->ps_queue);
     /* Add the head value to the sum state variable. */
     ps_data->ps_var->f32_sum += f32_in;
@@ -1303,32 +1303,6 @@ pdsp_extern void pdsp_pi_clear(pdsp_pi_t *ps_data)
     ps_var->f32_x1 = 0.0f;
 }
 
-pdsp_extern void pdsp_pi2_clear(pdsp_pi2_t *ps_data)
-{
-    static pdsp_pi2_var_t *ps_var;
-    PDSP_ASSERT(ps_data != NULL);
-    ps_var = ps_data->ps_var;
-    ps_var->i16_active = 0U;
-    ps_var->i16_param_idx0 = 0U;
-    ps_var->i16_param_idx1 = 0U;
-    ps_var->f32_x0 = 0.0f;
-    ps_var->f32_x1 = 0.0f;
-}
-
-pdsp_extern void pdsp_pi4_clear(pdsp_pi4_t *ps_data)
-{
-    static pdsp_pi4_var_t *ps_var;
-    PDSP_ASSERT(ps_data != NULL);
-    ps_var = ps_data->ps_var;
-    ps_var->i16_active = 0U;
-    ps_var->i16_param_idx0 = 0U;
-    ps_var->i16_param_idx1 = 0U;
-    ps_var->i16_param_idx2 = 0U;
-    ps_var->i16_param_idx3 = 0U;
-    ps_var->f32_x0 = 0.0f;
-    ps_var->f32_x1 = 0.0f;
-}
-
 pdsp_extern pdsp_f32_t pdsp_pi(pdsp_pi_t *ps_data, pdsp_f32_t f32_error)
 {
     static pdsp_f32_t f32_out;
@@ -1351,104 +1325,61 @@ pdsp_extern pdsp_f32_t pdsp_pi(pdsp_pi_t *ps_data, pdsp_f32_t f32_error)
     return f32_out;
 }
 
-pdsp_extern pdsp_f32_t pdsp_pi2(pdsp_pi2_t *ps_data, pdsp_f32_t f32_error0,
-                                pdsp_f32_t f32_error1)
+pdsp_extern pdsp_f32_t pdsp_pi2(pdsp_pi_t *ps_data, pdsp_f32_t f32_error[2])
 {
     static pdsp_f32_t f32_out;
     static pdsp_f32_t f32_sum;
-    static pdsp_pi_err_param_t *ps_param0;
-    static pdsp_pi_err_param_t *ps_param1;
+    static pdsp_pi_var_t *ps_var;
+    static pdsp_pi_err_param_t *ps_param;
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL) &&
-                (ps_data->pas_param0 != NULL) && (ps_data->pas_param1 != NULL));
-    ps_param0 = &ps_data->pas_param0[ps_data->ps_var->i16_param_idx0];
-    ps_param1 = &ps_data->pas_param1[ps_data->ps_var->i16_param_idx1];
-    /* Run controller */
-    if ((f32_error0 * ps_param0->f32_ka) < (f32_error1 * ps_param1->f32_ka))
-    {
-        ps_data->ps_var->i16_active = 0;
-        /* Calculate integral path, including saturation delta. */
-        ps_data->ps_var->f32_x0 += f32_error0 * ps_param0->f32_ki +
-                                   ps_data->ps_var->f32_x1 * ps_param0->f32_ks;
-        /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error0 * ps_param0->f32_kp + ps_data->ps_var->f32_x0;
-    }
-    else
-    {
-        ps_data->ps_var->i16_active = 1;
-        /* Calculate integral path, including saturation delta. */
-        ps_data->ps_var->f32_x0 += f32_error1 * ps_param1->f32_ki +
-                                   ps_data->ps_var->f32_x1 * ps_param1->f32_ks;
-        /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error1 * ps_param1->f32_kp + ps_data->ps_var->f32_x0;
-    }
+                (ps_data->pas_param != NULL));
+    ps_var = ps_data->ps_var;
+    ps_param = &ps_data->pas_param[ps_var->i16_param_idx];
+    /* Active decision (ture == 1)*/
+    ps_var->i16_active = 0;
+    ps_var->i16_active += (f32_error[0] * ps_param[0].f32_ka) >
+                          (f32_error[1] * ps_param[1].f32_ka);
+    /* Calculate integral path, including saturation delta. */
+    ps_var->f32_x0 +=
+        (f32_error[ps_var->i16_active] * ps_param[ps_var->i16_active].f32_ki +
+         ps_var->f32_x1 * ps_param[ps_var->i16_active].f32_ks);
+    /* Calculate the sum of integral and proportional part. */
+    f32_sum =
+        f32_error[ps_var->i16_active] * ps_param[ps_var->i16_active].f32_kp +
+        ps_var->f32_x0;
     /* Apply saturation. */
     f32_out = pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
-    ps_data->ps_var->f32_x1 = f32_out - f32_sum;
+    ps_var->f32_x1 = f32_out - f32_sum;
     return f32_out;
 }
 
-pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
-                                pdsp_f32_t f32_error1, pdsp_f32_t f32_error2,
-                                pdsp_f32_t f32_error3)
+pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi_t *ps_data, pdsp_f32_t f32_error[4])
 {
     static pdsp_f32_t f32_out;
     static pdsp_f32_t f32_sum;
-    static pdsp_pi4_var_t *ps_var;
-    static pdsp_pi_err_param_t *ps_param0;
-    static pdsp_pi_err_param_t *ps_param1;
-    static pdsp_pi_err_param_t *ps_param2;
-    static pdsp_pi_err_param_t *ps_param3;
+    static pdsp_pi_var_t *ps_var;
+    static pdsp_pi_err_param_t *ps_param;
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL) &&
-                (ps_data->pas_param0 != NULL) &&
-                (ps_data->pas_param1 != NULL) &&
-                (ps_data->pas_param2 != NULL) && (ps_data->pas_param3 != NULL));
+                (ps_data->pas_param != NULL));
     ps_var = ps_data->ps_var;
-    ps_param0 = &ps_data->pas_param0[ps_var->i16_param_idx0];
-    ps_param1 = &ps_data->pas_param1[ps_var->i16_param_idx1];
-    ps_param2 = &ps_data->pas_param2[ps_var->i16_param_idx2];
-    ps_param3 = &ps_data->pas_param3[ps_var->i16_param_idx3];
-    /* Active decision */
+    ps_param = &ps_data->pas_param[ps_var->i16_param_idx];
+    /* Active decision (ture == 1)*/
     ps_var->i16_active = 0;
-    ps_var->i16_active +=
-        (f32_error0 * ps_param0->f32_ka) > (f32_error1 * ps_param1->f32_ka);
-    ps_var->i16_active +=
-        (f32_error1 * ps_param1->f32_ka) > (f32_error2 * ps_param2->f32_ka);
-    ps_var->i16_active +=
-        (f32_error2 * ps_param2->f32_ka) > (f32_error3 * ps_param3->f32_ka);
-    /* Run controller */
-    if (ps_var->i16_active == 0)
-    {
-        /* Calculate integral path, including saturation delta. */
-        ps_var->f32_x0 +=
-            f32_error0 * ps_param0->f32_ki + ps_var->f32_x1 * ps_param0->f32_ks;
-        /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error0 * ps_param0->f32_kp + ps_var->f32_x0;
-    }
-    if (ps_var->i16_active == 1)
-    {
-        /* Calculate integral path, including saturation delta. */
-        ps_var->f32_x0 +=
-            f32_error1 * ps_param1->f32_ki + ps_var->f32_x1 * ps_param1->f32_ks;
-        /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error1 * ps_param1->f32_kp + ps_var->f32_x0;
-    }
-    if (ps_var->i16_active == 2)
-    {
-        /* Calculate integral path, including saturation delta. */
-        ps_var->f32_x0 +=
-            f32_error2 * ps_param2->f32_ki + ps_var->f32_x1 * ps_param2->f32_ks;
-        /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error2 * ps_param2->f32_kp + ps_var->f32_x0;
-    }
-    if (ps_var->i16_active == 3)
-    {
-        /* Calculate integral path, including saturation delta. */
-        ps_var->f32_x0 +=
-            f32_error3 * ps_param3->f32_ki + ps_var->f32_x1 * ps_param3->f32_ks;
-        /* Calculate the sum of integral and proportional part. */
-        f32_sum = f32_error3 * ps_param3->f32_kp + ps_var->f32_x0;
-    }
+    ps_var->i16_active += (f32_error[0] * ps_param[0].f32_ka) >
+                          (f32_error[1] * ps_param[1].f32_ka);
+    ps_var->i16_active += (f32_error[1] * ps_param[1].f32_ka) >
+                          (f32_error[2] * ps_param[2].f32_ka);
+    ps_var->i16_active += (f32_error[2] * ps_param[2].f32_ka) >
+                          (f32_error[3] * ps_param[3].f32_ka);
+    /* Calculate integral path, including saturation delta. */
+    ps_var->f32_x0 +=
+        (f32_error[ps_var->i16_active] * ps_param[ps_var->i16_active].f32_ki +
+         ps_var->f32_x1 * ps_param[ps_var->i16_active].f32_ks);
+    /* Calculate the sum of integral and proportional part. */
+    f32_sum =
+        f32_error[ps_var->i16_active] * ps_param[ps_var->i16_active].f32_kp +
+        ps_var->f32_x0;
     /* Apply saturation. */
     f32_out = pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_sum));
     /* Store saturation delta. */
@@ -1457,26 +1388,6 @@ pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
 }
 
 pdsp_extern void pdsp_pi_set(pdsp_pi_t *ps_data, pdsp_f32_t f32_out)
-{
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    /* Set integral value to out_value. */
-    ps_data->ps_var->f32_x0 =
-        pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_out));
-    /* Set saturation memory to 0. */
-    ps_data->ps_var->f32_x1 = 0.0f;
-}
-
-pdsp_extern void pdsp_pi2_set(pdsp_pi2_t *ps_data, pdsp_f32_t f32_out)
-{
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    /* Set integral value to out_value. */
-    ps_data->ps_var->f32_x0 =
-        pdsp_maxf(ps_data->f32_min, pdsp_minf(ps_data->f32_max, f32_out));
-    /* Set saturation memory to 0. */
-    ps_data->ps_var->f32_x1 = 0.0f;
-}
-
-pdsp_extern void pdsp_pi4_set(pdsp_pi4_t *ps_data, pdsp_f32_t f32_out)
 {
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     /* Set integral value to out_value. */

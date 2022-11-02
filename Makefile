@@ -2,7 +2,7 @@ TARGET = example
 CC = gcc
 SIZE = size
 OBJDUMP = objdump
-CFLAGS = -Wall
+CFLAGS = -Wall -O0
 INC=-I./
 
 .PHONY: all
@@ -14,12 +14,12 @@ $(TARGET): pdsp.o examples.o
 
 pdsp.o: pdsp.c
 	$(info Compile pdsp.c:)
-	$(CC) $(CFLAGS) $(INC) -c -O0 -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 	$(CC) $(CFLAGS) $(INC) -S -fverbose-asm $<
 
 examples.o: examples.c
 	$(info Compile examples.c:)
-	$(CC) $(CFLAGS) $(INC) -c -O0 -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 info: pdsp.o
 	$(info Print size and disassemble:)

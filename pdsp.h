@@ -249,6 +249,15 @@ typedef struct pdsp_stopwatch_tag
     pdsp_u32_t u32_hw_max;
 } pdsp_stopwatch_t;
 
+/** Stopwatch struct. */
+typedef struct pdsp_macro_stopwatch_tag
+{
+    /** Time state variable, stores start time. */
+    pdsp_u32_t u32_time_mem;
+    /** Hardware timer maximum value (overflow). */
+    pdsp_u32_t u32_hw_max;
+} pdsp_macro_stopwatch_t;
+
 /** Funtion pointer (pointer to bool function) */
 typedef pdsp_bool_t (*pdsp_pb_func_t)(void);
 
@@ -278,6 +287,17 @@ typedef struct pdsp_hyst_tag
     /** Higher hysteresis threshold. */
     pdsp_f32_t f32_high;
 } pdsp_hyst_t;
+
+/** Hysteresis value struct. */
+typedef struct pdsp_macro_hyst_tag
+{
+    /** Hysteresis state variable. */
+    pdsp_bool_t b_state;
+    /** Lower hysteresis threshold. */
+    pdsp_f32_t f32_low;
+    /** Higher hysteresis threshold. */
+    pdsp_f32_t f32_high;
+} pdsp_macro_hyst_t;
 
 /** Hysteresis list variable struct. */
 typedef struct pdsp_hyst_list_var_tag
@@ -441,6 +461,19 @@ typedef struct pdsp_ain_var_tag
     /** DAQ conversion offset. */
     pdsp_f32_t f32_offset;
 } pdsp_ain_var_t;
+
+/** DAQ processing variable struct. */
+typedef struct pdsp_macro_ain_var_tag
+{
+    /** Override value. */
+    pdsp_f32_t f32_ovr_value;
+    /** Override disable. Set to 1.0f to disable override. */
+    pdsp_f32_t f32_ovr_dis;
+    /** DAQ conversion gain. */
+    pdsp_f32_t f32_gain;
+    /** DAQ conversion offset. */
+    pdsp_f32_t f32_offset;
+} pdsp_macro_ain_var_t;
 
 /** Min-max state variable struct. */
 typedef struct pdsp_minmax_var_tag
@@ -626,6 +659,52 @@ typedef struct pdsp_rollsum_tag
     const pdsp_queue_t *ps_queue;
 } pdsp_rollsum_t;
 
+// /** Rolling sum variable struct. */
+// typedef struct pdsp_rollsum_3f32_var_tag
+// {
+//     /** Sum of history array (divided by size) */
+//     pdsp_f32_t f32_sum0;
+//     /** Sum of history array (divided by size) */
+//     pdsp_f32_t f32_sum1;
+//     /** Sum of history array (divided by size) */
+//     pdsp_f32_t f32_sum2;
+//     /** Sum of history array (divided by size) */
+//     pdsp_f32_t f32_sum3;
+//     /** Sum of history array (divided by size) */
+//     pdsp_f32_t f32_sum4;
+//     /** Sum of history array (divided by size) */
+//     pdsp_f32_t f32_sum5;
+//     /** Head index of the queue. */
+//     pdsp_i16_t i16_head;
+//     /** Tail index of the queue. */
+//     pdsp_i16_t i16_tail;
+//     /** Number of items in the queue. */
+//     pdsp_i16_t i16_count;
+//     /** Inverse window length. */
+//     pdsp_f32_t f32_win_size_inv;
+// } pdsp_rollsum_3f32_var_t;
+
+// /** Rolling sum data struct. */
+// typedef struct pdsp_rollsum_3f32_tag
+// {
+//     /** Pointer to the pdsp_rollsum_t struct. */
+//     pdsp_rollsum_3f32_var_t *ps_var;
+//     /** Size of the data array. */
+//     pdsp_i16_t i16_size;
+//     /** Pointer to the data array 0. */
+//     pdsp_f32_t *paf32_data0;
+//     /** Pointer to the data array 1. */
+//     pdsp_f32_t *paf32_data1;
+//     /** Pointer to the data array 2. */
+//     pdsp_f32_t *paf32_data2;
+//     /** Pointer to the data array 3. */
+//     pdsp_f32_t *paf32_data3;
+//     /** Pointer to the data array 4. */
+//     pdsp_f32_t *paf32_data4;
+//     /** Pointer to the data array 5. */
+//     pdsp_f32_t *paf32_data5;
+// } pdsp_rollsum_3f32_t;
+
 /** @} signal */
 /* ------------------------------------------------------------------------ */
 /** @addtogroup control Control
@@ -672,86 +751,6 @@ typedef struct pdsp_pi_tag
     /** PI saturation minimum value. */
     pdsp_f32_t f32_min;
 } pdsp_pi_t;
-
-/** PI controller variable struct. */
-typedef struct pdsp_pi2_var_tag
-{
-    /** Curretly active error input. */
-    pdsp_i16_t i16_active;
-    /** Currently active parameter array index for error0 */
-    pdsp_i16_t i16_param_idx0;
-    /** Currently active parameter array index for error0 */
-    pdsp_i16_t i16_param_idx1;
-    /** PI controller state variable (integrator). */
-    pdsp_f32_t f32_x0;
-    /** PI controller state variable (saturation delta). */
-    pdsp_f32_t f32_x1;
-} pdsp_pi2_var_t;
-
-/** PI dual controller struct. */
-typedef struct pdsp_pi2_tag
-{
-    /** PI controller parameter struct array. */
-    pdsp_pi_err_param_t *pas_param0;
-    /** Size of parameter struct */
-    pdsp_i16_t i16_param_size0;
-    /** PI controller parameter struct array. */
-    pdsp_pi_err_param_t *pas_param1;
-    /** Size of parameter struct */
-    pdsp_i16_t i16_param_size1;
-    /** PI controller variable struct. */
-    pdsp_pi2_var_t *ps_var;
-    /** PI saturation maximum value. */
-    pdsp_f32_t f32_max;
-    /** PI saturation minimum value. */
-    pdsp_f32_t f32_min;
-} pdsp_pi2_t;
-
-/** PI controller variable struct. */
-typedef struct pdsp_pi4_var_tag
-{
-    /** Curretly active error input. */
-    pdsp_i16_t i16_active;
-    /** Currently active parameter array index for error0 */
-    pdsp_i16_t i16_param_idx0;
-    /** Currently active parameter array index for error0 */
-    pdsp_i16_t i16_param_idx1;
-    /** Currently active parameter array index for error0 */
-    pdsp_i16_t i16_param_idx2;
-    /** Currently active parameter array index for error0 */
-    pdsp_i16_t i16_param_idx3;
-    /** PI controller state variable (integrator). */
-    pdsp_f32_t f32_x0;
-    /** PI controller state variable (saturation delta). */
-    pdsp_f32_t f32_x1;
-} pdsp_pi4_var_t;
-
-/** PI quad controller struct. */
-typedef struct pdsp_pi4_tag
-{
-    /** PI controller parameter struct array. */
-    pdsp_pi_err_param_t *pas_param0;
-    /** Size of parameter struct */
-    pdsp_i16_t i16_param_size0;
-    /** PI controller parameter struct array. */
-    pdsp_pi_err_param_t *pas_param1;
-    /** Size of parameter struct */
-    pdsp_i16_t i16_param_size1;
-    /** PI controller parameter struct array. */
-    pdsp_pi_err_param_t *pas_param2;
-    /** Size of parameter struct */
-    pdsp_i16_t i16_param_size2;
-    /** PI controller parameter struct array. */
-    pdsp_pi_err_param_t *pas_param3;
-    /** Size of parameter struct */
-    pdsp_i16_t i16_param_size3;
-    /** PI controller variable struct. */
-    pdsp_pi4_var_t *ps_var;
-    /** PI saturation maximum value. */
-    pdsp_f32_t f32_max;
-    /** PI saturation minimum value. */
-    pdsp_f32_t f32_min;
-} pdsp_pi4_t;
 
 /** Set point parameter struct. */
 typedef struct pdsp_setp_param_tag
@@ -1214,6 +1213,25 @@ pdsp_extern pdsp_u32_t pdsp_stopwatch_stop(const pdsp_stopwatch_t *ps_data,
                                            pdsp_u32_t u32_hw_now);
 
 /**
+ * @brief (macro) Start the stopwatch with 32bit HW counter.
+ * @param s_data Stopwatch struct pdsp_macto_stopwatch_t.
+ * @param u32_hw_now Current time from the hardware timer.
+ */
+#define pdsp_macro_stopwatch_start(s_data, u32_hw_now)                         \
+    (s_data).u32_time_mem = (u32_hw_now)
+
+/**
+ * @brief (macro) Calculate the time elapsed since the start.
+ * Alternative with signed int min(max(0, now-mem), now-mem+max)
+ * @param s_data Stopwatch parameter struct pdsp_macto_stopwatch_t.
+ * @param u32_hw_now Current time from the hardware timer.
+ */
+#define pdsp_macro_stopwatch_stop(s_data, u32_hw_now)                          \
+    ((s_data).u32_time_mem < (u32_hw_now))                                     \
+        ? (u32_hw_now - (s_data).u32_time_mem)                                 \
+        : (u32_hw_now - (s_data).u32_time_mem + (s_data).u32_hw_max)
+
+/**
  * @brief Call a function from the jump table apf_list.
  *
  * @details Use this function for a handler based state machine implementation.
@@ -1329,6 +1347,25 @@ pdsp_extern pdsp_char_t *pdsp_u64_to_hex(pdsp_u64_t u64_in,
 pdsp_extern pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
                                 pdsp_f32_t f32_in_hi, pdsp_f32_t f32_out_lo,
                                 pdsp_f32_t f32_out_hi);
+
+/**
+ * @brief (macro) Map a value from one range to another (Uses division).
+ * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
+ * to implement the mapping (interpollation). The output for (x1 - x0) == 0 is y
+ * = (y1 - y0) * 0.5.
+ * @param f32_in Input value.
+ * @param f32_in_lo Input range low value.
+ * @param f32_in_hi Input range high value.
+ * @param f32_out_lo Output range low value.
+ * @param f32_out_hi Output range high value.
+ */
+#define pdsp_macro_map(f32_in, f32_in_lo, f32_in_hi, f32_out_lo, f32_out_hi)   \
+    (((f32_in_hi) - (f32_in_lo)) == 0.0f)                                      \
+        ? (((f32_out_hi) + (f32_out_lo)) * 0.5f)                               \
+        : ((pdsp_divf(((f32_out_hi) - (f32_out_lo)),                           \
+                      ((f32_in_hi) - (f32_in_lo))) *                           \
+                ((f32_in) - (f32_in_lo)) +                                     \
+            (f32_out_lo)))
 
 /**
  * @brief Map a value to an index (Uses division, uses float to int conversion).
@@ -1463,6 +1500,21 @@ pdsp_extern pdsp_bool_t pdsp_hysteresis_value(const pdsp_hyst_t *ps_data,
                                               pdsp_f32_t f32_in);
 
 /**
+ * @brief (macro) Value hysteresis function.
+ * @param s_data Data struct.
+ * @param f32_in Value input.
+ */
+#define pdsp_macro_hysteresis_value_run(s_data, f32_in)                        \
+    if ((f32_in) > (s_data).f32_high)                                          \
+    {                                                                          \
+        (s_data).b_state = PDSP_TRUE;                                          \
+    }                                                                          \
+    else if ((f32_in) < (s_data).f32_low)                                      \
+    {                                                                          \
+        (s_data).b_state = PDSP_FALSE;                                         \
+    }
+
+/**
  * @brief Value list hysteresis function clear.
  * @param ps_data Hysteresis state struct.
  */
@@ -1578,36 +1630,16 @@ pdsp_extern pdsp_bool_t pdsp_bit_read_u32(const pdsp_u32_t *pu32_mem,
  * @param bit Bit position.
  * @param val Value to write.
  */
-#define pdsp_macro_bit_write(v, bit, val) (v) &= ~(1 << bit); (v) |= (((val) & 1U) << (bit))
+#define pdsp_macro_bit_write(v, bit, val)                                      \
+    (v) &= ~(1 << bit);                                                        \
+    (v) |= (((val)&1U) << (bit))
 
 /**
  * @brief (Macro) Read bit.
  * @param v Variable.
  * @param bit Bit position.
  */
-#define pdsp_macro_bit_read(v, bit)  (((val) >> (bit)) & 1U)
-
-/**
- * @brief (Macro) Mask set.
- * @param v Variable.
- * @param mask Mask.
- */
-#define pdsp_macro_mask_set(v, mask)  (v) |= (mask)
-
-/**
- * @brief (Macro) Mask clear.
- * @param v Variable.
- * @param mask Mask.
- */
-#define pdsp_macro_mask_clear(v, mask)  (v) &= ~(mask)
-
-/**
- * @brief (Macro) Mask get true and false.
- * @param v Variable.
- * @param mtrue Mask for true values.
- * @param mfalse Mask for false values.
- */
-#define pdsp_macro_mask_get(v, mtrue, mfalse)  ((v) & (mtrue)) | ((~(v)) & (mfalse))
+#define pdsp_macro_bit_read(v, bit) (((val) >> (bit)) & 1U)
 
 /**
  * @brief Write to status register. Set bits in mask.
@@ -1633,8 +1665,31 @@ pdsp_extern void pdsp_mask_clear(pdsp_u32_t *pu32_mem, pdsp_u32_t u32_mask);
  * @return pdsp_bool_t Compare result.
  */
 pdsp_extern pdsp_bool_t pdsp_mask_get(pdsp_u32_t *pu32_mem,
-                                        pdsp_u32_t u32_mask_true,
-                                        pdsp_u32_t u32_mask_false);
+                                      pdsp_u32_t u32_mask_true,
+                                      pdsp_u32_t u32_mask_false);
+
+/**
+ * @brief (Macro) Mask set.
+ * @param v Variable.
+ * @param mask Mask.
+ */
+#define pdsp_macro_mask_set(v, mask) (v) |= (mask)
+
+/**
+ * @brief (Macro) Mask clear.
+ * @param v Variable.
+ * @param mask Mask.
+ */
+#define pdsp_macro_mask_clear(v, mask) (v) &= ~(mask)
+
+/**
+ * @brief (Macro) Mask get true and false.
+ * @param v Variable.
+ * @param mtrue Mask for true values.
+ * @param mfalse Mask for false values.
+ */
+#define pdsp_macro_mask_get(v, mtrue, mfalse)                                  \
+    ((v) & (mtrue)) | ((~(v)) & (mfalse))
 
 /**
  * @brief Convert (gain/offset) f32 to i16 and write signal into a 64bit word
@@ -1688,6 +1743,16 @@ pdsp_extern pdsp_f32_t pdsp_mean2w_f32(pdsp_f32_t f32_in0, pdsp_f32_t f32_in1,
                                        pdsp_f32_t f32_weight0);
 
 /**
+ * @brief (macro) Weighted mean from two values.
+ * @param f32_in0 First sample.
+ * @param f32_in1 Second sample.
+ * @param f32_weight0 Weight of first sample [0, 1]. Second sample weight is
+ * (1-f32_weight0).
+ */
+#define pdsp_macro_mean2w_f32(f32_in0, f32_in1, f32_weight0)                   \
+    ((f32_in0) * (f32_weight0)) + ((f32_in1) * (1.0f - (f32_weight0)))
+
+/**
  * @brief Mean from four 16bit values. Use to average 4 ADC values.
  * @param a4u16_in Sample array of length 4.
  * @return pdsp_f32_t Mean value.
@@ -1695,11 +1760,40 @@ pdsp_extern pdsp_f32_t pdsp_mean2w_f32(pdsp_f32_t f32_in0, pdsp_f32_t f32_in1,
 pdsp_extern pdsp_f32_t pdsp_mean4_u16(pdsp_u16_t a4u16_in[]);
 
 /**
+ * @brief (macro) Mean from four 16bit values. Use to average 4 ADC values.
+ * @param u16_in0 Sample 0.
+ * @param u16_in1 Sample 1.
+ * @param u16_in2 Sample 2.
+ * @param u16_in3 Sample 3.
+ */
+#define pdsp_macro_mean4_u16(u16_in0, u16_in1, u16_in2, u16_in3)               \
+    0.25f * (pdsp_f32_t)((pdsp_u32_t)(u16_in0) + (pdsp_u32_t)(u16_in1) +       \
+                         (pdsp_u32_t)(u16_in2) + (pdsp_u32_t)(u16_in3))
+
+/**
  * @brief Mean from eight 16bit values. Use to average 8 ADC values.
  * @param a8u16_in Sample array of length 8.
  * @return pdsp_f32_t Mean value.
  */
 pdsp_extern pdsp_f32_t pdsp_mean8_u16(pdsp_u16_t a8u16_in[]);
+
+/**
+ * @brief (macro) Mean from eight 16bit values. Use to average 4 ADC values.
+ * @param u16_in0 Sample 0.
+ * @param u16_in1 Sample 1.
+ * @param u16_in2 Sample 2.
+ * @param u16_in3 Sample 3.
+ * @param u16_in4 Sample 4.
+ * @param u16_in5 Sample 5.
+ * @param u16_in6 Sample 6.
+ * @param u16_in7 Sample 7.
+ */
+#define pdsp_macro_mean8_u16(u16_in0, u16_in1, u16_in2, u16_in3, u16_in4,      \
+                             u16_in5, u16_in6, u16_in7)                        \
+    0.125f * (pdsp_f32_t)((pdsp_u32_t)(u16_in0) + (pdsp_u32_t)(u16_in1) +      \
+                          (pdsp_u32_t)(u16_in2) + (pdsp_u32_t)(u16_in3) +      \
+                          (pdsp_u32_t)(u16_in4) + (pdsp_u32_t)(u16_in5) +      \
+                          (pdsp_u32_t)(u16_in6) + (pdsp_u32_t)(u16_in7))
 
 /**
  * @brief Initialize queue.
@@ -1833,32 +1927,46 @@ pdsp_extern pdsp_f32_t pdsp_ain_ovr(pdsp_ain_var_t *ps_data,
 
 /**
  * @brief (Macro) Apply gain / offset to raw signal.
- * @param v Signal data struct.
+ * @param v Signal data struct pdsp_macro_ain_t.
  * @param raw Raw input signal.
  */
 #define pdsp_macro_ain(v, raw)                                                 \
-    ((raw)*v.f32_gain + v.f32_offset + v.f32_ovr_value)
+    (((((raw)*v.f32_gain) + v.f32_offset) * v.f32_ovr_dis) + v.f32_ovr_value)
 
 /**
  * @brief (Macro) Apply gain / offset to raw signal with 2x oversampling.
- * @param v Signal data struct.
+ * @param v Signal data struct pdsp_macro_ain_t.
+ * @param raw0 Raw input signal.
  * @param raw1 Raw input signal.
- * @param raw2 Raw input signal.
  */
-#define pdsp_macro_ain2(v, raw1, raw2)                                         \
-    (((raw1) + (raw2)) * v.f32_gain + v.f32_offset + v.f32_ovr_value)
+#define pdsp_macro_ain2(v, raw0, raw1)                                         \
+    ((((((raw0) + (raw1)) * v.f32_gain) + v.f32_offset) * v.f32_ovr_dis) +     \
+     v.f32_ovr_value)
 
 /**
  * @brief (Macro) Apply gain / offset to raw signal with 4x oversampling.
- * @param v Signal data struct.
+ * @param v Signal data struct pdsp_macro_ain_t.
+ * @param raw0 Raw input signal.
  * @param raw1 Raw input signal.
  * @param raw2 Raw input signal.
  * @param raw3 Raw input signal.
- * @param raw4 Raw input signal.
  */
-#define pdsp_macro_ain4(v, raw1, raw2, raw3, raw4)                             \
-    (((raw1) + (raw2) + (raw3) + (raw4)) * v.f32_gain + v.f32_offset +         \
+#define pdsp_macro_ain4(v, raw0, raw1, raw2, raw3)                             \
+    ((((((raw0) + (raw1) + (raw2) + (raw3)) * v.f32_gain) + v.f32_offset) *    \
+      v.f32_ovr_dis) +                                                         \
      v.f32_ovr_value)
+
+/**
+ * @brief (Macro) Enable override.
+ * @param v Signal data struct pdsp_macro_ain_t.
+ */
+#define pdsp_macro_ain_ovr_enable(v) v.f32_ovr_dis = 0.0f
+
+/**
+ * @brief (Macro) Disable override.
+ * @param v Signal data struct pdsp_macro_ain_t.
+ */
+#define pdsp_macro_ain_ovr_disable(v) v.f32_ovr_dis = 1.0f
 
 /**
  * @brief (Macro) Set injection value.
@@ -2267,18 +2375,6 @@ pdsp_extern void pdsp_dq0_abc(pdsp_dq_abc_var_t *ps_var, pdsp_f32_t f32_d,
 pdsp_extern void pdsp_pi_clear(pdsp_pi_t *ps_data);
 
 /**
- * @brief Initialize / clear pi controller struct.
- * @param ps_data Controller data struct.
- */
-pdsp_extern void pdsp_pi2_clear(pdsp_pi2_t *ps_data);
-
-/**
- * @brief Initialize / clear pi controller struct.
- * @param ps_data Controller data struct.
- */
-pdsp_extern void pdsp_pi4_clear(pdsp_pi4_t *ps_data);
-
-/**
  * @brief Calculate PI controller.
  * @param ps_data Controller data struct.
  * @param f32_error Controller error signal input.
@@ -2289,25 +2385,18 @@ pdsp_extern pdsp_f32_t pdsp_pi(pdsp_pi_t *ps_data, pdsp_f32_t f32_error);
 /**
  * @brief Calculate dual PI controller.
  * @param ps_data Controller data struct.
- * @param f32_error0 First error signal input.
- * @param f32_error1 Second error signal input.
+ * @param f32_error Error array signal input.
  * @returns pdsp_f32_t Controller output.
  */
-pdsp_extern pdsp_f32_t pdsp_pi2(pdsp_pi2_t *ps_data, pdsp_f32_t f32_error0,
-                                pdsp_f32_t f32_error1);
+pdsp_extern pdsp_f32_t pdsp_pi2(pdsp_pi_t *ps_data, pdsp_f32_t f32_error[2]);
 
 /**
  * @brief Calculate quad PI controller.
  * @param ps_data Controller data struct.
- * @param f32_error0 First error signal input.
- * @param f32_error1 Second error signal input.
- * @param f32_error2 Third error signal input.
- * @param f32_error3 Fourth error signal input.
+ * @param f32_error Array error signal input.
  * @returns pdsp_f32_t Controller output.
  */
-pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
-                                pdsp_f32_t f32_error1, pdsp_f32_t f32_error2,
-                                pdsp_f32_t f32_error3);
+pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi_t *ps_data, pdsp_f32_t f32_error[4]);
 
 /**
  * @brief Set the PI controller to given state.
@@ -2315,20 +2404,6 @@ pdsp_extern pdsp_f32_t pdsp_pi4(pdsp_pi4_t *ps_data, pdsp_f32_t f32_error0,
  * @param f32_out Set controller output value.
  */
 pdsp_extern void pdsp_pi_set(pdsp_pi_t *ps_data, pdsp_f32_t f32_out);
-
-/**
- * @brief Set the dual PI controller to given state.
- * @param ps_data Controller data struct.
- * @param f32_out Set controller output value.
- */
-pdsp_extern void pdsp_pi2_set(pdsp_pi2_t *ps_data, pdsp_f32_t f32_out);
-
-/**
- * @brief Set the quad PI controller to given state.
- * @param ps_data Controller data struct.
- * @param f32_out Set controller output value.
- */
-pdsp_extern void pdsp_pi4_set(pdsp_pi4_t *ps_data, pdsp_f32_t f32_out);
 
 /**
  * @brief Initialize set point processor struct.
