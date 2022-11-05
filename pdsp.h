@@ -63,15 +63,19 @@
 /** All functions have storage class static */
 #define pdsp_extern static
 #else
-/** All functions have storage class extern */
+/** Macro for extern function declarationa and definition. */
 #define pdsp_extern extern
 #endif
 
+/** Macero for for inline function definition in the header file. */
+#define pdsp_inline __attribute__((always_inline)) static inline
+
 /*==============================================================================
- PUBLIC DEFINES
+ PUBLIC TYPES
  =============================================================================*/
 
-/** @addtogroup math Math
+/* ------------------------------------------------------------------------ */
+/** @addtogroup types Types
  *  @{
  */
 
@@ -79,6 +83,73 @@
 #define PDSP_TRUE 1
 /** False value. */
 #define PDSP_FALSE 0
+
+/* Fixed and floating point types */
+#if defined(_WIN64)
+/** Defined if compiling on host */
+#define PDSP_HOST
+/** Floating point rounding behavior is set to round to nearest. */
+#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
+/** 64bit unsigned integer type.  */
+typedef unsigned long long pdsp_u64_t;
+/** 32bit floating point type. */
+typedef float pdsp_f32_t;
+/** 64bit floating point type. */
+typedef float pdsp_f64_t;
+/** 32bit integer type. */
+typedef int pdsp_i32_t;
+/** 32bit unsigned integer type.  */
+typedef unsigned int pdsp_u32_t;
+/** 16bit signed integer type. */
+typedef short pdsp_i16_t;
+/** 16bit unsigned signed integer type. */
+typedef unsigned short pdsp_u16_t;
+/** Boolean type. */
+typedef bool pdsp_bool_t;
+/** Size type. */
+typedef size_t pdsp_size_t;
+/** Char type. */
+typedef char pdsp_char_t;
+#elif defined(__TMS320C2000__)
+#define PDSP_MCU
+#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
+typedef unsigned long long pdsp_u64_t;
+typedef float pdsp_f32_t;
+typedef long pdsp_i32_t;
+typedef unsigned long pdsp_u32_t;
+typedef int pdsp_i16_t;
+typedef unsigned int pdsp_u16_t;
+typedef int pdsp_bool_t;
+typedef size_t pdsp_size_t;
+typedef char pdsp_char_t;
+#elif defined(__TMS320C28XX_CLA__)
+#define PDSP_CLA
+#elif defined(__arm__)
+#define PDSP_ARM
+#endif
+
+/** PDSP status for function return value. */
+typedef enum pdsp_status_tag
+{
+    /** Function return status when it executed successfully. */
+    PDSP_OK,
+    /** Function return status for general fault. */
+    PDSP_NOT_OK,
+    /** Function return status when illegal operation was attempted. */
+    PDSP_ILLEGAL,
+    /** Function return value for when an acessed ressource was busy. */
+    PDSP_BUSY
+} pdsp_status_t;
+
+/** @} types */
+
+/*==============================================================================
+ MATH CONSTANTS
+ =============================================================================*/
+
+/** @addtogroup math Math
+ *  @{
+ */
 
 /** Float literal holding PI. */
 #define PDSP_PI_F (3.14159265358f)
@@ -150,75 +221,283 @@
 
 /** @} math */
 
+/* ------------------------------------------------------------------------ */
+/** @addtogroup fixmath Fixed Point Math
+ *  @{
+ * @details Module for fixed point math.
+ */
+
+/**
+ * @defgroup fixtofloat Float to fixed point integer conversion
+ * @brief Float to fixed point integer conversion functions.
+ * @param f32_in Float input.
+ * @return pdsp_i16_t Result in iq16 format.
+ * @{
+ */
+/** @brief Float to q0 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq0(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 1.0f);
+}
+/** @brief Float to q1 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq1(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 2.0f);
+}
+/** @brief Float to q2 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq2(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 4.0f);
+}
+/** @brief Float to q3 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq3(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 8.0f);
+}
+/** @brief Float to q4 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq4(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 16.0f);
+}
+/** @brief Float to q5 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq5(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 32.0f);
+}
+/** @brief Float to q6 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq6(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 64.0f);
+}
+/** @brief Float to q7 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq7(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 128.0f);
+}
+/** @brief Float to q8 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq8(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 256.0f);
+}
+/** @brief Float to q9 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq9(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 512.0f);
+}
+/** @brief Float to q10 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq10(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 1024.0f);
+}
+/** @brief Float to q11 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq11(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 2048.0f);
+}
+/** @brief Float to q12 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq12(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 4096.0f);
+}
+/** @brief Float to q13 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq13(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 8192.0f);
+}
+/** @brief Float to q14 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq14(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 16384.0f);
+}
+/** @brief Float to q15 conversion.*/
+pdsp_inline pdsp_i16_t iq16_ftoq15(pdsp_f32_t f32_in)
+{
+    return (pdsp_i16_t)(f32_in * 32768.0f);
+}
+/** @}*/
+
+/**
+ * @defgroup floatofix Fixed point integer to float conversion.
+ * @brief Fixed point integer to float conversion functions.
+ * @param i16_in Fixed point integer input.
+ * @return pdsp_f32_t Result in float format.
+ * @{
+ */
+/** @brief Q0 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q0tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 1.0f;
+}
+/** @brief Q1 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q1tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.5f;
+}
+/** @brief Q2 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q2tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.25f;
+}
+/** @brief Q3 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q3tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.125f;
+}
+/** @brief Q4 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q4tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.0625f;
+}
+/** @brief Q5 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q5tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.03125f;
+}
+/** @brief Q6 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q6tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.015625f;
+}
+/** @brief Q7 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q7tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.0078125f;
+}
+/** @brief Q8 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q8tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.00390625f;
+}
+/** @brief Q9 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q9tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.001953125f;
+}
+/** @brief Q10 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q10tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.0009765625f;
+}
+/** @brief Q11 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q11tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.00048828125f;
+}
+/** @brief Q12 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q12tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.000244140625f;
+}
+/** @brief Q13 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q13tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 0.0001220703125f;
+}
+/** @brief Q14 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q14tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 6.103515625e-05f;
+}
+/** @brief Q15 to float conversion.*/
+pdsp_inline pdsp_f32_t iq16_q15tof(pdsp_i16_t i16_in)
+{
+    return (pdsp_f32_t)i16_in * 3.0517578125e-05f;
+}
+/** @}*/
+
+/**
+ * @defgroup fixshift Fixed point integer shifting.
+ * @brief Fixed point integer multiplication and division by arithmetic shift.
+ * @param i16_in Fixed point integer input.
+ * @return pdsp_i16_t Multiplication or division output.
+ * @{
+ */
+/** @brief Fixed point multiplication by 2. */
+pdsp_inline pdsp_i16_t iq16_mul2(pdsp_i16_t iq_in) { return iq_in << 1; }
+/** @brief Fixed point multiplication by 4. */
+pdsp_inline pdsp_i16_t iq16_mul4(pdsp_i16_t iq_in) { return iq_in << 2; }
+/** @brief Fixed point multiplication by 8. */
+pdsp_inline pdsp_i16_t iq16_mul8(pdsp_i16_t iq_in) { return iq_in << 3; }
+/** @brief Fixed point multiplication by 16. */
+pdsp_inline pdsp_i16_t iq16_mul16(pdsp_i16_t iq_in) { return iq_in << 4; }
+/** @brief Fixed point multiplication by 32. */
+pdsp_inline pdsp_i16_t iq16_mul32(pdsp_i16_t iq_in) { return iq_in << 5; }
+/** @brief Fixed point multiplication by 64. */
+pdsp_inline pdsp_i16_t iq16_mul64(pdsp_i16_t iq_in) { return iq_in << 6; }
+/** @brief Fixed point division by 2. */
+pdsp_inline pdsp_i16_t iq16_div2(pdsp_i16_t iq_in) { return iq_in >> 1; }
+/** @brief Fixed point division by 4. */
+pdsp_inline pdsp_i16_t iq16_div4(pdsp_i16_t iq_in) { return iq_in >> 2; }
+/** @brief Fixed point division by 8. */
+pdsp_inline pdsp_i16_t iq16_div8(pdsp_i16_t iq_in) { return iq_in >> 3; }
+/** @brief Fixed point division by 16. */
+pdsp_inline pdsp_i16_t iq16_div16(pdsp_i16_t iq_in) { return iq_in >> 4; }
+/** @brief Fixed point division by 32. */
+pdsp_inline pdsp_i16_t iq16_div32(pdsp_i16_t iq_in) { return iq_in >> 5; }
+/** @brief Fixed point division by 64. */
+pdsp_inline pdsp_i16_t iq16_div64(pdsp_i16_t iq_in) { return iq_in >> 6; }
+/** @}*/
+
+/**
+ * @defgroup fixmul Fixed point integer multiplication and division.
+ * @brief Fixed point integer multiplication and division.
+ * @param i16_in0 First fixed point integer input.
+ * @param i16_in1 Second fixed point integer input.
+ * @return pdsp_i16_t Multiplication output.
+ * @{
+ */
+/** @brief Fixed point multiplication (no rounding). */
+pdsp_inline pdsp_i16_t iq16_mulq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1);
+}
+/** @brief Fixed point multiplication ( rounding). */
+pdsp_inline pdsp_i16_t iq16_rmulq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return 0;
+}
+/** @brief Fixed point multiplication ( rounding). */
+pdsp_inline pdsp_i16_t iq16_rsmulq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return 0;
+}
+/** @brief Fixed point division (no rounding). */
+pdsp_inline pdsp_i16_t iq16_divq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return 0;
+}
+/** @}*/
+
+/**
+ * @defgroup fixsqrt Fixed point integer square root.
+ * @brief Fixed point integer square root.
+ * @param i16_in First fixed point integer input.
+ * @return pdsp_i16_t Square root output.
+ * @{
+ */
+/** @brief Fixed point square root (no rounding). */
+pdsp_inline pdsp_i16_t iq16_sqrtq0(pdsp_i16_t iq_in) { return 0; }
+/** @}*/
+
+/**
+ * @defgroup fixtrig Fixed point integer trigonometry.
+ * @brief Fixed point integer trigonometry.
+ * @param i16_in First fixed point integer input.
+ * @return pdsp_i16_t Square root output.
+ * @{
+ */
+/** @brief Fixed point sine (no rounding). */
+pdsp_inline pdsp_i16_t iq16_sinq0(pdsp_i16_t iq_in) { return 0; }
+/** @}*/
+
+/** @} fixmath */
+
 /*==============================================================================
  PUBLIC TYPEDEFS
  =============================================================================*/
-
-/* ------------------------------------------------------------------------ */
-/** @addtogroup types Types
- *  @{
- */
-
-/* Fixed and floating point types */
-#if defined(_WIN64)
-/** Defined if compiling on host */
-#define PDSP_HOST
-/** Floating point rounding behavior is set to round to nearest. */
-#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
-/** 64bit unsigned integer type.  */
-typedef unsigned long long pdsp_u64_t;
-/** 32bit floating point type. */
-typedef float pdsp_f32_t;
-/** 32bit integer type.  */
-typedef int pdsp_i32_t;
-/** 32bit unsigned integer type.  */
-typedef unsigned int pdsp_u32_t;
-/** 16bit signed integer type.  */
-typedef short pdsp_i16_t;
-/** 16bit unsigned signed integer type. */
-typedef unsigned short pdsp_u16_t;
-/** Boolean type. */
-typedef bool pdsp_bool_t;
-/** Size type. */
-typedef size_t pdsp_size_t;
-/** 16bit signed integer type. */
-typedef char pdsp_char_t;
-#elif defined(__TMS320C2000__)
-#define PDSP_MCU
-#define F32_TO_INT_ROUNDS_TOWARDS_ZERO
-typedef unsigned long long pdsp_u64_t;
-typedef float pdsp_f32_t;
-typedef long pdsp_i32_t;
-typedef unsigned long pdsp_u32_t;
-typedef int pdsp_i16_t;
-typedef unsigned int pdsp_u16_t;
-typedef int pdsp_bool_t;
-typedef size_t pdsp_size_t;
-typedef char pdsp_char_t;
-#elif defined(__TMS320C28XX_CLA__)
-#define PDSP_CLA
-#elif defined(__arm__)
-#define PDSP_ARM
-#endif
-
-/** PDSP status for function return value. */
-typedef enum pdsp_status_tag
-{
-    /** Function return status when it executed successfully. */
-    PDSP_OK,
-    /** Function return status for general fault. */
-    PDSP_NOT_OK,
-    /** Function return status when illegal operation was attempted. */
-    PDSP_ILLEGAL,
-    /** Function return value for when an acessed ressource was busy. */
-    PDSP_BUSY
-} pdsp_status_t;
-
-/** @} types */
 /** @addtogroup util Util
  *  @{
  */
-
 /** Signal properties struct for 64bit word (log, CAN), stored in big endian,
  * unsigned. */
 typedef struct pdsp_signal_prop_tag
@@ -535,6 +814,21 @@ typedef struct pdsp_1p1z_inv_tag
     pdsp_f32_t f32_a1;
 } pdsp_1p1z_inv_t;
 
+/** 1P1Z filter state memory struct. */
+typedef struct pdsp_macro_1p1z_inv_tag
+{
+    /** 1P1Z filter b0 coefficient. */
+    pdsp_f32_t f32_b0;
+    /** 1P1Z filter b1 coefficient. */
+    pdsp_f32_t f32_b1;
+    /** 1P1Z filter a1 coefficient. */
+    pdsp_f32_t f32_a1;
+    /** 1P1Z filter x0 state variable */
+    pdsp_f32_t f32_x1;
+    /** 1P1Z filter output */
+    pdsp_f32_t f32_out;
+} pdsp_macro_1p1z_inv_t;
+
 /** 1P1Z coefficient struct for s or z transfer function. */
 typedef struct pdsp_1p1z_tag
 {
@@ -573,6 +867,27 @@ typedef struct pdsp_2p2z_inv_tag
     /** 2P2Z filter a2 coefficient. */
     pdsp_f32_t f32_a2;
 } pdsp_2p2z_inv_t;
+
+/** 2P2Z filter state memory struct. */
+typedef struct pdsp_macro_2p2z_inv_tag
+{
+    /** 2P2Z filter b0 coefficient. */
+    pdsp_f32_t f32_b0;
+    /** 2P2Z filter b1 coefficient. */
+    pdsp_f32_t f32_b1;
+    /** 2P2Z filter b2 coefficient. */
+    pdsp_f32_t f32_b2;
+    /** 2P2Z filter a1 coefficient. */
+    pdsp_f32_t f32_a1;
+    /** 2P2Z filter a2 coefficient. */
+    pdsp_f32_t f32_a2;
+    /** 2P2Z filter x0 state variable */
+    pdsp_f32_t f32_x1;
+    /** 2P2Z filter x1 state variable */
+    pdsp_f32_t f32_x2;
+    /** 2P2Z filter output */
+    pdsp_f32_t f32_out;
+} pdsp_macro_2p2z_inv_t;
 
 /** 2P2Z coefficient struct for s or z transfer function. */
 typedef struct pdsp_2p2z_tag
@@ -615,7 +930,6 @@ typedef struct pdsp_3p3z_inv_tag
     pdsp_f32_t f32_b2;
     /** 3P3Z filter b3 coefficient. */
     pdsp_f32_t f32_b3;
-
     /** 3P3Z filter a1 coefficient. */
     pdsp_f32_t f32_a1;
     /** 3P3Z filter a2 coefficient. */
@@ -623,6 +937,33 @@ typedef struct pdsp_3p3z_inv_tag
     /** 3P3Z filter a2 coefficient. */
     pdsp_f32_t f32_a3;
 } pdsp_3p3z_inv_t;
+
+/** 3P3Z filter state memory struct. */
+typedef struct pdsp_macro_3p3z_inv_tag
+{
+    /** 3P3Z filter b0 coefficient. */
+    pdsp_f32_t f32_b0;
+    /** 3P3Z filter b1 coefficient. */
+    pdsp_f32_t f32_b1;
+    /** 3P3Z filter b2 coefficient. */
+    pdsp_f32_t f32_b2;
+    /** 3P3Z filter b3 coefficient. */
+    pdsp_f32_t f32_b3;
+    /** 3P3Z filter a1 coefficient. */
+    pdsp_f32_t f32_a1;
+    /** 3P3Z filter a2 coefficient. */
+    pdsp_f32_t f32_a2;
+    /** 3P3Z filter a2 coefficient. */
+    pdsp_f32_t f32_a3;
+    /** 3P3Z filter x0 state variable */
+    pdsp_f32_t f32_x1;
+    /** 3P3Z filter x1 state variable */
+    pdsp_f32_t f32_x2;
+    /** 3P3Z filter x1 state variable */
+    pdsp_f32_t f32_x3;
+    /** 3P3Z filter output */
+    pdsp_f32_t f32_out;
+} pdsp_macro_3p3z_inv_t;
 
 /** 3P3Z coefficient struct for s or z transfer function. */
 typedef struct pdsp_3p3z_tag
@@ -654,6 +995,17 @@ typedef struct pdsp_med3_var_tag
     pdsp_f32_t f32_x2;
 } pdsp_med3_var_t;
 
+/** Median memory struct. */
+typedef struct pdsp_macro_med3_var_tag
+{
+    /** Median of 3 last value. */
+    pdsp_f32_t f32_x1;
+    /** Median of 3 before last value. */
+    pdsp_f32_t f32_x2;
+    /** Median of 3 output. */
+    pdsp_f32_t f32_out;
+} pdsp_macro_med3_var_t;
+
 /** Rolling sum variable struct. */
 typedef struct pdsp_rollsum_var_tag
 {
@@ -671,6 +1023,17 @@ typedef struct pdsp_rollsum_tag
     /** Pointer to queue struct */
     const pdsp_queue_t *ps_queue;
 } pdsp_rollsum_t;
+
+/** Rolling sum variable struct. */
+typedef struct pdsp_macro_rollsum_tag
+{
+    /** Queue struct */
+    pdsp_macro_queue_t s_queue;
+    /** Sum of history array (divided by size) */
+    pdsp_f32_t f32_sum;
+    /** Inverse window length. */
+    pdsp_f32_t f32_win_size_inv;
+} pdsp_macro_rollsum_t;
 
 // /** Rolling sum variable struct. */
 // typedef struct pdsp_rollsum_3f32_var_tag
@@ -1197,12 +1560,51 @@ typedef struct pdsp_aout_tag
 /** @} debug */
 
 /*==============================================================================
- GLOBAL CONSTANTS
- =============================================================================*/
-
-/*==============================================================================
  GLOBAL FUNCTIOS PROTOTYPES
  =============================================================================*/
+
+/** @addtogroup math Math
+ *  @{
+ */
+
+/* Floating point functions with intrinsics on MCU. */
+#if defined(_WIN64)
+/** Floating point minimum function macro */
+#define pdsp_minf(x, y) fminf((x), (y))
+/** Floating point maximum function macro */
+#define pdsp_maxf(x, y) fmaxf((x), (y))
+/** Floating point division */
+#define pdsp_divf(x, y) ((x) / (y))
+/** Sine function macro */
+#define pdsp_sinf(x) sinf((x))
+/** Sine function macro PU */
+#define pdsp_sinpuf(x) sinf((x) / PDSP_2_PI_F)
+/** Cosine function macro */
+#define pdsp_cosf(x) cosf((x))
+/** Cosine function macro PU */
+#define pdsp_cospuf(x) cosf((x) / PDSP_2_PI_F)
+/** Square root function */
+#define pdsp_sqrtf(x) sqrtf((x))
+
+/* Specific intrinsics for C28x */
+#elif defined(__TMS320C2000__)
+#define pdsp_minf(x, y) __fmin((x), (y))
+#define pdsp_maxf(x, y) __fmax((x), (y))
+#define pdsp_divf(x, y) __divf32((x), (y))
+#define pdsp_sinf(x) __sin((x))
+#define pdsp_sinpuf(x) __sinpuf32((x))
+#define pdsp_cosf(x) __cos((x))
+#define pdsp_cospuf(x) __cospuf32((x))
+#define pdsp_sqrtf(x) __sqrt((x))
+#elif defined(__TMS320C28XX_CLA__)
+/* Specific intrinsics for CLA */
+
+#elif defined(__arm__)
+/* Specific intrinsics for ARM */
+
+#endif
+
+/** @} math */
 
 /** @addtogroup util
  *  @{
@@ -1851,8 +2253,10 @@ pdsp_extern void pdsp_queue_push_ch(const pdsp_queue_t *ps_data,
 /**
  * @brief (define )Initialize queue.
  * @param s_data Queue data struct.
+ * @param size Size of the array.
  */
-#define pdsp_macro_queue_init(s_data)                                          \
+#define pdsp_macro_queue_init(s_data, size)                                    \
+    (s_data).i16_size = (size);                                                \
     (s_data).i16_count = 0;                                                    \
     (s_data).i16_head = (s_data).i16_size - 1;                                 \
     (s_data).i16_tail = 0
@@ -2006,53 +2410,57 @@ pdsp_extern pdsp_f32_t pdsp_ain_ovr(pdsp_ain_var_t *ps_data,
 
 /**
  * @brief (Macro) Apply gain / offset to raw signal.
- * @param v Signal data struct pdsp_macro_ain_t.
+ * @param s_data Signal data struct pdsp_macro_ain_t.
  * @param raw Raw input signal.
  */
-#define pdsp_macro_ain(v, raw)                                                 \
-    (((((raw)*v.f32_gain) + v.f32_offset) * v.f32_ovr_dis) + v.f32_ovr_value)
+#define pdsp_macro_ain(s_data, raw)                                            \
+    (((((raw) * (s_data).f32_gain) + (s_data).f32_offset) *                    \
+      (s_data).f32_ovr_dis) +                                                  \
+     (s_data).f32_ovr_value)
 
 /**
  * @brief (Macro) Apply gain / offset to raw signal with 2x oversampling.
- * @param v Signal data struct pdsp_macro_ain_t.
+ * @param s_data Signal data struct pdsp_macro_ain_t.
  * @param raw0 Raw input signal.
  * @param raw1 Raw input signal.
  */
-#define pdsp_macro_ain2(v, raw0, raw1)                                         \
-    ((((((raw0) + (raw1)) * v.f32_gain) + v.f32_offset) * v.f32_ovr_dis) +     \
-     v.f32_ovr_value)
+#define pdsp_macro_ain2(s_data, raw0, raw1)                                    \
+    ((((((raw0) + (raw1)) * (s_data).f32_gain) + (s_data).f32_offset) *        \
+      (s_data).f32_ovr_dis) +                                                  \
+     (s_data).f32_ovr_value)
 
 /**
  * @brief (Macro) Apply gain / offset to raw signal with 4x oversampling.
- * @param v Signal data struct pdsp_macro_ain_t.
+ * @param s_data Signal data struct pdsp_macro_ain_t.
  * @param raw0 Raw input signal.
  * @param raw1 Raw input signal.
  * @param raw2 Raw input signal.
  * @param raw3 Raw input signal.
  */
-#define pdsp_macro_ain4(v, raw0, raw1, raw2, raw3)                             \
-    ((((((raw0) + (raw1) + (raw2) + (raw3)) * v.f32_gain) + v.f32_offset) *    \
-      v.f32_ovr_dis) +                                                         \
-     v.f32_ovr_value)
+#define pdsp_macro_ain4(s_data, raw0, raw1, raw2, raw3)                        \
+    ((((((raw0) + (raw1) + (raw2) + (raw3)) * (s_data).f32_gain) +             \
+       (s_data).f32_offset) *                                                  \
+      (s_data).f32_ovr_dis) +                                                  \
+     (s_data).f32_ovr_value)
 
 /**
  * @brief (Macro) Enable override.
- * @param v Signal data struct pdsp_macro_ain_t.
+ * @param s_data Signal data struct pdsp_macro_ain_t.
  */
-#define pdsp_macro_ain_ovr_enable(v) v.f32_ovr_dis = 0.0f
+#define pdsp_macro_ain_ovr_enable(s_data) (s_data).f32_ovr_dis = 0.0f
 
 /**
  * @brief (Macro) Disable override.
- * @param v Signal data struct pdsp_macro_ain_t.
+ * @param s_data Signal data struct pdsp_macro_ain_t.
  */
-#define pdsp_macro_ain_ovr_disable(v) v.f32_ovr_dis = 1.0f
+#define pdsp_macro_ain_ovr_disable(s_data) (s_data).f32_ovr_dis = 1.0f
 
 /**
  * @brief (Macro) Set injection value.
- * @param v Signal data struct.
+ * @param s_data Signal data struct.
  * @param inj Injection signal.
  */
-#define pdsp_macro_ain_inject(v, inj) v.f32_ovr_value = (inj)
+#define pdsp_macro_ain_inject(s_data, inj) (s_data).f32_ovr_value = (inj)
 
 /**
  * @brief Set and enable override.
@@ -2113,6 +2521,25 @@ pdsp_extern void pdsp_minmax_clear(pdsp_minmax_var_t *ps_var);
 pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
+ * @brief (macro) Initialize / Clear min-max struct.
+ * @param s_data Min-max state variable struct.
+ */
+#define pdsp_macro_minmax_clear(s_data)                                        \
+    (s_data).f32_min = PDSP_POS_INF;                                           \
+    (s_data).f32_max = PDSP_NEG_INF;                                           \
+    (s_data).f32_delta = 0.0f
+
+/**
+ * @brief (macro) Process min-max.
+ * @param s_data Min-max state variable struct.
+ * @param f32_in Filter input.
+ */
+#define pdsp_macro_minmax(s_data, f32_in)                                      \
+    (s_data).f32_min = pdsp_minf((s_data).f32_min, (f32_in));                  \
+    (s_data).f32_max = pdsp_maxf((s_data).f32_max, (f32_in));                  \
+    (s_data).f32_delta = (s_data).f32_max - (s_data).f32_min
+
+/**
  * @brief Initialize / Clear simple exponential average struct.
  * @param ps_data Filter state variable struct.
  */
@@ -2128,12 +2555,18 @@ pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
                                    pdsp_f32_t f32_in);
 
 /**
- * @brief (Macro) Calculate simplple exponential averaging filter.
- * @param v Filter state variable struct.
+ * @brief (macro) Initialize / Clear simple exponential average struct.
+ * @param s_data Filter state variable struct.
+ */
+#define pdsp_macro_expavg_clear(s_data) (s_data).f32_x1 = 0.0f
+
+/**
+ * @brief (macro) Calculate simplple exponential averaging filter.
+ * @param s_data Filter state variable struct.
  * @param in Filter input.
  */
-#define pdsp_macro_expavg_calc(v, in)                                          \
-    v.ps_var->f32_x1 += v.f32_tau * (in - v.ps_var->f32_x1)
+#define pdsp_macro_expavg_calc(s_data, in)                                     \
+    (s_data).f32_x1 += (s_data).f32_tau * ((in) - (s_data).f32_x1)
 
 /**
  * @brief Convert continuous H(s) to H(1/z) for 1P1Z transfer function using
@@ -2243,6 +2676,43 @@ pdsp_extern void pdsp_df21_post(pdsp_1p1z_inv_t *ps_data,
                                 pdsp_1p1z_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
+ * @brief (macro) Initialize / Clear DF21 filter struct.
+ * @param s_var Filter state variable struct.
+ */
+#define pdsp_macro_df21_clear(s_var) (s_var).f32_x1 = 0.0f
+
+/**
+ * @brief (macro) Calculate DF21 filter.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+#define pdsp_macro_df21(s_data, f32_in)                                        \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;         \
+    (s_data).f32_x1 =                                                          \
+        ((f32_in) * (s_data).f32_b1) + ((s_data).f32_out * (s_data).f32_a1)
+
+/**
+ * @brief (macro) Pre-calculate DF21 filter. Must be used in combination with
+ * pdsp_df21_post.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+#define pdsp_macro_df21_pre(s_data, f32_in)                                    \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1
+
+/**
+ * @brief (macro) Post-calculate DF21 filter. Must be used in combination with
+ * pdsp_df21_pre.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ */
+#define pdsp_macro_df21_post(s_data, f32_in)                                   \
+    (s_data).f32_x1 =                                                          \
+        ((f32_in) * (s_data).f32_b1) + ((s_data).f32_out * (s_data).f32_a1);
+
+/**
  * @brief Initialize / Clear DF22 biquad filter struct.
  * @param ps_var Filter state variable struct.
  */
@@ -2279,6 +2749,49 @@ pdsp_extern pdsp_f32_t pdsp_df22_pre(pdsp_2p2z_inv_t *ps_data,
  */
 pdsp_extern void pdsp_df22_post(pdsp_2p2z_inv_t *ps_data,
                                 pdsp_2p2z_var_t *ps_var, pdsp_f32_t f32_in);
+
+/**
+ * @brief (macro) Initialize / Clear DF22 biquad filter struct.
+ * @param s_data Filter state variable struct.
+ */
+#define pdsp_macro_df22_clear(s_data)                                          \
+    (s_data).f32_x1 = 0.0f;                                                    \
+    (s_data).f32_x2 = 0.0f
+
+/**
+ * @brief (macro) Calculate DF22 biquad filter.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+#define pdsp_macro_df22(s_data, f32_in)                                        \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;         \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
+    (s_data).f32_x2 =                                                          \
+        ((f32_in) * (s_data).f32_b2) + ((s_data).f32_out * (s_data).f32_a2)
+
+/**
+ * @brief (macro) Pre-calculate DF22 biquad filter. Must be used in combination
+ * with pdsp_df22_post.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+#define pdsp_macro_df22_pre(s_data, f32_in)                                    \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1
+
+/**
+ * @brief (macro) Post-calculate DF22 biquad filter. Must be used in combination
+ * with pdsp_df22_pre.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ */
+#define pdsp_macro_df22_post(s_data, f32_in)                                   \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
+    (s_data).f32_x2 =                                                          \
+        ((f32_in) * (s_data).f32_b2) + ((s_data).f32_out * (s_data).f32_a2)
 
 /**
  * @brief Initialize / Clear DF23 filter struct.
@@ -2319,6 +2832,54 @@ pdsp_extern void pdsp_df23_post(pdsp_3p3z_inv_t *ps_data,
                                 pdsp_3p3z_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
+ * @brief (macro) Initialize / Clear DF23 filter struct.
+ * @param s_data Filter state variable struct.
+ */
+#define pdsp_macro_df23_clear(s_data)                                          \
+    (s_data).f32_x1 = 0.0f;                                                    \
+    (s_data).f32_x2 = 0.0f;                                                    \
+    (s_data).f32_x3 = 0.0f
+
+/**
+ * @brief (macro) Calculate DF23 filter.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+#define pdsp_macro_df23(s_data, f32_in)                                        \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;         \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
+    (s_data).f32_x2 = ((f32_in) * (s_data).f32_b2) +                           \
+                      ((s_data).f32_out * (s_data).f32_a2) + (s_data).f32_x3;  \
+    (s_data).f32_x3 =                                                          \
+        ((f32_in) * (s_data).f32_b3) + ((s_data).f32_out * (s_data).f32_a3)
+
+/**
+ * @brief (macro) Pre-calculate DF23 filter. Must be used in combination with
+ * pdsp_df23_post.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ * @returns pdsp_f32_t Filter output.
+ */
+#define pdsp_macro_df23_pre(s_data, f32_in)                                    \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1
+
+/**
+ * @brief (macro) Post-calculate DF23 biquad filter. Must be used in combination
+ * with pdsp_df23_pre.
+ * @param s_data Filter data memory struct.
+ * @param f32_in Filter input signal.
+ */
+#define pdsp_macro_df23_post(s_data, f32_in)                                   \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
+    (s_data).f32_x2 = ((f32_in) * (s_data).f32_b2) +                           \
+                      ((s_data).f32_out * (s_data).f32_a2) + (s_data).f32_x3;  \
+    (s_data).f32_x3 =                                                          \
+        ((f32_in) * (s_data).f32_b3) + ((s_data).f32_out * (s_data).f32_a3)
+
+/**
  * @brief Initialize / Clear median filter struct.
  * @param ps_var Filter state variable struct.
  */
@@ -2331,6 +2892,27 @@ pdsp_extern void pdsp_med3_clear(pdsp_med3_var_t *ps_var);
  * @returns pdsp_f32_t Filter output.
  */
 pdsp_extern pdsp_f32_t pdsp_med3(pdsp_med3_var_t *ps_var, pdsp_f32_t f32_in);
+
+/**
+ * @brief (macro) Initialize / Clear median filter struct.
+ * @param s_data Filter state variable struct.
+ */
+#define pdsp_macro_med3_clear(s_data)                                          \
+    (s_data).f32_x1 = 0.0f;                                                    \
+    (s_data).f32_x2 = 0.0f
+
+/**
+ * @brief (macro) Calculate median filter with kernel size 3.
+ * @param s_data Filter state memory struct.
+ * @param f32_in Filter input signal.
+ */
+#define pdsp_macro_med3(s_data, f32_in)                                        \
+    (s_data).f32_out =                                                         \
+        (((s_data).f32_x2 + (s_data).f32_x1 + (f32_in)) -                      \
+         pdsp_minf((s_data).f32_x2, pdsp_minf((s_data).f32_x1, (f32_in))) -    \
+         pdsp_maxf((s_data).f32_x2, pdsp_maxf((s_data).f32_x1, (f32_in))));    \
+    (s_data).f32_x2 = (s_data).f32_x1;                                         \
+    (s_data).f32_x1 = (f32_in)
 
 /**
  * @brief Initialize / Clear rolling sum struct.
@@ -2385,6 +2967,73 @@ pdsp_extern void pdsp_rollrms_init(const pdsp_rollsum_t *ps_data,
  */
 pdsp_extern pdsp_f32_t pdsp_rollrms(const pdsp_rollsum_t *ps_data,
                                     pdsp_f32_t f32_in);
+
+/**
+ * @brief (macro) Initialize / Clear rolling sum struct.
+ * @param s_data Filter state variable struct.
+ * @param size Size of the array.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
+ */
+#define pdsp_macro_rollsum_init(s_data, size, i16_win_size)                    \
+    (s_data).f32_sum = 0.0f;                                                   \
+    (s_data).s_queue.i16_size = (size);                                        \
+    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                    \
+    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;                 \
+    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size);    \
+    (s_data).f32_win_size_inv = pdsp_divf(1.0f, (pdsp_f32_t)(i16_win_size));
+
+/**
+ * @brief (macro) Calculate rolling sum.
+ * @param s_data Filter state memory struct.
+ * @param a_data Filter data array.
+ * @param f32_in Rolling sum input signal.
+ */
+#define pdsp_macro_rollsum(s_data, a_data, f32_in)                             \
+    (s_data).f32_sum -= pdsp_macro_queue_pop((s_data).s_queue);                \
+    (s_data).f32_sum += (f32_in);                                              \
+    pdsp_macro_queue_push((s_data).s_queue, a_data, f32_in)
+
+/**
+ * @brief (macro) Initialize / clear rolling averaging struct.
+ * @param s_data Filter state variable struct.
+ * @param size Size of the array.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
+ */
+#define pdsp_macro_rollavg_init(s_data, size, i16_win_size)                    \
+    pdsp_macro_rollsum_init((s_data), (size), (i16_win_size))
+
+/**
+ * @brief (macro) Calculate rolling averaging filter.
+ * @param s_data Filter state memory struct.
+ * @param a_data Filter data array.
+ * @param f32_in Filter input signal.
+ */
+#define pdsp_macro_rollavg(s_data, a_data, f32_in)                             \
+    pdsp_macro_rollsum((s_data), (a_data), (f32_in) * (s_data).f32_win_size_inv)
+
+/**
+ * @brief (macro) Initialize / clear rolling rms struct.
+ * @param s_data Filter state variable struct.
+ * @param size Size of the array.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
+ */
+#define pdsp_macro_rollrms_init(s_data, size, i16_win_size)                    \
+    pdsp_macro_rollsum_init((s_data), (size), (i16_win_size))
+
+/**
+ * @brief (macro) Calculate rolling Root Mean Square filter.
+ * @param s_data Filter state memory struct.
+ * @param a_data Filter data array.
+ * @param f32_in Filter input signal.
+ * @param f32_out Filter output signal.
+ */
+#define pdsp_macro_rollrms(s_data, a_data, f32_in, f32_out)                    \
+    pdsp_macro_rollsum((s_data), a_data,                                       \
+                       (f32_in) * (f32_in) * (s_data).f32_win_size_inv);       \
+    (f32_out) = pdsp_sqrtf((s_data).f32_sum);
 
 /** @} signal */
 

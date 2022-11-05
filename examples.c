@@ -528,7 +528,7 @@ void example_queue(void)
     // macro version
     pdsp_macro_queue_t mdata = {
         .i16_head = 2, .i16_tail = 4, .i16_count = 4, .i16_size = 4};
-    pdsp_macro_queue_init(mdata);
+    pdsp_macro_queue_init(mdata, 4);
     PDSP_ASSERT(mdata.i16_count == 0);
     PDSP_ASSERT(pdsp_macro_queue_is_not_full(mdata));
     pdsp_macro_queue_push(mdata, ch, 't');
@@ -1002,6 +1002,35 @@ void example_fault(void)
     PDSP_ASSERT(flt_status == 0);
 }
 
+void example_fixmath(void)
+{
+    printf("-- void example_fixmath(void) --\n");
+    PDSP_ASSERT(iq16_mul2(1) == 2);
+    PDSP_ASSERT(iq16_mul4(1) == 4);
+    PDSP_ASSERT(iq16_mul8(1) == 8);
+    PDSP_ASSERT(iq16_mul16(1) == 16);
+    PDSP_ASSERT(iq16_mul32(1) == 32);
+    PDSP_ASSERT(iq16_mul64(1) == 64);
+    PDSP_ASSERT(iq16_mul2(-1) == -2);
+    PDSP_ASSERT(iq16_mul4(-1) == -4);
+    PDSP_ASSERT(iq16_mul8(-1) == -8);
+    PDSP_ASSERT(iq16_mul16(-1) == -16);
+    PDSP_ASSERT(iq16_mul32(-1) == -32);
+    PDSP_ASSERT(iq16_mul64(-1) == -64);
+    PDSP_ASSERT(iq16_div2(2) == 1);
+    PDSP_ASSERT(iq16_div4(4) == 1);
+    PDSP_ASSERT(iq16_div8(8) == 1);
+    PDSP_ASSERT(iq16_div16(16) == 1);
+    PDSP_ASSERT(iq16_div32(32) == 1);
+    PDSP_ASSERT(iq16_div64(64) == 1);
+    PDSP_ASSERT(iq16_div2(-2) == -1);
+    PDSP_ASSERT(iq16_div4(-4) == -1);
+    PDSP_ASSERT(iq16_div8(-8) == -1);
+    PDSP_ASSERT(iq16_div16(-16) == -1);
+    PDSP_ASSERT(iq16_div32(-32) == -1);
+    PDSP_ASSERT(iq16_div64(-64) == -1);
+}
+
 int main()
 {
 
@@ -1037,6 +1066,7 @@ int main()
     example_bit_read_write();
     example_signal_read_write();
     example_fault();
+    example_fixmath();
 
     return 0;
 }

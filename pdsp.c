@@ -2125,6 +2125,19 @@ pdsp_extern pdsp_u16_t pdsp_aout(const pdsp_aout_t *ps_data)
     return 0;
 }
 
+
+/* pdsp_inline pdsp_iq_t iq_mul2(pdsp_iq_t iq_in) { return iq_in << 1; }
+
+pdsp_inline pdsp_iq_t iq_mul4(pdsp_iq_t iq_in) { return iq_in << 2; }
+
+pdsp_inline pdsp_iq_t iq_mul8(pdsp_iq_t iq_in) { return iq_in << 3; }
+
+pdsp_inline pdsp_iq_t iq_mul16(pdsp_iq_t iq_in) { return iq_in << 4; }
+
+pdsp_inline pdsp_iq_t iq_mul32(pdsp_iq_t iq_in) { return iq_in << 5; }
+
+pdsp_inline pdsp_iq_t iq_mul64(pdsp_iq_t iq_in) { return iq_in << 6; } */
+
 /*==============================================================================
  ENF OF FILE
  =============================================================================*/

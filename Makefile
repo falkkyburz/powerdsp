@@ -20,6 +20,7 @@ pdsp.o: pdsp.c
 examples.o: examples.c
 	$(info Compile examples.c:)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	$(CC) $(CFLAGS) $(INC) -S -fverbose-asm $<
 
 info: pdsp.o
 	$(info Print size and disassemble:)
@@ -35,6 +36,7 @@ clean:
 	del pdsp.s
 	del pdsp.map
 	del examples.o
+	del examples.s
 	del doxylog.txt
 	if exist html rmdir /s /q html
 

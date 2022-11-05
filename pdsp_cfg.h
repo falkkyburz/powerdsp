@@ -49,10 +49,16 @@
 /** Uncomment to set all functions to static and include them in the psdp.h file. */
 // #define PDSP_STATIC_FUNCTIONS
 
+/** Fixed point math integer size*/
+#define PDSP_FIXMATH_I32
+//#define PDSP_FIXMATH_I16
+
 /** Place PRAGMAs for TMS320 DSP optimization here */
 #if defined(__TMS320C2000__)
 #pragma CODE_SECTION(pdsp_stopwatch_start, ".TI.ramfunc")
 #pragma CODE_SECTION(pdsp_stopwatch_stop, ".TI.ramfunc")
 #endif
+
+
 
 #endif /* PDSP_CFG_H */
