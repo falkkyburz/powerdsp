@@ -205,6 +205,27 @@ typedef struct pdsp_macro_rollsum_tag
     pdsp_f32_t f32_win_size_inv;
 } pdsp_macro_rollsum_t;
 
+/** Rolling sum variable struct. */
+typedef struct pdsp_macro_rollsum6_tag
+{
+    /** Queue struct */
+    pdsp_macro_queue_t s_queue;
+    /** Sum of history array (divided by size) */
+    pdsp_f32_t f32_sum0;
+    /** Sum of history array (divided by size) */
+    pdsp_f32_t f32_sum1;
+    /** Sum of history array (divided by size) */
+    pdsp_f32_t f32_sum2;
+    /** Sum of history array (divided by size) */
+    pdsp_f32_t f32_sum3;
+    /** Sum of history array (divided by size) */
+    pdsp_f32_t f32_sum4;
+    /** Sum of history array (divided by size) */
+    pdsp_f32_t f32_sum5;
+    /** Inverse window length. */
+    pdsp_f32_t f32_win_size_inv;
+} pdsp_macro_rollsum6_t;
+
 /** @} signal */
 
 /*==============================================================================
@@ -231,8 +252,8 @@ typedef struct pdsp_macro_rollsum_tag
  */
 #define pdsp_macro_stopwatch_stop(s_data, u32_hw_now)                          \
     ((s_data).u32_time_mem < (u32_hw_now))                                     \
-        ? (u32_hw_now - (s_data).u32_time_mem)                                 \
-        : (u32_hw_now - (s_data).u32_time_mem + (s_data).u32_hw_max)
+        ? ((u32_hw_now) - (s_data).u32_time_mem)                               \
+        : ((u32_hw_now) - (s_data).u32_time_mem + (s_data).u32_hw_max)
 
 /**
  * @brief (macro) Map a value from one range to another (Uses division).
@@ -275,7 +296,7 @@ typedef struct pdsp_macro_rollsum_tag
  * @param val Value to write.
  */
 #define pdsp_macro_bit_write(v, bit, val)                                      \
-    (v) &= ~(1 << bit);                                                        \
+    (v) &= ~(1 << (bit));                                                      \
     (v) |= (((val)&1U) << (bit))
 
 /**
@@ -283,7 +304,7 @@ typedef struct pdsp_macro_rollsum_tag
  * @param v Variable.
  * @param bit Bit position.
  */
-#define pdsp_macro_bit_read(v, bit) (((val) >> (bit)) & 1U)
+#define pdsp_macro_bit_read(v, bit) (((v) >> (bit)) & 1U)
 
 /**
  * @brief (Macro) Mask set.
@@ -403,8 +424,13 @@ typedef struct pdsp_macro_rollsum_tag
  * @param in Data to push to the queue.
  */
 #define pdsp_macro_queue_push(s_data, a_data, in)                              \
-    pdsp_macro_queue_advance_head(s_data);                                     \
-    (a_data)[(s_data).i16_head] = in
+    (s_data).i16_head++;                                                       \
+    if ((s_data).i16_head >= (s_data).i16_size)                                \
+    {                                                                          \
+        (s_data).i16_head = 0;                                                 \
+    }                                                                          \
+    (s_data).i16_count++;                                                      \
+    (a_data)[(s_data).i16_head] = (in)
 
 /**
  * @brief (macro) Pop data from the queue.
@@ -413,7 +439,12 @@ typedef struct pdsp_macro_rollsum_tag
  */
 #define pdsp_macro_queue_pop(s_data, a_data)                                   \
     (a_data)[(s_data).i16_tail];                                               \
-    pdsp_macro_queue_advance_tail(s_data);
+    (s_data).i16_tail++;                                                       \
+    if ((s_data).i16_tail >= (s_data).i16_size)                                \
+    {                                                                          \
+        (s_data).i16_tail = 0;                                                 \
+    }                                                                          \
+    (s_data).i16_count--
 
 /** @} util */
 /* ------------------------------------------------------------------------ */
@@ -543,7 +574,7 @@ typedef struct pdsp_macro_rollsum_tag
  */
 #define pdsp_macro_df21_post(s_data, f32_in)                                   \
     (s_data).f32_x1 =                                                          \
-        ((f32_in) * (s_data).f32_b1) + ((s_data).f32_out * (s_data).f32_a1);
+        ((f32_in) * (s_data).f32_b1) + ((s_data).f32_out * (s_data).f32_a1)
 
 /**
  * @brief (macro) Initialize / Clear DF22 biquad filter struct.
@@ -670,7 +701,7 @@ typedef struct pdsp_macro_rollsum_tag
     (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                    \
     (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;                 \
     (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size);    \
-    (s_data).f32_win_size_inv = pdsp_divf(1.0f, (pdsp_f32_t)(i16_win_size));
+    (s_data).f32_win_size_inv = pdsp_divf(1.0f, (pdsp_f32_t)(i16_win_size))
 
 /**
  * @brief (macro) Calculate rolling sum.
@@ -679,9 +710,76 @@ typedef struct pdsp_macro_rollsum_tag
  * @param f32_in Rolling sum input signal.
  */
 #define pdsp_macro_rollsum(s_data, a_data, f32_in)                             \
-    (s_data).f32_sum -= pdsp_macro_queue_pop((s_data).s_queue);                \
+    (s_data).f32_sum -= (a_data)[(s_data).s_queue.i16_tail];                   \
+    (s_data).s_queue.i16_tail++;                                               \
+    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size)                \
+    {                                                                          \
+        (s_data).s_queue.i16_tail = 0;                                         \
+    }                                                                          \
     (s_data).f32_sum += (f32_in);                                              \
-    pdsp_macro_queue_push((s_data).s_queue, a_data, f32_in)
+    (s_data).s_queue.i16_head++;                                               \
+    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size)                \
+    {                                                                          \
+        (s_data).s_queue.i16_head = 0;                                         \
+    }                                                                          \
+    (a_data)[(s_data).s_queue.i16_head] = (f32_in)
+
+/**
+ * @brief (macro) Initialize / Clear rolling sum 6 struct.
+ * @param s_data Filter state variable struct pdsp_macro_rollsum6_t.
+ * @param size Size of the array.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
+ */
+#define pdsp_macro_rollsum6_init(s_data, size, i16_win_size)                   \
+    (s_data).f32_sum0 = 0.0f;                                                  \
+    (s_data).f32_sum1 = 0.0f;                                                  \
+    (s_data).f32_sum2 = 0.0f;                                                  \
+    (s_data).f32_sum3 = 0.0f;                                                  \
+    (s_data).f32_sum4 = 0.0f;                                                  \
+    (s_data).f32_sum5 = 0.0f;                                                  \
+    (s_data).s_queue.i16_size = (size);                                        \
+    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                    \
+    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;                 \
+    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size);    \
+    (s_data).f32_win_size_inv = pdsp_divf(1.0f, (pdsp_f32_t)(i16_win_size))
+
+/**
+ * @brief (macro) Calculate rolling sum 6.
+ * @param s_data Filter state memory struct pdsp_macro_rollsum_t.
+ * @param a_data Filter data array.
+ * @param f32_in Rolling sum input signal.
+ */
+#define pdsp_macro_rollsum6(s_data, a_data, f32_in0, f32_in1, f32_in2,         \
+                            f32_in3, f32_in4, f32_in5)                         \
+    (s_data).f32_sum0 -= (a_data)[0][(s_data).s_queue.i16_tail];               \
+    (s_data).f32_sum1 -= (a_data)[1][(s_data).s_queue.i16_tail];               \
+    (s_data).f32_sum2 -= (a_data)[2][(s_data).s_queue.i16_tail];               \
+    (s_data).f32_sum3 -= (a_data)[3][(s_data).s_queue.i16_tail];               \
+    (s_data).f32_sum4 -= (a_data)[4][(s_data).s_queue.i16_tail];               \
+    (s_data).f32_sum5 -= (a_data)[5][(s_data).s_queue.i16_tail];               \
+    (s_data).s_queue.i16_tail++;                                               \
+    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size)                \
+    {                                                                          \
+        (s_data).s_queue.i16_tail = 0;                                         \
+    }                                                                          \
+    (s_data).f32_sum0 += (f32_in0);                                            \
+    (s_data).f32_sum1 += (f32_in1);                                            \
+    (s_data).f32_sum2 += (f32_in2);                                            \
+    (s_data).f32_sum3 += (f32_in3);                                            \
+    (s_data).f32_sum4 += (f32_in4);                                            \
+    (s_data).f32_sum5 += (f32_in5);                                            \
+    (s_data).s_queue.i16_head++;                                               \
+    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size)                \
+    {                                                                          \
+        (s_data).s_queue.i16_head = 0;                                         \
+    }                                                                          \
+    (a_data)[0][(s_data).s_queue.i16_head] = (f32_in0);                        \
+    (a_data)[1][(s_data).s_queue.i16_head] = (f32_in1);                        \
+    (a_data)[2][(s_data).s_queue.i16_head] = (f32_in2);                        \
+    (a_data)[3][(s_data).s_queue.i16_head] = (f32_in3);                        \
+    (a_data)[4][(s_data).s_queue.i16_head] = (f32_in4);                        \
+    (a_data)[5][(s_data).s_queue.i16_head] = (f32_in5)
 
 /**
  * @brief (macro) Initialize / clear rolling averaging struct.
@@ -703,26 +801,79 @@ typedef struct pdsp_macro_rollsum_tag
     pdsp_macro_rollsum((s_data), (a_data), (f32_in) * (s_data).f32_win_size_inv)
 
 /**
- * @brief (macro) Initialize / clear rolling rms struct.
+ * @brief (macro) Initialize / clear rolling averaging 6 struct.
  * @param s_data Filter state variable struct pdsp_macro_rollsum_t.
  * @param size Size of the array.
  * @param i16_win_size Number of samples in the window. i16_win_size <=
  * queue size.
  */
-#define pdsp_macro_rollrms_init(s_data, size, i16_win_size)                    \
+#define pdsp_macro_rollavg6_init(s_data, size, i16_win_size)                   \
+    pdsp_macro_rollsum6_init((s_data), (size), (i16_win_size))
+
+/**
+ * @brief (macro) Calculate rolling averaging 6.
+ * @param s_data Filter state memory struct pdsp_macro_rollsum_t.
+ * @param a_data Filter data array.
+ * @param f32_in Filter input signal.
+ */
+#define pdsp_macro_rollavg6(s_data, a_data, f32_in0, f32_in1, f32_in2,         \
+                            f32_in3, f32_in4, f32_in5)                         \
+    pdsp_macro_rollsum6((s_data), (a_data),                                    \
+                        (f32_in) * (s_data).f32_win_size_inv,                  \
+                        (f32_in1) * (s_data).f32_win_size_inv,                 \
+                        (f32_in2) * (s_data).f32_win_size_inv,                 \
+                        (f32_in3) * (s_data).f32_win_size_inv,                 \
+                        (f32_in4) * (s_data).f32_win_size_inv,                 \
+                        (f32_in5) * (s_data).f32_win_size_inv)
+
+/**
+ * @brief (macro) Initialize / clear rolling mean sqauer struct.
+ * @param s_data Filter state variable struct pdsp_macro_rollsum_t.
+ * @param size Size of the array.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
+ */
+#define pdsp_macro_rollavgsq_init(s_data, size, i16_win_size)                  \
     pdsp_macro_rollsum_init((s_data), (size), (i16_win_size))
 
 /**
- * @brief (macro) Calculate rolling Root Mean Square filter.
+ * @brief (macro) Calculate rolling Root Mean Square.
  * @param s_data Filter state memory struct pdsp_macro_rollsum_t.
  * @param a_data Filter data array.
  * @param f32_in Filter input signal.
  * @param f32_out Filter output signal.
  */
-#define pdsp_macro_rollrms(s_data, a_data, f32_in, f32_out)                    \
-    pdsp_macro_rollsum((s_data), a_data,                                       \
+#define pdsp_macro_rollavgsq(s_data, a_data, f32_in, f32_out)                  \
+    pdsp_macro_rollsum((s_data), (a_data),                                     \
                        (f32_in) * (f32_in) * (s_data).f32_win_size_inv);       \
-    (f32_out) = pdsp_sqrtf((s_data).f32_sum);
+    (f32_out) = pdsp_sqrtf((s_data).f32_sum)
+
+/**
+ * @brief (macro) Initialize / clear rolling rms 6 struct.
+ * @param s_data Filter state variable struct pdsp_macro_rollsum_t.
+ * @param size Size of the array.
+ * @param i16_win_size Number of samples in the window. i16_win_size <=
+ * queue size.
+ */
+#define pdsp_macro_rollavgsq6_init(s_data, size, i16_win_size)                 \
+    pdsp_macro_rollsum6_init((s_data), (size), (i16_win_size))
+
+/**
+ * @brief (macro) Calculate rolling Root Mean Square 6.
+ * @param s_data Filter state memory struct pdsp_macro_rollsum_t.
+ * @param a_data Filter data array.
+ * @param f32_in Filter input signal.
+ * @param f32_out Filter output signal.
+ */
+#define pdsp_macro_rollavgsq6(s_data, a_data, f32_in0, f32_in1, f32_in2,       \
+                              f32_in3, f32_in4, f32_in5)                       \
+    pdsp_macro_rollsum6((s_data), (a_data),                                    \
+                        (f32_in0) * (f32_in0) * (s_data).f32_win_size_inv,     \
+                        (f32_in1) * (f32_in1) * (s_data).f32_win_size_inv,     \
+                        (f32_in2) * (f32_in2) * (s_data).f32_win_size_inv,     \
+                        (f32_in3) * (f32_in3) * (s_data).f32_win_size_inv,     \
+                        (f32_in4) * (f32_in4) * (s_data).f32_win_size_inv,     \
+                        (f32_in5) * (f32_in5) * (s_data).f32_win_size_inv);
 
 /** @} signal */
 
