@@ -1,8 +1,7 @@
-/** @file pdsp_cfg.h
+/** @file pdspm.h
  *
  * @author Falk Kyburz
- * @brief Configuration for pdsp module. This file is meant to be edited by the
- * user.
+ * @brief Power electronics digital signal processing module.
  *
  * @copyright
  * This is free and unencumbered software released into the public domain.
@@ -31,47 +30,26 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-#ifndef PDSP_CFG_H
-#define PDSP_CFG_H
+#ifndef PDSP_M_H
+#define PDSP_M_H
 
 /*==============================================================================
- USER CONFIGURATION
+ INCLUDE FILES
  =============================================================================*/
-
-/** Define the PDSP assert macro. */
-// #define PDSP_ASSERT(x)
-// #define PDSP_ASSERT(b_in) if(!(b_in)) while (1);
-#include <stdio.h>
-#define PDSP_ASSERT(b_in)                                                      \
-    if (!(b_in))                                                               \
-    printf("Assert failed: %s:%i\n", __FILE__, __LINE__)
-
-/** Uncomment to set all functions to static and include them in the psdp.h
- * file. */
-// #define PDSP_STATIC_FUNCTIONS
-
-/** Fixed point math integer size*/
-#define PDSP_FIXMATH_I32
-//#define PDSP_FIXMATH_I16
+#include "pdsp_cfg.h"
+#include "pdsp_math.h"
+#include "pdsp_types.h"
+#include <math.h>
 
 /*==============================================================================
- AUTOMATIC CONFIGURATION
+ PUBLIC TYPEDEFS
  =============================================================================*/
 
-/** Place PRAGMAs for TMS320 DSP optimization here */
-#if defined(__TMS320C2000__)
-#pragma CODE_SECTION(pdsp_stopwatch_start, ".TI.ramfunc")
-#pragma CODE_SECTION(pdsp_stopwatch_stop, ".TI.ramfunc")
-#endif
+/*==============================================================================
+ GLOBAL FUNCTIOS PROTOTYPES
+ =============================================================================*/
 
-/** Macro for for inline function definition in the header file. */
-#define pdsp_inline __attribute__((always_inline)) static inline
-
-/* Set pdsp_extern macro according to PDSP_STATIC_FUNCTIONS */
-#ifdef PDSP_STATIC_FUNCTIONS
-#define pdsp_extern static
-#else
-#define pdsp_extern extern
-#endif
-
-#endif /* PDSP_CFG_H */
+/*==============================================================================
+ ENF OF FILE
+ =============================================================================*/
+#endif /* PDSP_M_H */

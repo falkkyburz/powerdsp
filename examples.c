@@ -31,6 +31,8 @@
  */
 
 #include "pdsp.h"
+#include "pdsp_inline.h"
+#include "pdsp_macro.h"
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
