@@ -220,6 +220,60 @@ typedef struct pdsp_macro_rollavg3_tag
     pdsp_f32_t f32_win_size_inv;
 } pdsp_macro_rollavg3_t;
 
+/** PI controller parameter struct. */
+typedef struct pdsp_macro_pi_err_param_tag
+{
+    /** PI controller proportional gain. */
+    pdsp_f32_t f32_kp;
+    /** PI controller intrgral gain. */
+    pdsp_f32_t f32_ki;
+    /** PI controller saturation feedback gain. */
+    pdsp_f32_t f32_ks;
+    /** PI controller active decision gain. */
+    pdsp_f32_t f32_ka;
+} pdsp_macro_pi_err_param_t;
+
+/** PI controller struct. */
+typedef struct pdsp_macro_pi_tag
+{
+    /** Curretly active error input. */
+    pdsp_i16_t i16_active;
+    /** Currently active parameter array index for error0 */
+    pdsp_i16_t i16_param_idx;
+    /** PI controller state variable (integrator). */
+    pdsp_f32_t f32_x0;
+    /** PI controller state variable (saturation delta). */
+    pdsp_f32_t f32_x1;
+    /** PI controller sum variable. */
+    pdsp_f32_t f32_sum;
+    /** PI controller output variable. */
+    pdsp_f32_t f32_out;
+    /** Size of parameter struct */
+    pdsp_i16_t i16_param_size;
+    /** PI controller variable struct. */
+    pdsp_pi_var_t *ps_var;
+    /** PI saturation maximum value. */
+    pdsp_f32_t f32_max;
+    /** PI saturation minimum value. */
+    pdsp_f32_t f32_min;
+} pdsp_macro_pi_t;
+
+/** Set point state memory struct. */
+typedef struct pdsp_macro_setp_tag
+{
+    /** Setpoint minimum value. */
+    pdsp_f32_t f32_min;
+    /** Setpoint maximum value. */
+    pdsp_f32_t f32_max;
+    /** Absolute step size for ramp. First relative step for exponential
+     * process. */
+    pdsp_f32_t f32_step;
+    /** State memory for setpoint generator. */
+    pdsp_f32_t f32_x1;
+    /** Setpoint destination. */
+    pdsp_f32_t f32_dest;
+} pdsp_macro_setp_t;
+
 /** @} signal */
 
 /*==============================================================================
@@ -812,6 +866,134 @@ typedef struct pdsp_macro_rollavg3_tag
         (f32_curr) * (f32_curr) * (s_data).f32_win_size_inv;                   \
     (a_data)[(s_data).s_queue.i16_head][2] =                                   \
         (f32_volt) * (f32_curr) * (s_data).f32_win_size_inv
+
+/**
+ * @brief (macro) Initialize / clear pi controller struct.
+ * @param s_data Controller data struct.
+ */
+#define pdsp_macro_pi_clear(s_data)                                            \
+    (s_data).i16_active = 0U;                                                  \
+    (s_data).i16_param_idx = 0U;                                               \
+    (s_data).f32_x0 = 0.0f;                                                    \
+    (s_data).f32_x1 = 0.0f;
+
+/**
+ * @brief (macro) Calculate PI controller.
+ * @param s_data Controller data struct.
+ * @param as_param Controller parameter struct.
+ * @param f32_error Controller error signal input.
+ */
+#define pdsp_macro_pi(s_data, as_param, f32_error)                             \
+    (s_data).f32_x0 +=                                                         \
+        ((f32_error) * (as_param)[s_data.i16_param_idx].f32_ki +               \
+         (s_data).f32_x1 * (as_param)[(s_data).i16_param_idx].f32_ks);         \
+    (s_data).f32_sum =                                                         \
+        (f32_error) * (as_param)[(s_data).i16_param_idx].f32_kp +              \
+        (s_data).f32_x0;                                                       \
+    (s_data).f32_out = pdsp_maxf(                                              \
+        (s_data).f32_min, pdsp_minf((s_data).f32_max, (s_data).f32_sum));      \
+    (s_data).f32_x1 = (s_data).f32_out - (s_data).f32_sum
+
+/**
+ * @brief (macro) Calculate dual PI controller.
+ * @param s_data Controller data struct.
+ * @param f32_error Error array [2] signal input.
+ * @returns pdsp_f32_t Controller output.
+ */
+#define pdsp_macro_pi2(s_data, as_param, f32_error)                            \
+    (s_data).i16_active = 0;                                                   \
+    (s_data).i16_active +=                                                     \
+        ((f32_error)[0] * (as_param)[s_data.i16_param_idx][0].f32_ka) >        \
+        ((f32_error)[1] * (as_param)[s_data.i16_param_idx][1].f32_ka);         \
+    (s_data).f32_x0 +=                                                         \
+        ((f32_error)[(s_data).i16_active] *                                    \
+             (as_param)[s_data.i16_param_idx][(s_data).i16_active].f32_ki +    \
+         (s_data).f32_x1 *                                                     \
+             (as_param)[s_data.i16_param_idx][ps_var->i16_active].f32_ks);     \
+    (s_data).f32_sum = (f32_error[(s_data).i16_active]) *                      \
+                           (as_param)[(s_data).i16_param_idx].f32_kp +         \
+                       (s_data).f32_x0;                                        \
+    (s_data).f32_out = pdsp_maxf(                                              \
+        (s_data).f32_min, pdsp_minf((s_data).f32_max, (s_data).f32_sum));      \
+    (s_data).f32_x1 = (s_data).f32_out - (s_data).f32_sum
+
+/**
+ * @brief (macro) Set the PI controller to given state.
+ * @param s_data Controller data struct.
+ * @param f32_out Set controller output value.
+ */
+#define pdsp_macro_pi_set(s_data, f32_out)                                     \
+    (s_data).f32_x0 =                                                          \
+        pdsp_maxf((s_data).f32_min, pdsp_minf((s_data).f32_max, (f32_out)));   \
+    (s_data).f32_x1 = 0.0f
+
+/**
+ * @brief (macro) Initialize set point processor struct.
+ * @param s_state Set point state memory struct.
+ */
+#define pdsp_macro_setp_init(s_state)                                          \
+    (s_state).f32_x1 = 0.0f;                                                   \
+    (s_state).f32_dest = 0.0f
+
+/**
+ * @brief (macro) Calculate simple set point processor generating a ramp.
+ * @details
+ * @param s_state Set point state memory struct.
+ * @returns pdsp_f32_t Set point output.
+ */
+#define pdsp_macro_setp_ramp(s_state)                                          \
+    (s_state).f32_x1 =                                                         \
+        (s_state).f32_x1 +                                                     \
+        pdsp_maxf(pdsp_minf((s_state).f32_dest - (s_state).f32_x1,             \
+                            (s_data).f32_step),                                \
+                  -(s_data).f32_step)
+
+/**
+ * @brief (macro) Calculate simple set point processor generating an exponential
+ * settling process.
+ * @param s_state Set point state memory struct.
+ * @returns pdsp_f32_t Set point output.
+ */
+#define pdsp_macro_setp_exp(s_state)                                           \
+    (s_state).f32_x1 =                                                         \
+        (s_state).f32_x1 +                                                     \
+        (s_state).f32_step * ((s_state).f32_dest - (s_state).f32_x1)
+
+/**
+ * @brief (macro) Set destination of simple set point processor.
+ * @param ps_state Set point state memory struct.
+ * @param f32_dest Set point destination.
+ * @returns pdsp_status_t PDSP_OK
+ */
+#define pdsp_macro_setp_set_dest(s_state, f32_dest)                            \
+    (s_state).f32_dest =                                                       \
+        pdsp_maxf(pdsp_minf((f32_dest), (s_data).f32_max), (s_data).f32_min)
+
+/**
+ * @brief (macro) Set the state to the destination.
+ * @param ps_state Set point state memory struct.
+ * @returns pdsp_f32_t Set point output.
+ */
+#define pdsp_macro_setp_step(s_state) (s_state).f32_x1 = (s_state).f32_dest
+
+/**
+ * @brief (macro) Set the state to a defined value.
+ * @param ps_state Set point state memory struct.
+ * @param f32_value Set point value to step to.
+ * @returns pdsp_f32_t Set point output.
+ */
+#define pdsp_macrosetp_reset(s_state, f32_value)                               \
+    (s_state).f32_x1 = pdsp_maxf(pdsp_minf((f32_value), (s_state).f32_max),    \
+                                 (s_state).f32_min)
+
+/**
+ * @brief (macro) Set point reached.
+ * @param ps_state Set point state memory struct.
+ * @param f32_tol Tolarance for detection.
+ * @returns pdsp_bool_t
+ */
+#define pdsp_macro_setp_reached(s_state, f32_tol)                              \
+    (pdsp_bool_t)(fabsf((s_state).f32_x1 - (s_state).f32_dest) < (f32_tol))
 
 /** @} signal */
 

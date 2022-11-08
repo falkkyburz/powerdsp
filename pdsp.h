@@ -453,52 +453,6 @@ typedef struct pdsp_rollsum_tag
     const pdsp_queue_t *ps_queue;
 } pdsp_rollsum_t;
 
-// /** Rolling sum variable struct. */
-// typedef struct pdsp_rollsum_3f32_var_tag
-// {
-//     /** Sum of history array (divided by size) */
-//     pdsp_f32_t f32_sum0;
-//     /** Sum of history array (divided by size) */
-//     pdsp_f32_t f32_sum1;
-//     /** Sum of history array (divided by size) */
-//     pdsp_f32_t f32_sum2;
-//     /** Sum of history array (divided by size) */
-//     pdsp_f32_t f32_sum3;
-//     /** Sum of history array (divided by size) */
-//     pdsp_f32_t f32_sum4;
-//     /** Sum of history array (divided by size) */
-//     pdsp_f32_t f32_sum5;
-//     /** Head index of the queue. */
-//     pdsp_i16_t i16_head;
-//     /** Tail index of the queue. */
-//     pdsp_i16_t i16_tail;
-//     /** Number of items in the queue. */
-//     pdsp_i16_t i16_count;
-//     /** Inverse window length. */
-//     pdsp_f32_t f32_win_size_inv;
-// } pdsp_rollsum_3f32_var_t;
-
-// /** Rolling sum data struct. */
-// typedef struct pdsp_rollsum_3f32_tag
-// {
-//     /** Pointer to the pdsp_rollsum_t struct. */
-//     pdsp_rollsum_3f32_var_t *ps_var;
-//     /** Size of the data array. */
-//     pdsp_i16_t i16_size;
-//     /** Pointer to the data array 0. */
-//     pdsp_f32_t *paf32_data0;
-//     /** Pointer to the data array 1. */
-//     pdsp_f32_t *paf32_data1;
-//     /** Pointer to the data array 2. */
-//     pdsp_f32_t *paf32_data2;
-//     /** Pointer to the data array 3. */
-//     pdsp_f32_t *paf32_data3;
-//     /** Pointer to the data array 4. */
-//     pdsp_f32_t *paf32_data4;
-//     /** Pointer to the data array 5. */
-//     pdsp_f32_t *paf32_data5;
-// } pdsp_rollsum_3f32_t;
-
 /** @} signal */
 /* ------------------------------------------------------------------------ */
 /** @addtogroup control Control

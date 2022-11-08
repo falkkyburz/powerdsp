@@ -303,24 +303,12 @@ pdsp_inline pdsp_f32_t iq16_q15tof(pdsp_i16_t i16_in)
 /** @}*/
 
 /**
- * @defgroup fixshift Fixed point integer shifting.
- * @brief Fixed point integer multiplication and division by arithmetic shift.
+ * @defgroup fixshift Fixed point shifting division.
+ * @brief Fixed point integer division by arithmetic shift.
  * @param i16_in Fixed point integer input.
  * @return pdsp_i16_t Multiplication or division output.
  * @{
  */
-/** @brief Fixed point multiplication by 2. */
-pdsp_inline pdsp_i16_t iq16_mul2(pdsp_i16_t iq_in) { return iq_in << 1; }
-/** @brief Fixed point multiplication by 4. */
-pdsp_inline pdsp_i16_t iq16_mul4(pdsp_i16_t iq_in) { return iq_in << 2; }
-/** @brief Fixed point multiplication by 8. */
-pdsp_inline pdsp_i16_t iq16_mul8(pdsp_i16_t iq_in) { return iq_in << 3; }
-/** @brief Fixed point multiplication by 16. */
-pdsp_inline pdsp_i16_t iq16_mul16(pdsp_i16_t iq_in) { return iq_in << 4; }
-/** @brief Fixed point multiplication by 32. */
-pdsp_inline pdsp_i16_t iq16_mul32(pdsp_i16_t iq_in) { return iq_in << 5; }
-/** @brief Fixed point multiplication by 64. */
-pdsp_inline pdsp_i16_t iq16_mul64(pdsp_i16_t iq_in) { return iq_in << 6; }
 /** @brief Fixed point division by 2. */
 pdsp_inline pdsp_i16_t iq16_div2(pdsp_i16_t iq_in) { return iq_in >> 1; }
 /** @brief Fixed point division by 4. */
@@ -343,21 +331,174 @@ pdsp_inline pdsp_i16_t iq16_div64(pdsp_i16_t iq_in) { return iq_in >> 6; }
  * @return pdsp_i16_t Multiplication output.
  * @{
  */
-/** @brief Fixed point multiplication (no rounding). */
+/** @brief Fixed point multiplication iq0 * iq0 without rounding. */
 pdsp_inline pdsp_i16_t iq16_mulq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
 {
-    return (pdsp_i16_t)((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1);
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1));
 }
-/** @brief Fixed point multiplication ( rounding). */
+/** @brief Fixed point multiplication iq1 * iq1 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq1(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 1);
+}
+/** @brief Fixed point multiplication iq2 * iq2 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq2(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 2);
+}
+/** @brief Fixed point multiplication iq3 * iq3 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq3(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 3);
+}
+/** @brief Fixed point multiplication iq4 * iq4 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq4(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 4);
+}
+/** @brief Fixed point multiplication iq5 * iq5 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq5(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 5);
+}
+/** @brief Fixed point multiplication iq6 * iq6 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq6(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 6);
+}
+/** @brief Fixed point multiplication iq7 * iq7 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq7(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 7);
+}
+/** @brief Fixed point multiplication iq8 * iq8 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq8(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 8);
+}
+/** @brief Fixed point multiplication iq9 * iq9 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq9(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 9);
+}
+/** @brief Fixed point multiplication iq10 * iq10 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq10(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 10);
+}
+/** @brief Fixed point multiplication iq11 * iq11 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq11(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 11);
+}
+/** @brief Fixed point multiplication iq12 * iq12 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq12(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 12);
+}
+/** @brief Fixed point multiplication iq13 * iq13 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq13(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 13);
+}
+/** @brief Fixed point multiplication iq14 * iq14 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq14(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 14);
+}
+/** @brief Fixed point multiplication iq15 * iq15 without rounding. */
+pdsp_inline pdsp_i16_t iq16_mulq15(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) >> 15);
+}
+
+/** @brief Fixed point multiplication iq0 * iq0 without rounding. */
 pdsp_inline pdsp_i16_t iq16_rmulq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
 {
-    return 0;
+    return (pdsp_i16_t)(((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1));
 }
+/** @brief Fixed point multiplication iq1 * iq1 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq1(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 1) >> 1);
+}
+/** @brief Fixed point multiplication iq2 * iq2 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq2(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 2) >> 2);
+}
+/** @brief Fixed point multiplication iq3 * iq3 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq3(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 4) >> 3);
+}
+/** @brief Fixed point multiplication iq4 * iq4 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq4(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 8) >> 4);
+}
+/** @brief Fixed point multiplication iq5 * iq5 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq5(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 16) >> 5);
+}
+/** @brief Fixed point multiplication iq6 * iq6 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq6(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 32) >> 6);
+}
+/** @brief Fixed point multiplication iq7 * iq7 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq7(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 64) >> 7);
+}
+/** @brief Fixed point multiplication iq8 * iq8 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq8(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 128) >> 8);
+}
+/** @brief Fixed point multiplication iq9 * iq9 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq9(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 256) >> 9);
+}
+/** @brief Fixed point multiplication iq10 * iq10 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq10(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 512) >> 10);
+}
+/** @brief Fixed point multiplication iq11 * iq11 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq11(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 1024) >> 11);
+}
+/** @brief Fixed point multiplication iq12 * iq12 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq12(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 2048) >> 12);
+}
+/** @brief Fixed point multiplication iq13 * iq13 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq13(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 4096) >> 13);
+}
+/** @brief Fixed point multiplication iq14 * iq14 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq14(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 8192) >> 14);
+}
+/** @brief Fixed point multiplication iq15 * iq15 without rounding. */
+pdsp_inline pdsp_i16_t iq16_rmulq15(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
+{
+    return (pdsp_i16_t)((((pdsp_i32_t)iq_in0 * (pdsp_i32_t)iq_in1) + 16384) >> 15);
+}
+
 /** @brief Fixed point multiplication ( rounding). */
 pdsp_inline pdsp_i16_t iq16_rsmulq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
 {
     return 0;
 }
+
 /** @brief Fixed point division (no rounding). */
 pdsp_inline pdsp_i16_t iq16_divq0(pdsp_i16_t iq_in0, pdsp_i16_t iq_in1)
 {
