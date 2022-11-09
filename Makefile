@@ -2,11 +2,11 @@ TARGET = example
 CC = gcc
 SIZE = size
 OBJDUMP = objdump
-CFLAGS = -Wall -O0
+CFLAGS = -Wall
 INC=-I./
 
 .PHONY: all
-all: $(TARGET) info help run
+all: clean $(TARGET) info help run
 
 $(TARGET): pdsp.o examples.o
 	$(info Link target:)

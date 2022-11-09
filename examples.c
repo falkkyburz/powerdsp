@@ -1020,22 +1020,23 @@ void example_fixmath(void)
     PDSP_ASSERT(iq16_div32(-32) == -1);
     PDSP_ASSERT(iq16_div64(-64) == -1);
     PDSP_ASSERT(iq16_q0tof(iq16_mulq0(iq16_ftoq0(10.0f), iq16_ftoq0(10.0f))) == 100.0f);
-    PDSP_ASSERT(iq16_q1tof(iq16_mulq1(iq16_ftoq1(10.0f), iq16_ftoq1(10.0f))) == 100.0f);
-    PDSP_ASSERT(iq16_q2tof(iq16_mulq2(iq16_ftoq2(10.0f), iq16_ftoq2(10.0f))) == 100.0f);
+    PDSP_ASSERT(iq16_q1tof(iq16_mulq1(iq16_ftoq1(10.5f), iq16_ftoq1(10.5f))) == 110.0f);
+    PDSP_ASSERT(iq16_q2tof(iq16_mulq2(iq16_ftoq2(10.5f), iq16_ftoq2(10.5f))) == 110.25f);
     PDSP_ASSERT(iq16_q3tof(iq16_mulq3(iq16_ftoq3(10.0f), iq16_ftoq3(10.0f))) == 100.0f);
     PDSP_ASSERT(iq16_q4tof(iq16_mulq4(iq16_ftoq4(10.0f), iq16_ftoq4(10.0f))) == 100.0f);
     PDSP_ASSERT(iq16_q5tof(iq16_mulq5(iq16_ftoq5(10.0f), iq16_ftoq5(10.0f))) == 100.0f);
     PDSP_ASSERT(iq16_q6tof(iq16_mulq6(iq16_ftoq6(10.0f), iq16_ftoq6(10.0f))) == 100.0f);
     PDSP_ASSERT(iq16_q7tof(iq16_mulq7(iq16_ftoq7(10.0f), iq16_ftoq7(10.0f))) == 100.0f);
-    PDSP_ASSERT(iq16_q8tof(iq16_mulq8(iq16_ftoq8(10.0f), iq16_ftoq8(10.0f))) == 100.0f);
+    PDSP_ASSERT(iq16_q8tof(iq16_mulq8(iq16_ftoq8(10.5f), iq16_ftoq8(10.5f))) == 110.25f);
     PDSP_ASSERT(iq16_q9tof(iq16_mulq9(iq16_ftoq9(1.0f), iq16_ftoq9(10.0f))) == 10.0f);
     PDSP_ASSERT(iq16_q10tof(iq16_mulq10(iq16_ftoq10(1.0f), iq16_ftoq10(2.0f))) == 2.0f);
     PDSP_ASSERT(iq16_q11tof(iq16_mulq11(iq16_ftoq11(1.0f), iq16_ftoq11(2.0f))) == 2.0f);
     PDSP_ASSERT(iq16_q12tof(iq16_mulq12(iq16_ftoq12(1.0f), iq16_ftoq12(2.0f))) == 2.0f);
     PDSP_ASSERT(iq16_q13tof(iq16_mulq13(iq16_ftoq13(0.25f), iq16_ftoq13(0.25f))) == 0.0625f);
     PDSP_ASSERT(iq16_q14tof(iq16_mulq14(iq16_ftoq14(0.25f), iq16_ftoq14(0.25f))) == 0.0625f);
+    PDSP_ASSERT(iq16_q15tof(iq16_mulq15(iq16_ftoq15(0.25f), iq16_ftoq15(0.25f))) == 0.0625f);
     PDSP_ASSERT(iq16_q0tof(iq16_rmulq0(iq16_ftoq0(10.0f), iq16_ftoq0(10.0f))) == 100.0f);
-    PDSP_ASSERT(iq16_q1tof(iq16_rmulq1(iq16_ftoq1(10.0f), iq16_ftoq1(10.0f))) == 100.0f);
+    PDSP_ASSERT(iq16_q1tof(iq16_rmulq1(iq16_ftoq1(10.5f), iq16_ftoq1(10.5f))) == 110.5f);
     PDSP_ASSERT(iq16_q2tof(iq16_rmulq2(iq16_ftoq2(10.0f), iq16_ftoq2(10.0f))) == 100.0f);
     PDSP_ASSERT(iq16_q3tof(iq16_rmulq3(iq16_ftoq3(10.0f), iq16_ftoq3(10.0f))) == 100.0f);
     PDSP_ASSERT(iq16_q4tof(iq16_rmulq4(iq16_ftoq4(10.0f), iq16_ftoq4(10.0f))) == 100.0f);
@@ -1049,6 +1050,17 @@ void example_fixmath(void)
     PDSP_ASSERT(iq16_q12tof(iq16_rmulq12(iq16_ftoq12(1.0f), iq16_ftoq12(2.0f))) == 2.0f);
     PDSP_ASSERT(iq16_q13tof(iq16_rmulq13(iq16_ftoq13(0.25f), iq16_ftoq13(0.25f))) == 0.0625f);
     PDSP_ASSERT(iq16_q14tof(iq16_rmulq14(iq16_ftoq14(0.25f), iq16_ftoq14(0.25f))) == 0.0625f);
+    PDSP_ASSERT(iq16_q15tof(iq16_rmulq15(iq16_ftoq15(0.25f), iq16_ftoq15(0.25f))) == 0.0625f);
+
+    pdsp_i16_t test0 = iq16_ftoq8(1.5f);
+    pdsp_i16_t test1 = iq16_ftoq8(10.5f);
+    pdsp_i16_t test2 = 0;
+    test2 = iq16_mulq8(test0, test1);
+    test2 = iq16_mulq8(test1, test2);
+    test2 = iq16_mulq8(test0, test1);
+    test2 = iq16_mulq8(test1, test2);
+
+
 }
 
 int main()

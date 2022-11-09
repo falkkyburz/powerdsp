@@ -66,10 +66,12 @@
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 /** 64bit unsigned integer type.  */
 typedef unsigned long long pdsp_u64_t;
+/** 64bit signed integer type.  */
+typedef long long pdsp_i64_t;
 /** 32bit floating point type. */
 typedef float pdsp_f32_t;
 /** 64bit floating point type. */
-typedef float pdsp_f64_t;
+typedef double pdsp_f64_t;
 /** 32bit integer type. */
 typedef int pdsp_i32_t;
 /** 32bit unsigned integer type.  */
@@ -88,7 +90,9 @@ typedef char pdsp_char_t;
 #define PDSP_MCU
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 typedef unsigned long long pdsp_u64_t;
+typedef long long pdsp_i64_t;
 typedef float pdsp_f32_t;
+typedef double pdsp_f64_t;
 typedef long pdsp_i32_t;
 typedef unsigned long pdsp_u32_t;
 typedef int pdsp_i16_t;
