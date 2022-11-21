@@ -1,51 +1,51 @@
-TARGET = test
-CC = gcc
-SIZE = size
-OBJDUMP = objdump
-CFLAGS = -Wall
-INC=-I./
+TEST=.\test
+SRC=.
+BUILD=.\build
+TARGET=pdsp_test
+CC=gcc
+SIZE=size
+OBJDUMP=objdump
+CFLAGS=-Wall
+INC=-I.\
 
 .PHONY: all
-all: clean $(TARGET) info help run
+all: clean prepare $(BUILD)\$(TARGET) info help run
 
-$(TARGET): pdsp.o pdsp_test.o
+prepare:
+	mkdir $(BUILD)
+
+$(BUILD)\$(TARGET): $(BUILD)\pdsp.o $(BUILD)\pdsp_test.o
 	$(info Link target:)
 	$(CC) $(CFLAGS) -o $@ $^
 
-pdsp.o: pdsp.c
+$(BUILD)\pdsp.o: $(SRC)\pdsp.c
 	$(info Compile pdsp.c:)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
-	$(CC) $(CFLAGS) $(INC) -S -fverbose-asm $<
 
-pdsp_test.o: pdsp_test.c
-	$(info Compile pdsp_test.c:)
+$(BUILD)\pdsp_test.o: $(TEST)\pdsp_test.c
+	$(info Compile .\test\pdsp_test.c:)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
-	$(CC) $(CFLAGS) $(INC) -S -fverbose-asm $<
 
-info: pdsp.o
+info: $(BUILD)\pdsp.o
 	$(info Print size and disassemble:)
-	$(SIZE) pdsp.o
-	$(OBJDUMP) -d pdsp.o > pdsp.dis
-	$(OBJDUMP) -x pdsp.o > pdsp.map
+	$(SIZE) $(BUILD)\pdsp.o
+	$(OBJDUMP) -d $(BUILD)\pdsp.o > $(BUILD)\pdsp.dis
+	$(OBJDUMP) -x $(BUILD)\pdsp.o > $(BUILD)\pdsp.map
+	$(OBJDUMP) -d $(BUILD)\pdsp_test.o > $(BUILD)\pdsp_test.dis
+	$(OBJDUMP) -x $(BUILD)\pdsp_test.o > $(BUILD)\pdsp_test.map
+	$(CC) $(CFLAGS) $(INC) -S -fverbose-asm -o $(BUILD)\pdsp.s $(SRC)\pdsp.c
+	$(CC) $(CFLAGS) $(INC) -S -fverbose-asm -o $(BUILD)\pdsp_test.s $(TEST)\pdsp_test.c
 
 .PHONY: clean
 clean:
-	del $(TARGET).exe
-	del pdsp.o
-	del pdsp.dis
-	del pdsp.s
-	del pdsp.map
-	del pdsp_test.o
-	del pdsp_test.s
+	if exist $(BUILD) rmdir /s /q $(BUILD)
 	del doxylog.txt
 	if exist html rmdir /s /q html
-	if exist test rmdir /s /q test
 
-help: pdsp.h
+help: $(SRC)\pdsp.h
 	$(info Generate help:)
 	doxygen Doxyfile > doxylog.txt
 
-run: $(TARGET)
+run: $(BUILD)\$(TARGET)
 	$(info Run target:)
-	mkdir test
-	$(TARGET)
+	$(BUILD)\$(TARGET)
