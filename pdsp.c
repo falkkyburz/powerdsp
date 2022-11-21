@@ -929,6 +929,12 @@ pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in)
     ps_var->f32_delta = ps_var->f32_max - ps_var->f32_min;
 }
 
+pdsp_extern void pdsp_expavg_c2d(pdsp_expavg_t *ps_data, pdsp_f32_t f32_ts,
+                                 pdsp_f32_t f32_fc)
+{
+    ps_data->f32_tau = f32_ts * 2.0f * PDSP_PI_F * f32_fc;
+}
+
 pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
@@ -1934,7 +1940,8 @@ pdsp_extern pdsp_bool_t pdsp_sfra_running(pdsp_sfra_t *ps_data)
 pdsp_extern void pdsp_sfra_inject(pdsp_sfra_t *ps_data)
 {
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    *ps_data->f32_inject += ps_data->ps_var->f32_sin_val;
+    *ps_data->f32_inject +=
+        ps_data->ps_var->f32_sin_val * ps_data->ps_var->f32_inj_gain;
 }
 
 pdsp_extern void pdsp_sfra_process(pdsp_sfra_t *ps_data)
@@ -2124,7 +2131,6 @@ pdsp_extern pdsp_u16_t pdsp_aout(const pdsp_aout_t *ps_data)
     }
     return 0;
 }
-
 
 /* pdsp_inline pdsp_iq_t iq_mul2(pdsp_iq_t iq_in) { return iq_in << 1; }
 

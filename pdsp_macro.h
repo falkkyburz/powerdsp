@@ -274,6 +274,55 @@ typedef struct pdsp_macro_setp_tag
     pdsp_f32_t f32_dest;
 } pdsp_macro_setp_t;
 
+/** Software frequency response analyzer transfer function pair */
+typedef struct pdsp_macro_sfra_tag
+{
+    /** SFRA running */
+    pdsp_bool_t b_running;
+    /** Injection gain */
+    pdsp_f32_t f32_inj_gain;
+    /** Pre computed sine value. */
+    pdsp_f32_t f32_sin_val;
+    /** Pre computed sine value. */
+    pdsp_f32_t f32_cos_val;
+    /** Phase of quadrature values. */
+    pdsp_f32_t f32_phase;
+    /** Cycle counter. Abort if number of averaging cycles is reached. */
+    pdsp_u16_t u16_cycle_cnt;
+    /** Index in the bode array. */
+    pdsp_u16_t u16_bode_cnt;
+    /** Tau of exponential averaging filter. */
+    pdsp_f32_t f32_avg_tau;
+    /** Average of input sine values. */
+    pdsp_f32_t f32_avg_in_sin;
+    /** Average of input cos values */
+    pdsp_f32_t f32_avg_in_cos;
+    /** Average of input sine values. */
+    pdsp_f32_t f32_avg_out_sin;
+    /** Average of input cos values */
+    pdsp_f32_t f32_avg_out_cos;
+    /** Period array (1/frequency array). */
+    pdsp_f32_t *f32_bode_step;
+    /** Complex result array for real part. */
+    pdsp_f32_t *f32_bode_in_re;
+    /** Complex result array for imaginary part. */
+    pdsp_f32_t *f32_bode_in_im;
+    /** Complex result array for real part. */
+    pdsp_f32_t *f32_bode_out_re;
+    /** Complex result array for imaginary part. */
+    pdsp_f32_t *f32_bode_out_im;
+    /** Size of period and complex array (they must have the same length). */
+    pdsp_u16_t u16_bode_size;
+    /** Flaoting point transfer function injection destination signal. */
+    pdsp_f32_t *f32_inject;
+    /** Flaoting point transfer function input signal. */
+    pdsp_f32_t *f32_in;
+    /** Flaoting point transfer function output signal. */
+    pdsp_f32_t *f32_out;
+    /** Number of averaging cycles count-down per frequency. */
+    pdsp_f32_t f32_avg_cyc;
+} pdsp_macro_sfra_t;
+
 /** @} signal */
 
 /*==============================================================================
@@ -995,6 +1044,85 @@ typedef struct pdsp_macro_setp_tag
 #define pdsp_macro_setp_reached(s_state, f32_tol)                              \
     (pdsp_bool_t)(fabsf((s_state).f32_x1 - (s_state).f32_dest) < (f32_tol))
 
+/**
+ * @brief Clear all data in the SFRA struct.
+ * @param s_data SFRA data struct.
+ */
+#define pdsp_macro_sfra_clear(s_data)                                          \
+    (s_data).b_running = PDSP_FALSE;                                           \
+    (s_data).f32_sin_val = 0.0f;                                               \
+    (s_data).f32_cos_val = 0.0f;                                               \
+    (s_data).f32_phase = 0.0f;                                                 \
+    (s_data).u16_cycle_cnt = 0U;                                               \
+    (s_data).u16_bode_cnt = 0U;                                                \
+    (s_data).f32_avg_in_sin = 0.0f;                                            \
+    (s_data).f32_avg_in_cos = 0.0f;                                            \
+    (s_data).f32_avg_out_sin = 0.0f;                                           \
+    (s_data).f32_avg_out_cos = 0.0f
+
+/**
+ * @brief Start SFRA bode sweep.
+ * @param s_data SFRA data struct.
+ */
+#define pdsp_macro_sfra_start(s_data) (s_data).b_running = PDSP_TRUE
+
+/**
+ * @brief Software frequency response analysis processing function.
+ * @details Use pdsp_sfra_running guard when executing this function.
+ * @param s_data SFRA data struct.
+ */
+#define pdsp_macro_sfra_process(s_data, af32_step, af32_result)                \
+    if ((s_data).b_running == PDSP_TRUE)                                       \
+    {                                                                          \
+        (s_data).f32_avg_in_sin +=                                             \
+            (s_data).f32_avg_tau *                                             \
+            ((*(s_data).f32_input * (s_data).f32_sin_val) -                    \
+             (s_data).f32_avg_in_sin);                                         \
+        (s_data).f32_avg_in_cos +=                                             \
+            (s_data).f32_avg_tau *                                             \
+            ((*(s_data).f32_input * (s_data).f32_cos_val) -                    \
+             (s_data).f32_avg_in_cos);                                         \
+        (s_data).f32_avg_out_sin +=                                            \
+            (s_data).f32_avg_tau *                                             \
+            ((*(s_data).f32_output * (s_data).f32_sin_val) -                   \
+             (s_data).f32_avg_in_sin);                                         \
+        (s_data).f32_avg_out_cos +=                                            \
+            (s_data).f32_avg_tau *                                             \
+            ((*(s_data).f32_output * (s_data).f32_cos_val) -                   \
+             (s_data).f32_avg_in_cos);                                         \
+        (s_data).f32_sin_val =                                                 \
+            pdsp_sinf((s_data).f32_phase) * (s_data).f32_inj_gain;             \
+        (s_data).f32_cos_val =                                                 \
+            pdsp_cosf((s_data).f32_phase) * (s_data).f32_inj_gain;             \
+        *(s_data).f32_inject += (s_data).f32_sin_val;                          \
+        (s_data).f32_phase += (af32_step)[(s_data).u16_bode_cnt];              \
+        if ((s_data).f32_phase > PDSP_2_PI_F)                                  \
+        {                                                                      \
+            (s_data).f32_phase = 0.0f;                                         \
+            (s_data).u16_cycle_cnt++;                                          \
+            if ((s_data).u16_cycle_cnt > (s_data).f32_avg_cyc)                 \
+            {                                                                  \
+                (af32_result)[(s_data).u16_bode_cnt][0] =                      \
+                    (s_data).f32_avg_in_sin;                                   \
+                (s_data).f32_avg_in_sin = 0.0f;                                \
+                (af32_result)[(s_data).u16_bode_cnt][1] =                      \
+                    (s_data).f32_avg_in_cos;                                   \
+                (s_data).f32_avg_in_cos = 0.0f;                                \
+                (af32_result)[(s_data).u16_bode_cnt][2] =                      \
+                    (s_data).f32_avg_out_sin;                                  \
+                (s_data).f32_avg_out_sin = 0.0f;                               \
+                (af32_result)[(s_data).u16_bode_cnt][3] =                      \
+                    (s_data).f32_avg_out_cos;                                  \
+                (s_data).f32_avg_out_cos = 0.0f;                               \
+                (s_data).u16_bode_cnt++;                                       \
+            }                                                                  \
+            if ((s_data).u16_bode_cnt >= (s_data).ps_bode->u16_bode_size)      \
+            {                                                                  \
+                (s_data).u16_bode_cnt = 0;                                     \
+                (s_data).b_running = PDSP_FALSE;                               \
+            }                                                                  \
+        }                                                                      \
+    }
 /** @} signal */
 
 /*==============================================================================

@@ -780,6 +780,8 @@ typedef struct pdsp_sfra_var_tag
 {
     /** SFRA running */
     pdsp_bool_t b_running;
+    /** Injection gain */
+    pdsp_f32_t f32_inj_gain;
     /** Pre computed sine value. */
     pdsp_f32_t f32_sin_val;
     /** Pre computed sine value. */
@@ -1596,13 +1598,26 @@ pdsp_extern void pdsp_minmax_clear(pdsp_minmax_var_t *ps_var);
 pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in);
 
 /**
+ * @brief Calculate the exponential averaging coefficient.
+ * @details The coefficient is effectively the time constant of the countinuous
+ * system converted to discrete time. It is the time for the step response to 
+ * reach 1-1/e ≈ 63.2%. This funcion is an approximation for the case where
+ * ts << 2*pi*fc
+ * @param ps_data Filter state variable struct.
+ * @param f32_ts Sampling time of the filter.
+ * @param f32_fc Corner freuency of the filter.
+ */
+pdsp_extern void pdsp_expavg_c2d(pdsp_expavg_t *ps_data, pdsp_f32_t f32_ts,
+                                 pdsp_f32_t f32_fc);
+
+/**
  * @brief Initialize / Clear simple exponential average struct.
  * @param ps_data Filter state variable struct.
  */
 pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data);
 
 /**
- * @brief Calculate simplple exponential averaging filter.
+ * @brief Exponential moving average filter.
  * @param ps_data Filter state variable struct.
  * @param f32_in Filter input.
  * @returns pdsp_f32_t Filter ouptut.
