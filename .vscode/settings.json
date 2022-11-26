@@ -1,3 +1,20 @@
 {
+    "cSpell.words": [
+        "biquad",
+        "ddsrf",
+        "delayrf",
+        "dpll",
+        "expavg",
+        "hyst",
+        "linspace",
+        "pdsp",
+        "rollavg",
+        "rollrms",
+        "rollsum",
+        "sfra",
+        "sogi",
+        "srec",
+        "srecord"
+    ]
 
 }

@@ -159,24 +159,24 @@ void test_map_idx(void)
     PDSP_ASSERT(pdsp_map_idx(3.0f, 1.0f, 2.0f, 10.0) == 10);
 }
 
-void test_interpollate_2d(void)
+void test_interpolate_2d(void)
 {
-    printf("-- void test_interpollate_2d(void) --\n");
+    printf("-- void pdsp_interpolate_2d(void) --\n");
     const pdsp_f32_t xarr[5] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f};
     const pdsp_f32_t yarr[5] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f};
     const pdsp_f32_t yarrn[5] = {0.0f, -1.0f, -2.0f, -3.0f, -4.0f};
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, -0.5f) == -0.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 0.5f) == 0.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 1.5f) == 1.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 2.5f) == 2.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 3.5f) == 3.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarr, 5, 4.5f) == 4.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, -0.5f) == 0.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 0.5f) == -0.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 1.5f) == -1.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 2.5f) == -2.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 3.5f) == -3.5f);
-    PDSP_ASSERT(pdsp_interpollate_2d(xarr, yarrn, 5, 4.5f) == -4.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarr, 5, -0.5f) == -0.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarr, 5, 0.5f) == 0.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarr, 5, 1.5f) == 1.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarr, 5, 2.5f) == 2.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarr, 5, 3.5f) == 3.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarr, 5, 4.5f) == 4.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarrn, 5, -0.5f) == 0.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarrn, 5, 0.5f) == -0.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarrn, 5, 1.5f) == -1.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarrn, 5, 2.5f) == -2.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarrn, 5, 3.5f) == -3.5f);
+    PDSP_ASSERT(pdsp_interpolate_2d(xarr, yarrn, 5, 4.5f) == -4.5f);
 }
 
 void test_array_set(void)
@@ -1388,7 +1388,7 @@ int main()
     test_array_set();
     test_array_apply();
     test_array_linlogspace();
-    test_interpollate_2d();
+    test_interpolate_2d();
     test_hysteresis_value();
     test_hysteresis_list();
     test_debounce();

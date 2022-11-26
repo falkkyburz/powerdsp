@@ -105,7 +105,7 @@ typedef struct pdsp_macro_minmax_var_tag
 {
     /** Minimum value since last clear. */
     pdsp_f32_t f32_min;
-    /** Maximum value sincce last clear. */
+    /** Maximum value since last clear. */
     pdsp_f32_t f32_max;
     /** Delta (max-min) value since last clear. */
     pdsp_f32_t f32_delta;
@@ -225,7 +225,7 @@ typedef struct pdsp_macro_pi_err_param_tag
 {
     /** PI controller proportional gain. */
     pdsp_f32_t f32_kp;
-    /** PI controller intrgral gain. */
+    /** PI controller integral gain. */
     pdsp_f32_t f32_ki;
     /** PI controller saturation feedback gain. */
     pdsp_f32_t f32_ks;
@@ -236,7 +236,7 @@ typedef struct pdsp_macro_pi_err_param_tag
 /** PI controller struct. */
 typedef struct pdsp_macro_pi_tag
 {
-    /** Curretly active error input. */
+    /** Currently active error input. */
     pdsp_i16_t i16_active;
     /** Currently active parameter array index for error0 */
     pdsp_i16_t i16_param_idx;
@@ -261,16 +261,16 @@ typedef struct pdsp_macro_pi_tag
 /** Set point state memory struct. */
 typedef struct pdsp_macro_setp_tag
 {
-    /** Setpoint minimum value. */
+    /** Set point minimum value. */
     pdsp_f32_t f32_min;
-    /** Setpoint maximum value. */
+    /** Set point maximum value. */
     pdsp_f32_t f32_max;
     /** Absolute step size for ramp. First relative step for exponential
      * process. */
     pdsp_f32_t f32_step;
-    /** State memory for setpoint generator. */
+    /** State memory for set point generator. */
     pdsp_f32_t f32_x1;
-    /** Setpoint destination. */
+    /** Set point destination. */
     pdsp_f32_t f32_dest;
 } pdsp_macro_setp_t;
 
@@ -313,11 +313,11 @@ typedef struct pdsp_macro_sfra_tag
     pdsp_f32_t *f32_bode_out_im;
     /** Size of period and complex array (they must have the same length). */
     pdsp_u16_t u16_bode_size;
-    /** Flaoting point transfer function injection destination signal. */
+    /** Floating point transfer function injection destination signal. */
     pdsp_f32_t *f32_inject;
-    /** Flaoting point transfer function input signal. */
+    /** Floating point transfer function input signal. */
     pdsp_f32_t *f32_in;
-    /** Flaoting point transfer function output signal. */
+    /** Floating point transfer function output signal. */
     pdsp_f32_t *f32_out;
     /** Number of averaging cycles count-down per frequency. */
     pdsp_f32_t f32_avg_cyc;
@@ -368,7 +368,7 @@ typedef struct pdsp_macro_log32_tag
 
 /**
  * @brief (macro) Start the stopwatch with 32bit HW counter.
- * @param s_data Stopwatch struct pdsp_macto_stopwatch_t.
+ * @param s_data Stopwatch struct pdsp_macro_stopwatch_t.
  * @param u32_hw_now Current time from the hardware timer.
  */
 #define pdsp_macro_stopwatch_start(s_data, u32_hw_now)                         \
@@ -377,7 +377,7 @@ typedef struct pdsp_macro_log32_tag
 /**
  * @brief (macro) Calculate the time elapsed since the start.
  * Alternative with signed int min(max(0, now-mem), now-mem+max)
- * @param s_data Stopwatch parameter struct pdsp_macto_stopwatch_t.
+ * @param s_data Stopwatch parameter struct pdsp_macro_stopwatch_t.
  * @param u32_hw_now Current time from the hardware timer.
  */
 #define pdsp_macro_stopwatch_stop(s_data, u32_hw_now)                          \
@@ -388,7 +388,7 @@ typedef struct pdsp_macro_log32_tag
 /**
  * @brief (macro) Map a value from one range to another (Uses division).
  * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
- * to implement the mapping (interpollation). The output for (x1 - x0) == 0 is y
+ * to implement the mapping (interpolation). The output for (x1 - x0) == 0 is y
  * = (y1 - y0) * 0.5.
  * @param f32_in Input value.
  * @param f32_in_lo Input range low value.
@@ -657,13 +657,13 @@ typedef struct pdsp_macro_log32_tag
 
 /**
  * @brief (macro) Calculate the exponential averaging coefficient.
- * @details The coefficient is effectively the time constant of the countinuous
+ * @details The coefficient is effectively the time constant of the continuous
  * system converted to discrete time. It is the time for the step response to
- * reach 1-1/e ≈ 63.2%. This funcion is an approximation for the case where
+ * reach 1-1/e ≈ 63.2%. This function is an approximation for the case where
  * ts << 2*pi*fc
  * @param s_data Filter state variable struct.
  * @param f32_ts Sampling time of the filter.
- * @param f32_fc Corner freuency of the filter.
+ * @param f32_fc Corner frequency of the filter.
  */
 #define pdsp_macro_expavg_c2d(s_data, f32_ts, f32_fc)                          \
     (s_data).f32_tau = 2.0f * PDSP_PI_F * (f32_ts) * (f32_fc)
@@ -675,7 +675,7 @@ typedef struct pdsp_macro_log32_tag
 #define pdsp_macro_expavg_clear(s_data) (s_data).f32_x1 = 0.0f
 
 /**
- * @brief (macro) Calculate simplple exponential averaging filter.
+ * @brief (macro) Calculate simple exponential averaging filter.
  * @param s_data Filter state variable struct pdsp_macro_expavg_var_t.
  * @param in Filter input.
  */
@@ -1088,7 +1088,7 @@ typedef struct pdsp_macro_log32_tag
 /**
  * @brief (macro) Set point reached.
  * @param s_state Set point state memory struct.
- * @param f32_tol Tolarance for detection.
+ * @param f32_tol Tolerance for detection.
  * @returns pdsp_bool_t
  */
 #define pdsp_macro_setp_reached(s_state, f32_tol)                              \

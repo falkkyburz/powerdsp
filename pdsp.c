@@ -46,15 +46,15 @@ static const pdsp_u16_t pdsp_mask_i16[16] = {
     0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF};
 
 /*==============================================================================
- PRIVATE FUNCTIOS PROTOTYPES
+ PRIVATE FUNCTION PROTOTYPES
  =============================================================================*/
 
 /*==============================================================================
- PRIVATE FUNCTIO PROTOTYPES
+ PRIVATE FUNCTION PROTOTYPES
  =============================================================================*/
 
 /*==============================================================================
- GLOBAL FUNCTIOS
+ GLOBAL FUNCTION
  =============================================================================*/
 
 /*-----------------------------------------------------------------------------
@@ -334,7 +334,7 @@ pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
 #endif
 }
 
-pdsp_extern pdsp_f32_t pdsp_interpollate_2d(const pdsp_f32_t af32_x[],
+pdsp_extern pdsp_f32_t pdsp_interpolate_2d(const pdsp_f32_t af32_x[],
                                             const pdsp_f32_t af32_y[],
                                             pdsp_u32_t u32_size,
                                             pdsp_f32_t f32_x_in)
