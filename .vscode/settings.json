@@ -1,7 +1,3 @@
 {
-    "files.associations": {
-        "pdsp.h": "c",
-        "pdsp_macro.h": "c"
-    }
 
 }

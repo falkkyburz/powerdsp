@@ -323,6 +323,39 @@ typedef struct pdsp_macro_sfra_tag
     pdsp_f32_t f32_avg_cyc;
 } pdsp_macro_sfra_t;
 
+/** Logger state memory struct. */
+typedef struct pdsp_macro_log32_tag
+{
+    /** Size as a shift. */
+    pdsp_u16_t u16_size_half;
+    /** Size as a shift. */
+    pdsp_u16_t u16_size_shift;
+    /** Mask for the size of the array. */
+    pdsp_u16_t u16_size_mask;
+    /** Current array index. */
+    pdsp_u16_t u16_index;
+    /** Logger index add for each loop. */
+    pdsp_u16_t u16_index_add;
+    /** Logger index add for each loop. */
+    pdsp_u16_t u16_index_add_read;
+    /** Count samples after trigger event. */
+    pdsp_u16_t u16_count;
+    /** Logger counter add for each loop. */
+    pdsp_u16_t u16_count_add;
+    /** Trigger source index. */
+    pdsp_u16_t u16_trig_index;
+    /** Channel 1 source index. */
+    pdsp_u16_t u16_ch1_index;
+    /** Channel 1 source index. */
+    pdsp_u16_t u16_ch2_index;
+    /** Channel 1 source index. */
+    pdsp_u16_t u16_ch3_index;
+    /** Channel 1 source index. */
+    pdsp_u16_t u16_ch4_index;
+    /** Trigger level. */
+    pdsp_f32_t f32_trig_level;
+} pdsp_macro_log32_t;
+
 /** @} signal */
 
 /*==============================================================================
@@ -623,6 +656,19 @@ typedef struct pdsp_macro_sfra_tag
     (s_data).f32_delta = (s_data).f32_max - (s_data).f32_min
 
 /**
+ * @brief (macro) Calculate the exponential averaging coefficient.
+ * @details The coefficient is effectively the time constant of the countinuous
+ * system converted to discrete time. It is the time for the step response to
+ * reach 1-1/e ≈ 63.2%. This funcion is an approximation for the case where
+ * ts << 2*pi*fc
+ * @param s_data Filter state variable struct.
+ * @param f32_ts Sampling time of the filter.
+ * @param f32_fc Corner freuency of the filter.
+ */
+#define pdsp_macro_expavg_c2d(s_data, f32_ts, f32_fc)                          \
+    (s_data).f32_tau = 2.0f * PDSP_PI_F * (f32_ts) * (f32_fc)
+
+/**
  * @brief (macro) Initialize / Clear simple exponential average struct.
  * @param s_data Filter state variable struct pdsp_macro_expavg_var_t.
  */
@@ -842,7 +888,9 @@ typedef struct pdsp_macro_sfra_tag
  * @brief (macro) Calculate rolling sum 6 for 3 phase power.
  * @param s_data Filter state memory struct pdsp_macro_rollsum_t.
  * @param a_data Filter data array.
- * @param f32_in Rolling sum input signal.
+ * @param f32_in0 Rolling sum input signal.
+ * @param f32_in1 Rolling sum input signal.
+ * @param f32_in2 Rolling sum input signal.
  */
 #define pdsp_macro_rollavg3(s_data, a_data, f32_in0, f32_in1, f32_in2)         \
     (s_data).f32_sum0 -= (a_data)[(s_data).s_queue.i16_tail][0];               \
@@ -890,7 +938,8 @@ typedef struct pdsp_macro_sfra_tag
  * @details sum0 = volt_rmssq, sum1 = current_rmssq, sum2 = power_avg
  * @param s_data Filter state memory struct pdsp_macro_rollavg3_t.
  * @param a_data Filter data array [size][3] .
- * @param f32_in Rolling sum input signal.
+ * @param f32_volt Rolling sum input signal (voltage).
+ * @param f32_curr Rolling sum input signal (current).
  */
 #define pdsp_macro_rollvap(s_data, a_data, f32_volt, f32_curr)                 \
     (s_data).f32_sum0 -= (a_data)[(s_data).s_queue.i16_tail][0];               \
@@ -946,6 +995,7 @@ typedef struct pdsp_macro_sfra_tag
 /**
  * @brief (macro) Calculate dual PI controller.
  * @param s_data Controller data struct.
+ * @param as_param Array of controller parameter structs.
  * @param f32_error Error array [2] signal input.
  * @returns pdsp_f32_t Controller output.
  */
@@ -1010,7 +1060,7 @@ typedef struct pdsp_macro_sfra_tag
 
 /**
  * @brief (macro) Set destination of simple set point processor.
- * @param ps_state Set point state memory struct.
+ * @param s_state Set point state memory struct.
  * @param f32_dest Set point destination.
  * @returns pdsp_status_t PDSP_OK
  */
@@ -1020,14 +1070,14 @@ typedef struct pdsp_macro_sfra_tag
 
 /**
  * @brief (macro) Set the state to the destination.
- * @param ps_state Set point state memory struct.
+ * @param s_state Set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
 #define pdsp_macro_setp_step(s_state) (s_state).f32_x1 = (s_state).f32_dest
 
 /**
  * @brief (macro) Set the state to a defined value.
- * @param ps_state Set point state memory struct.
+ * @param s_state Set point state memory struct.
  * @param f32_value Set point value to step to.
  * @returns pdsp_f32_t Set point output.
  */
@@ -1037,7 +1087,7 @@ typedef struct pdsp_macro_sfra_tag
 
 /**
  * @brief (macro) Set point reached.
- * @param ps_state Set point state memory struct.
+ * @param s_state Set point state memory struct.
  * @param f32_tol Tolarance for detection.
  * @returns pdsp_bool_t
  */
@@ -1070,6 +1120,8 @@ typedef struct pdsp_macro_sfra_tag
  * @brief Software frequency response analysis processing function.
  * @details Use pdsp_sfra_running guard when executing this function.
  * @param s_data SFRA data struct.
+ * @param af32_step ARray of time steps for measurement points. [size]
+ * @param af32_result Array of complex results array. [size][4]
  */
 #define pdsp_macro_sfra_process(s_data, af32_step, af32_result)                \
     if ((s_data).b_running == PDSP_TRUE)                                       \
@@ -1123,6 +1175,73 @@ typedef struct pdsp_macro_sfra_tag
             }                                                                  \
         }                                                                      \
     }
+
+/**
+ * @brief Logger init.
+ * @param s_data Logger data struct.
+ * @param size_shift Size as a left shift number. Equal to 2^size
+ */
+#define pdsp_macro_log32_init(s_data, size_shift)                              \
+    (s_data).u16_size_half = (1 << ((size_shift)-1));                          \
+    (s_data).u16_size_shift = (size_shift);                                    \
+    (s_data).u16_size_mask = (1 << (size_shift)) - 1U;                         \
+    (s_data).u16_index = 0U;                                                   \
+    (s_data).u16_index_add = 1U;                                               \
+    (s_data).u16_index_add_read = 1U;                                          \
+    (s_data).u16_count = 0U;                                                   \
+    (s_data).u16_count_add = 0U
+
+/**
+ * @brief Set channels and trigger level.
+ * @param s_data Logger data struct.
+ * @param ch1_idx Channel 1 index from data pointer array.
+ * @param ch2_idx Channel 2 index from data pointer array.
+ * @param ch3_idx Channel 3 index from data pointer array.
+ * @param ch4_idx Channel 4 index from data pointer array.
+ * @param trig_idx Trigger index from data pointer array.
+ * @param trig_level Trigger level.
+ */
+#define pdsp_macro_log32_setup(s_data, ch1_idx, ch2_idx, ch3_idx, ch4_idx,     \
+                               trig_idx, trig_level)                           \
+    (s_data).u16_ch1_index = (ch1_idx);                                        \
+    (s_data).u16_ch2_index = (ch2_idx);                                        \
+    (s_data).u16_ch3_index = (ch3_idx);                                        \
+    (s_data).u16_ch4_index = (ch4_idx);                                        \
+    (s_data).u16_trig_index = (trig_idx);                                      \
+    (s_data).f32_trig_level = (trig_level)
+
+/**
+ * @brief Logger run function.
+ * @param s_data Logger data struct.
+ * @param apf32_source Source array of source pointers.
+ * @param af32_data Size of the logging data array.
+ */
+#define pdsp_macro_log32_run(s_data, apf32_source, af32_data)                  \
+    if ((s_data).u16_index_add == 1U)                                          \
+    {                                                                          \
+        af32_data[(s_data).u16_index][0] =                                     \
+            *apf32_source[(s_data).u16_ch1_index];                             \
+        af32_data[(s_data).u16_index][1] =                                     \
+            *apf32_source[(s_data).u16_ch2_index];                             \
+        af32_data[(s_data).u16_index][2] =                                     \
+            *apf32_source[(s_data).u16_ch3_index];                             \
+        af32_data[(s_data).u16_index][3] =                                     \
+            *apf32_source[(s_data).u16_ch4_index];                             \
+        (s_data).u16_index += (s_data).u16_index_add;                          \
+        (s_data).u16_index &= (s_data).u16_size_mask;                          \
+        (s_data).u16_count += (s_data).u16_count_add;                          \
+        if ((s_data).u16_count > (s_data).u16_size_half)                       \
+        {                                                                      \
+            (s_data).u16_index_add = 0U;                                       \
+            (s_data).u16_count_add = 0U;                                       \
+        }                                                                      \
+        else if (*apf32_source[(s_data).u16_trig_index] >                      \
+                 (s_data).f32_trig_level)                                      \
+        {                                                                      \
+            (s_data).u16_count_add = 1U;                                       \
+        }                                                                      \
+    }
+
 /** @} signal */
 
 /*==============================================================================

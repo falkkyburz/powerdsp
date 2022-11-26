@@ -453,6 +453,95 @@ typedef struct pdsp_rollsum_tag
     const pdsp_queue_t *ps_queue;
 } pdsp_rollsum_t;
 
+/** EVSE communication standard. */
+typedef enum
+{
+    /** EVSE standard is IEC. */
+    PDSP_EVSE_LLC_STD_IEC,
+    /** EVSE standard is SAE. */
+    PDSP_EVSE_LLC_STD_SAE,
+    /** EVSE standard is GBT. */
+    PDSP_EVSE_LLC_STD_GBT
+} pdsp_evse_llc_std_e;
+
+/** EVSE communication state. */
+typedef enum
+{
+    /** EVSE control pilot state A1. EV not connected. 12V DC */
+    PDSP_EVSE_LLC_STATE_A,
+    /** EVSE control pilot state B1. EV connected, not ready. 9V DC */
+    PDSP_EVSE_LLC_STATE_B1,
+    /** EVSE control pilot state B2. EV connected, not ready, 9V 1kHz PWM. */
+    PDSP_EVSE_LLC_STATE_B2,
+    /** EVSE control pilot state C1. EV connected, ready, 6V DC. */
+    PDSP_EVSE_LLC_STATE_C1,
+    /** EVSE control pilot state C2. EV connected, ready, 6V 1kHz PWM. */
+    PDSP_EVSE_LLC_STATE_C2,
+    /** EVSE control pilot state D1. EV connected, ready, 3V DC, ventilation
+       requested. */
+    PDSP_EVSE_LLC_STATE_D1,
+    /** EVSE control pilot state D2. EV connected, ready, 3V 1kHz PWM
+       ventilation reuested, PWM enabled. */
+    PDSP_EVSE_LLC_STATE_D2,
+    /** EVSE control pilot state E. EVSE error, 0V DC. */
+    PDSP_EVSE_LLC_STATE_E,
+    /** EVSE control pilot state F. EVSE not available, -12V DC. */
+    PDSP_EVSE_LLC_STATE_F
+} pdsp_evse_llc_state_e;
+
+/** EVSE control pilot duty cycle. */
+typedef enum
+{
+    /** EVSE control pilot duty state. */
+    PDSP_EVSE_LLC_HLC_REQUEST,
+    PDSP_EVSE_LLC_NORMAL,
+    PDSP_EVSE_LLC_ILLEGAL
+} pdsp_evse_llc_duty_state_e;
+
+/** Low level EVSE communication variable struct. */
+typedef struct pdsp_evse_llc_var_tag
+{
+    /** Current limit from control pilot. */
+    pdsp_f32_t cp_curr_lim;
+    /** Current limit from proximity resistor. */
+    pdsp_f32_t pp_curr_lim;
+    /** Low level communication state. */
+    pdsp_evse_llc_state_e cp_state;
+    /** Duty cycle state. */
+    pdsp_evse_llc_duty_state_e duty_state;
+    /** Plug detection result. */
+    pdsp_bool_t plug_detected;
+} pdsp_evse_llc_var_t;
+
+/** Low level EVSE communication data struct. */
+typedef struct pdsp_evse_llc_tag
+{
+    /** Pointer to variable struct. */
+    pdsp_evse_llc_var_t *ps_var;
+    /** EVSE communication standard. */
+    pdsp_evse_llc_std_e std;
+} pdsp_evse_llc_t;
+
+/** Signal delay data variable struct. */
+typedef struct pdsp_delayrf_bool_var_tag
+{
+    /** Signal delay in counts. */
+    pdsp_bool_t b_state;
+    /** Delay counter. */
+    pdsp_u16_t u16_count;
+} pdsp_delayrf_bool_var_t;
+
+/** Signal delay data struct. */
+typedef struct pdsp_delayrf_bool_tag
+{
+    /** Pointer to variable struct. */
+    pdsp_delayrf_bool_var_t *ps_var;
+    /** Signal rising delay in counts. */
+    pdsp_u16_t u16_rising_delay_count;
+    /** Signal falling delay in counts. */
+    pdsp_u16_t u16_falling_delay_count;
+} pdsp_delayrf_bool_t;
+
 /** @} signal */
 /* ------------------------------------------------------------------------ */
 /** @addtogroup control Control
@@ -1600,7 +1689,7 @@ pdsp_extern void pdsp_minmax(pdsp_minmax_var_t *ps_var, pdsp_f32_t f32_in);
 /**
  * @brief Calculate the exponential averaging coefficient.
  * @details The coefficient is effectively the time constant of the countinuous
- * system converted to discrete time. It is the time for the step response to 
+ * system converted to discrete time. It is the time for the step response to
  * reach 1-1/e ≈ 63.2%. This funcion is an approximation for the case where
  * ts << 2*pi*fc
  * @param ps_data Filter state variable struct.
@@ -1875,6 +1964,23 @@ pdsp_extern void pdsp_rollrms_init(const pdsp_rollsum_t *ps_data,
  */
 pdsp_extern pdsp_f32_t pdsp_rollrms(const pdsp_rollsum_t *ps_data,
                                     pdsp_f32_t f32_in);
+
+/**
+ * @brief Rising and falling edge delay clear.
+ * @param ps_data Filter state memory struct.
+ */
+pdsp_extern void pdsp_delayrf_bool_clear(const pdsp_delayrf_bool_t *ps_data);
+
+/**
+ * @brief Rising and falling edge delay a signal by a number of counts.
+ * @details This is functionally the same as debouncing, but accepts a boolean
+ * signals as an input.
+ * @param ps_data Filter state memory struct.
+ * @param b_in Filter input signal.
+ * @returns pdsp_bool_t Delayed data ouptut.
+ */
+pdsp_extern pdsp_bool_t pdsp_delayrf_bool(const pdsp_delayrf_bool_t *ps_data,
+                                        pdsp_bool_t b_in);
 
 /** @} signal */
 

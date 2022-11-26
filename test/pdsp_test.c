@@ -1,4 +1,4 @@
-/** @file examples.c
+/** @file pdsp_test.c
  *
  * @author Falk Kyburz
  * @brief Examples and tests.
@@ -794,6 +794,37 @@ void test_rollrms(void)
     PDSP_ASSERT(out == 0.5f);
 }
 
+void test_delay(void)
+{
+    printf("-- void test_delay(void) --\n");
+    pdsp_delayrf_bool_var_t delay_var = {0};
+    pdsp_delayrf_bool_t delay = {.ps_var = &delay_var,
+                               .u16_rising_delay_count = 2U,
+                               .u16_falling_delay_count = 3U};
+    pdsp_delayrf_bool_clear(&delay);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_TRUE);
+    pdsp_delayrf_bool_t delay0 = {.ps_var = &delay_var,
+                                .u16_rising_delay_count = 0U,
+                                .u16_falling_delay_count = 0U};
+    pdsp_delayrf_bool_clear(&delay0);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay0, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay0, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay0, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_delayrf_bool(&delay0, PDSP_TRUE) == PDSP_TRUE);
+}
+
 void test_pi(void)
 {
     printf("-- void test_pi(void) --\n");
@@ -1116,6 +1147,233 @@ void test_fixmath(void)
     test2 = iq16_mulq8(test1, test2);
 }
 
+void test_log32(void)
+{
+    printf("-- void test_log32(void) --\n");
+    pdsp_f32_t src1[8] = {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f};
+    pdsp_f32_t src2[8] = {1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f};
+    pdsp_f32_t src3[8] = {2.1f, 2.2f, 2.3f, 2.4f, 2.5f, 2.6f, 2.7f, 2.8f};
+    pdsp_f32_t src4[8] = {3.1f, 3.2f, 3.3f, 3.4f, 3.5f, 3.6f, 3.7f, 3.8f};
+    pdsp_f32_t log1;
+    pdsp_f32_t log2;
+    pdsp_f32_t log3;
+    pdsp_f32_t log4;
+    pdsp_f32_t *plog[4] = {&log1, &log2, &log3, &log4};
+    pdsp_f32_t data[4][4] = {0};
+    pdsp_f32_t data1[4][4] = {0};
+    pdsp_macro_log32_t log = {0};
+    pdsp_macro_log32_t loga = {0};
+    pdsp_macro_log32_init(log, 2);
+    pdsp_macro_log32_setup(log, 0, 1, 2, 3, 0, 10.0f);
+    /* 0 */
+    log1 = src1[0];
+    log2 = src2[0];
+    log3 = src3[0];
+    log4 = src4[0];
+    pdsp_macro_log32_run(log, plog, data);
+    PDSP_ASSERT((data[0][0] == 0.1f) && (data[0][1] == 1.1f) &&
+                (data[0][2] == 2.1f) && (data[0][3] == 3.1f));
+    PDSP_ASSERT((data[1][0] == 0.0f) && (data[1][1] == 0.0f) &&
+                (data[1][2] == 0.0f) && (data[1][3] == 0.0f));
+    PDSP_ASSERT((data[2][0] == 0.0f) && (data[2][1] == 0.0f) &&
+                (data[2][2] == 0.0f) && (data[2][3] == 0.0f));
+    PDSP_ASSERT((data[3][0] == 0.0f) && (data[3][1] == 0.0f) &&
+                (data[3][2] == 0.0f) && (data[3][3] == 0.0f));
+    PDSP_ASSERT(log.u16_count == 0U);
+    PDSP_ASSERT(log.u16_index_add == 1U);
+    PDSP_ASSERT(log.u16_count_add == 0U);
+    /* 1 */
+    log1 = src1[1];
+    log2 = src2[1];
+    log3 = src3[1];
+    log4 = src4[1];
+    pdsp_macro_log32_run(log, plog, data);
+    PDSP_ASSERT((data[0][0] == 0.1f) && (data[0][1] == 1.1f) &&
+                (data[0][2] == 2.1f) && (data[0][3] == 3.1f));
+    PDSP_ASSERT((data[1][0] == 0.2f) && (data[1][1] == 1.2f) &&
+                (data[1][2] == 2.2f) && (data[1][3] == 3.2f));
+    PDSP_ASSERT((data[2][0] == 0.0f) && (data[2][1] == 0.0f) &&
+                (data[2][2] == 0.0f) && (data[2][3] == 0.0f));
+    PDSP_ASSERT((data[3][0] == 0.0f) && (data[3][1] == 0.0f) &&
+                (data[3][2] == 0.0f) && (data[3][3] == 0.0f));
+    PDSP_ASSERT(log.u16_count == 0U);
+    PDSP_ASSERT(log.u16_index_add == 1U);
+    PDSP_ASSERT(log.u16_count_add == 0U);
+    /* 2 */
+    log1 = src1[2];
+    log2 = src2[2];
+    log3 = src3[2];
+    log4 = src4[2];
+    pdsp_macro_log32_run(log, plog, data);
+    PDSP_ASSERT((data[0][0] == 0.1f) && (data[0][1] == 1.1f) &&
+                (data[0][2] == 2.1f) && (data[0][3] == 3.1f));
+    PDSP_ASSERT((data[1][0] == 0.2f) && (data[1][1] == 1.2f) &&
+                (data[1][2] == 2.2f) && (data[1][3] == 3.2f));
+    PDSP_ASSERT((data[2][0] == 0.3f) && (data[2][1] == 1.3f) &&
+                (data[2][2] == 2.3f) && (data[2][3] == 3.3f));
+    PDSP_ASSERT((data[3][0] == 0.0f) && (data[3][1] == 0.0f) &&
+                (data[3][2] == 0.0f) && (data[3][3] == 0.0f));
+    PDSP_ASSERT(log.u16_count == 0U);
+    PDSP_ASSERT(log.u16_index_add == 1U);
+    PDSP_ASSERT(log.u16_count_add == 0U);
+    /* 3 */
+    log1 = src1[3];
+    log2 = src2[3];
+    log3 = src3[3];
+    log4 = src4[3];
+    pdsp_macro_log32_run(log, plog, data);
+    PDSP_ASSERT((data[0][0] == 0.1f) && (data[0][1] == 1.1f) &&
+                (data[0][2] == 2.1f) && (data[0][3] == 3.1f));
+    PDSP_ASSERT((data[1][0] == 0.2f) && (data[1][1] == 1.2f) &&
+                (data[1][2] == 2.2f) && (data[1][3] == 3.2f));
+    PDSP_ASSERT((data[2][0] == 0.3f) && (data[2][1] == 1.3f) &&
+                (data[2][2] == 2.3f) && (data[2][3] == 3.3f));
+    PDSP_ASSERT((data[3][0] == 0.4f) && (data[3][1] == 1.4f) &&
+                (data[3][2] == 2.4f) && (data[3][3] == 3.4f));
+    PDSP_ASSERT(log.u16_count == 0U);
+    PDSP_ASSERT(log.u16_index_add == 1U);
+    PDSP_ASSERT(log.u16_count_add == 0U);
+    /* 4 */
+    log1 = src1[4];
+    log2 = src2[4];
+    log3 = src3[4];
+    log4 = src4[4];
+    pdsp_macro_log32_run(log, plog, data);
+    PDSP_ASSERT((data[0][0] == 0.5f) && (data[0][1] == 1.5f) &&
+                (data[0][2] == 2.5f) && (data[0][3] == 3.5f));
+    PDSP_ASSERT((data[1][0] == 0.2f) && (data[1][1] == 1.2f) &&
+                (data[1][2] == 2.2f) && (data[1][3] == 3.2f));
+    PDSP_ASSERT((data[2][0] == 0.3f) && (data[2][1] == 1.3f) &&
+                (data[2][2] == 2.3f) && (data[2][3] == 3.3f));
+    PDSP_ASSERT((data[3][0] == 0.4f) && (data[3][1] == 1.4f) &&
+                (data[3][2] == 2.4f) && (data[3][3] == 3.4f));
+    PDSP_ASSERT(log.u16_count == 0U);
+    PDSP_ASSERT(log.u16_index_add == 1U);
+    PDSP_ASSERT(log.u16_count_add == 0U);
+    /* reset */
+    pdsp_macro_log32_init(loga, 2);
+    pdsp_macro_log32_setup(loga, 0, 1, 2, 3, 0, 0.1f);
+    /* 0 */
+    log1 = src1[0];
+    log2 = src2[0];
+    log3 = src3[0];
+    log4 = src4[0];
+    pdsp_macro_log32_run(loga, plog, data1);
+    PDSP_ASSERT((data1[0][0] == 0.1f) && (data1[0][1] == 1.1f) &&
+                (data1[0][2] == 2.1f) && (data1[0][3] == 3.1f));
+    PDSP_ASSERT((data1[1][0] == 0.0f) && (data1[1][1] == 0.0f) &&
+                (data1[1][2] == 0.0f) && (data1[1][3] == 0.0f));
+    PDSP_ASSERT((data1[2][0] == 0.0f) && (data1[2][1] == 0.0f) &&
+                (data1[2][2] == 0.0f) && (data1[2][3] == 0.0f));
+    PDSP_ASSERT((data1[3][0] == 0.0f) && (data1[3][1] == 0.0f) &&
+                (data1[3][2] == 0.0f) && (data1[3][3] == 0.0f));
+    PDSP_ASSERT(loga.u16_count == 0U);
+    PDSP_ASSERT(loga.u16_index_add == 1U);
+    PDSP_ASSERT(loga.u16_count_add == 0U);
+    /* 1 */
+    log1 = src1[1];
+    log2 = src2[1];
+    log3 = src3[1];
+    log4 = src4[1];
+    pdsp_macro_log32_run(loga, plog, data1);
+    PDSP_ASSERT((data1[0][0] == 0.1f) && (data1[0][1] == 1.1f) &&
+                (data1[0][2] == 2.1f) && (data1[0][3] == 3.1f));
+    PDSP_ASSERT((data1[1][0] == 0.2f) && (data1[1][1] == 1.2f) &&
+                (data1[1][2] == 2.2f) && (data1[1][3] == 3.2f));
+    PDSP_ASSERT((data1[2][0] == 0.0f) && (data1[2][1] == 0.0f) &&
+                (data1[2][2] == 0.0f) && (data1[2][3] == 0.0f));
+    PDSP_ASSERT((data1[3][0] == 0.0f) && (data1[3][1] == 0.0f) &&
+                (data1[3][2] == 0.0f) && (data1[3][3] == 0.0f));
+    PDSP_ASSERT(loga.u16_count == 0U);
+    PDSP_ASSERT(loga.u16_index_add == 1U);
+    PDSP_ASSERT(loga.u16_count_add == 1U);
+    /* 2 */
+    log1 = src1[2];
+    log2 = src2[2];
+    log3 = src3[2];
+    log4 = src4[2];
+    pdsp_macro_log32_run(loga, plog, data1);
+    PDSP_ASSERT((data1[0][0] == 0.1f) && (data1[0][1] == 1.1f) &&
+                (data1[0][2] == 2.1f) && (data1[0][3] == 3.1f));
+    PDSP_ASSERT((data1[1][0] == 0.2f) && (data1[1][1] == 1.2f) &&
+                (data1[1][2] == 2.2f) && (data1[1][3] == 3.2f));
+    PDSP_ASSERT((data1[2][0] == 0.3f) && (data1[2][1] == 1.3f) &&
+                (data1[2][2] == 2.3f) && (data1[2][3] == 3.3f));
+    PDSP_ASSERT((data1[3][0] == 0.0f) && (data1[3][1] == 0.0f) &&
+                (data1[3][2] == 0.0f) && (data1[3][3] == 0.0f));
+    PDSP_ASSERT(loga.u16_count == 1U);
+    PDSP_ASSERT(loga.u16_index_add == 1U);
+    PDSP_ASSERT(loga.u16_count_add == 1U);
+    /* 3 */
+    log1 = src1[3];
+    log2 = src2[3];
+    log3 = src3[3];
+    log4 = src4[3];
+    pdsp_macro_log32_run(loga, plog, data1);
+    PDSP_ASSERT((data1[0][0] == 0.1f) && (data1[0][1] == 1.1f) &&
+                (data1[0][2] == 2.1f) && (data1[0][3] == 3.1f));
+    PDSP_ASSERT((data1[1][0] == 0.2f) && (data1[1][1] == 1.2f) &&
+                (data1[1][2] == 2.2f) && (data1[1][3] == 3.2f));
+    PDSP_ASSERT((data1[2][0] == 0.3f) && (data1[2][1] == 1.3f) &&
+                (data1[2][2] == 2.3f) && (data1[2][3] == 3.3f));
+    PDSP_ASSERT((data1[3][0] == 0.4f) && (data1[3][1] == 1.4f) &&
+                (data1[3][2] == 2.4f) && (data1[3][3] == 3.4f));
+    PDSP_ASSERT(loga.u16_count == 2U);
+    PDSP_ASSERT(loga.u16_index_add == 1U);
+    PDSP_ASSERT(loga.u16_count_add == 1U);
+    /* 4 0*/
+    log1 = src1[4];
+    log2 = src2[4];
+    log3 = src3[4];
+    log4 = src4[4];
+    pdsp_macro_log32_run(loga, plog, data1);
+    PDSP_ASSERT((data1[0][0] == 0.5f) && (data1[0][1] == 1.5f) &&
+                (data1[0][2] == 2.5f) && (data1[0][3] == 3.5f));
+    PDSP_ASSERT((data1[1][0] == 0.2f) && (data1[1][1] == 1.2f) &&
+                (data1[1][2] == 2.2f) && (data1[1][3] == 3.2f));
+    PDSP_ASSERT((data1[2][0] == 0.3f) && (data1[2][1] == 1.3f) &&
+                (data1[2][2] == 2.3f) && (data1[2][3] == 3.3f));
+    PDSP_ASSERT((data1[3][0] == 0.4f) && (data1[3][1] == 1.4f) &&
+                (data1[3][2] == 2.4f) && (data1[3][3] == 3.4f));
+    PDSP_ASSERT(loga.u16_count == 3U);
+    PDSP_ASSERT(loga.u16_index_add == 0U);
+    PDSP_ASSERT(loga.u16_count_add == 0U);
+    /* 5 1*/
+    log1 = src1[5];
+    log2 = src2[5];
+    log3 = src3[5];
+    log4 = src4[5];
+    pdsp_macro_log32_run(loga, plog, data1);
+    PDSP_ASSERT((data1[0][0] == 0.5f) && (data1[0][1] == 1.5f) &&
+                (data1[0][2] == 2.5f) && (data1[0][3] == 3.5f));
+    PDSP_ASSERT((data1[1][0] == 0.2f) && (data1[1][1] == 1.2f) &&
+                (data1[1][2] == 2.2f) && (data1[1][3] == 3.2f));
+    PDSP_ASSERT((data1[2][0] == 0.3f) && (data1[2][1] == 1.3f) &&
+                (data1[2][2] == 2.3f) && (data1[2][3] == 3.3f));
+    PDSP_ASSERT((data1[3][0] == 0.4f) && (data1[3][1] == 1.4f) &&
+                (data1[3][2] == 2.4f) && (data1[3][3] == 3.4f));
+    PDSP_ASSERT(loga.u16_count == 3U);
+    PDSP_ASSERT(loga.u16_index_add == 0U);
+    PDSP_ASSERT(loga.u16_count_add == 0U);
+    /* 5 1*/
+    log1 = src1[6];
+    log2 = src2[6];
+    log3 = src3[6];
+    log4 = src4[6];
+    pdsp_macro_log32_run(loga, plog, data1);
+    PDSP_ASSERT((data1[0][0] == 0.5f) && (data1[0][1] == 1.5f) &&
+                (data1[0][2] == 2.5f) && (data1[0][3] == 3.5f));
+    PDSP_ASSERT((data1[1][0] == 0.2f) && (data1[1][1] == 1.2f) &&
+                (data1[1][2] == 2.2f) && (data1[1][3] == 3.2f));
+    PDSP_ASSERT((data1[2][0] == 0.3f) && (data1[2][1] == 1.3f) &&
+                (data1[2][2] == 2.3f) && (data1[2][3] == 3.3f));
+    PDSP_ASSERT((data1[3][0] == 0.4f) && (data1[3][1] == 1.4f) &&
+                (data1[3][2] == 2.4f) && (data1[3][3] == 3.4f));
+    PDSP_ASSERT(loga.u16_count == 3U);
+    PDSP_ASSERT(loga.u16_index_add == 0U);
+    PDSP_ASSERT(loga.u16_count_add == 0U);
+}
+
 int main()
 {
 
@@ -1147,11 +1405,13 @@ int main()
     test_rollsum();
     test_rollavg();
     test_rollrms();
+    test_delay();
     test_pi();
     test_bit_read_write();
     test_signal_read_write();
     test_fault();
     test_fixmath();
+    test_log32();
 
     return 0;
 }

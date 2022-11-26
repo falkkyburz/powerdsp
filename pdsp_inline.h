@@ -1,4 +1,4 @@
-/** @file pdspm.h
+/** @file pdsp_inline.h
  *
  * @author Falk Kyburz
  * @brief Power electronics digital signal processing module.

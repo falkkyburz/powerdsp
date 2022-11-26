@@ -1232,6 +1232,47 @@ pdsp_extern pdsp_f32_t pdsp_rollrms(const pdsp_rollsum_t *ps_data,
         ps_data, f32_in * f32_in * ps_data->ps_var->f32_win_size_inv));
 }
 
+pdsp_extern void pdsp_delayrf_bool_clear(const pdsp_delayrf_bool_t *ps_data)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->ps_var->b_state = PDSP_FALSE;
+    ps_data->ps_var->u16_count = 0U;
+}
+
+pdsp_extern pdsp_bool_t pdsp_delayrf_bool(const pdsp_delayrf_bool_t *ps_data,
+                                        pdsp_bool_t b_in)
+{
+    static pdsp_delayrf_bool_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_var = ps_data->ps_var;
+    /* PDSP_FALSE or OFF state */
+    if (!(ps_var->b_state) && b_in)
+    {
+        ps_var->u16_count++;
+        if (ps_var->u16_count > ps_data->u16_rising_delay_count)
+        {
+            ps_var->b_state = PDSP_TRUE;
+            ps_var->u16_count = 0U;
+        }
+    }
+    /* PDSP_TRUE or ON state */
+    else if ((ps_var->b_state) && !b_in)
+    {
+        ps_var->u16_count++;
+        if (ps_var->u16_count > ps_data->u16_falling_delay_count)
+        {
+            ps_var->b_state = PDSP_FALSE;
+            ps_var->u16_count = 0U;
+        }
+    }
+    /* PDSP_FALSE && !b_in || PDSP_TRUE && b_in */
+    else
+    {
+        ps_var->u16_count = 0U;
+    }
+    return ps_var->b_state;
+}
+
 /*-----------------------------------------------------------------------------
 CONTROL
 -----------------------------------------------------------------------------*/

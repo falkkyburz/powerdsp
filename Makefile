@@ -26,7 +26,7 @@ $(BUILD)\pdsp_test.o: $(TEST)\pdsp_test.c
 	$(info Compile .\test\pdsp_test.c:)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
-info: $(BUILD)\pdsp.o
+info: $(BUILD)\pdsp.o $(BUILD)\pdsp_test.o
 	$(info Print size and disassemble:)
 	$(SIZE) $(BUILD)\pdsp.o
 	$(OBJDUMP) -d $(BUILD)\pdsp.o > $(BUILD)\pdsp.dis
@@ -42,7 +42,7 @@ clean:
 	del doxylog.txt
 	if exist html rmdir /s /q html
 
-help: $(SRC)\pdsp.h
+help:
 	$(info Generate help:)
 	doxygen Doxyfile > doxylog.txt
 
