@@ -355,6 +355,24 @@ void test_debounce(void)
     PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_TRUE);
+
+    pdsp_debounce_cnt_var_t debounce_var = {0};
+    const pdsp_debounce_cnt_t debounce = {
+        .ps_var = &debounce_var, .u16_cnt_high = 2U, .u16_cnt_low = 2U};
+    pdsp_debounce_cnt_clear(&debounce);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_TRUE);
 }
 
 void test_robust(void)
@@ -799,8 +817,8 @@ void test_delay(void)
     printf("-- void test_delay(void) --\n");
     pdsp_delayrf_bool_var_t delay_var = {0};
     pdsp_delayrf_bool_t delay = {.ps_var = &delay_var,
-                               .u16_rising_delay_count = 2U,
-                               .u16_falling_delay_count = 3U};
+                                 .u16_rising_delay_count = 2U,
+                                 .u16_falling_delay_count = 3U};
     pdsp_delayrf_bool_clear(&delay);
     PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_FALSE) == PDSP_FALSE);
@@ -816,8 +834,8 @@ void test_delay(void)
     PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_delayrf_bool(&delay, PDSP_TRUE) == PDSP_TRUE);
     pdsp_delayrf_bool_t delay0 = {.ps_var = &delay_var,
-                                .u16_rising_delay_count = 0U,
-                                .u16_falling_delay_count = 0U};
+                                  .u16_rising_delay_count = 0U,
+                                  .u16_falling_delay_count = 0U};
     pdsp_delayrf_bool_clear(&delay0);
     PDSP_ASSERT(pdsp_delayrf_bool(&delay0, PDSP_FALSE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_delayrf_bool(&delay0, PDSP_TRUE) == PDSP_TRUE);

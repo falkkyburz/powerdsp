@@ -46,7 +46,7 @@
     if (!(b_in))                                                               \
     printf("Assert failed: %s:%i\n", __FILE__, __LINE__)
 
-/** Uncomment to set all functions to static and include them in the psdp.h
+/** Uncomment to set all functions to static and include them in the pdsp.h
  * file. */
 // #define PDSP_STATIC_FUNCTIONS
 

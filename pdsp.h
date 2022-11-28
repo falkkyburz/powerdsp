@@ -149,6 +149,26 @@ typedef struct pdsp_debounce_tag
     pdsp_f32_t f32_t_low;
 } pdsp_debounce_t;
 
+/** Debounce based on counter status struct */
+typedef struct pdsp_debounce_cnt_var_tag
+{
+    /** Debounce status state variable. */
+    pdsp_bool_t b_state;
+    /** Debounce time state variable. */
+    pdsp_u16_t u16_count;
+} pdsp_debounce_cnt_var_t;
+
+/** Debounce based on counter parameter struct */
+typedef struct pdsp_debounce_cnt_tag
+{
+    /** Pointer to pdsp_debounce_var_t struct. */
+    pdsp_debounce_cnt_var_t *ps_var;
+    /** Debounce detection count. High transition. */
+    pdsp_u16_t u16_cnt_high;
+    /** Debounce recovery count. Low transition. */
+    pdsp_u16_t u16_cnt_low;
+} pdsp_debounce_cnt_t;
+
 /** Robust status struct */
 typedef struct pdsp_robust_var_tag
 {
@@ -1190,9 +1210,9 @@ pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
  * @returns pdsp_f32_t Interpolated value.
  */
 pdsp_extern pdsp_f32_t pdsp_interpolate_2d(const pdsp_f32_t af32_x[],
-                                            const pdsp_f32_t af32_y[],
-                                            pdsp_u32_t u32_size,
-                                            pdsp_f32_t f32_x_in);
+                                           const pdsp_f32_t af32_y[],
+                                           pdsp_u32_t u32_size,
+                                           pdsp_f32_t f32_x_in);
 
 /**
  * @brief Set all elements in f32 array to given value.
@@ -1338,6 +1358,21 @@ pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data);
  */
 pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
                                       pdsp_bool_t b_in);
+
+/**
+ * @brief Counter based debounce function clear.
+ * @param ps_data Hysteresis state struct.
+ */
+pdsp_extern void pdsp_debounce_cnt_clear(const pdsp_debounce_cnt_t *ps_data);
+
+/**
+ * @brief Counter based debouncing function with detecting and recovering count.
+ * @param ps_data Hysteresis state struct.
+ * @param b_in Input condition.
+ * @return pdsp_bool_t Status output.
+ */
+pdsp_extern pdsp_bool_t pdsp_debounce_cnt(const pdsp_debounce_cnt_t *ps_data,
+                                          pdsp_bool_t b_in);
 
 /**
  * @brief Robust function clear.
@@ -1980,7 +2015,7 @@ pdsp_extern void pdsp_delayrf_bool_clear(const pdsp_delayrf_bool_t *ps_data);
  * @returns pdsp_bool_t Delayed data output.
  */
 pdsp_extern pdsp_bool_t pdsp_delayrf_bool(const pdsp_delayrf_bool_t *ps_data,
-                                        pdsp_bool_t b_in);
+                                          pdsp_bool_t b_in);
 
 /** @} signal */
 

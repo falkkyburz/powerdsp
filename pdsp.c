@@ -335,9 +335,9 @@ pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
 }
 
 pdsp_extern pdsp_f32_t pdsp_interpolate_2d(const pdsp_f32_t af32_x[],
-                                            const pdsp_f32_t af32_y[],
-                                            pdsp_u32_t u32_size,
-                                            pdsp_f32_t f32_x_in)
+                                           const pdsp_f32_t af32_y[],
+                                           pdsp_u32_t u32_size,
+                                           pdsp_f32_t f32_x_in)
 {
     /* Index of higher array element. */
     pdsp_u32_t u32_idx_hi = 1U;
@@ -530,6 +530,47 @@ pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
     else
     {
         ps_var->f32_time = 0.0f;
+    }
+    return ps_var->b_state;
+}
+
+pdsp_extern void pdsp_debounce_cnt_clear(const pdsp_debounce_cnt_t *ps_data)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->ps_var->b_state = PDSP_FALSE;
+    ps_data->ps_var->u16_count = 0U;
+}
+
+pdsp_extern pdsp_bool_t pdsp_debounce_cnt(const pdsp_debounce_cnt_t *ps_data,
+                                          pdsp_bool_t b_in)
+{
+    static pdsp_debounce_cnt_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_var = ps_data->ps_var;
+    /* PDSP_FALSE or OFF state */
+    if (!(ps_var->b_state) && b_in)
+    {
+        ps_var->u16_count++;
+        if (ps_var->u16_count > ps_data->u16_cnt_high)
+        {
+            ps_var->b_state = PDSP_TRUE;
+            ps_var->u16_count = 0U;
+        }
+    }
+    /* PDSP_TRUE or ON state */
+    else if ((ps_var->b_state) && !b_in)
+    {
+        ps_var->u16_count++;
+        if (ps_var->u16_count > ps_data->u16_cnt_low)
+        {
+            ps_var->b_state = PDSP_FALSE;
+            ps_var->u16_count = 0U;
+        }
+    }
+    /* PDSP_FALSE && !b_in || PDSP_TRUE && b_in */
+    else
+    {
+        ps_var->u16_count = 0U;
     }
     return ps_var->b_state;
 }
@@ -1240,7 +1281,7 @@ pdsp_extern void pdsp_delayrf_bool_clear(const pdsp_delayrf_bool_t *ps_data)
 }
 
 pdsp_extern pdsp_bool_t pdsp_delayrf_bool(const pdsp_delayrf_bool_t *ps_data,
-                                        pdsp_bool_t b_in)
+                                          pdsp_bool_t b_in)
 {
     static pdsp_delayrf_bool_var_t *ps_var;
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
