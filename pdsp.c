@@ -1485,67 +1485,67 @@ pdsp_extern void pdsp_pi_set(pdsp_pi_t *ps_data, pdsp_f32_t f32_out)
     ps_data->ps_var->f32_x1 = 0.0f;
 }
 
-pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_state)
+pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_data)
 {
-    PDSP_ASSERT(ps_state != NULL);
-    ps_state->f32_x1 = 0.0f;
-    ps_state->f32_dest = 0.0f;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    ps_data->ps_var->f32_x1 = 0.0f;
+    ps_data->ps_var->f32_dest = 0.0f;
 }
 
-pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_state,
-                                      const pdsp_setp_param_t *ps_param)
+pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_data)
 {
-    PDSP_ASSERT((ps_state != NULL) && (ps_param != NULL));
-    ps_state->f32_x1 =
-        ps_state->f32_x1 +
-        pdsp_maxf(pdsp_minf(ps_state->f32_dest - ps_state->f32_x1,
-                            ps_param->f32_step),
-                  -ps_param->f32_step);
-    return ps_state->f32_x1;
+    static pdsp_setp_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    ps_var = ps_data->ps_var;
+    ps_var->f32_x1 =
+        ps_var->f32_x1 +
+        pdsp_maxf(pdsp_minf(ps_var->f32_dest - ps_var->f32_x1,
+                            ps_data->f32_step),
+                  -ps_data->f32_step);
+    return ps_var->f32_x1;
 }
 
-pdsp_extern pdsp_f32_t pdsp_setp_exp(pdsp_setp_t *ps_state,
-                                     const pdsp_setp_param_t *ps_param)
+pdsp_extern pdsp_f32_t pdsp_setp_exp(pdsp_setp_t *ps_data)
 {
-    PDSP_ASSERT((ps_state != NULL) && (ps_param != NULL));
-    ps_state->f32_x1 =
-        ps_state->f32_x1 +
-        ps_param->f32_step * (ps_state->f32_dest - ps_state->f32_x1);
-    return ps_state->f32_x1;
+    static pdsp_setp_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    ps_var = ps_data->ps_var;
+    ps_var->f32_x1 =
+        ps_var->f32_x1 +
+        ps_data->f32_step * (ps_var->f32_dest - ps_var->f32_x1);
+    return ps_var->f32_x1;
 }
 
-pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_state,
-                                             const pdsp_setp_param_t *ps_param,
+pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_data,
                                              pdsp_f32_t f32_dest)
 {
-    PDSP_ASSERT((ps_state != NULL) && (ps_param != NULL));
-    ps_state->f32_dest =
-        pdsp_maxf(pdsp_minf(f32_dest, ps_param->f32_max), ps_param->f32_min);
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    ps_data->ps_var->f32_dest =
+        pdsp_maxf(pdsp_minf(f32_dest, ps_data->f32_max), ps_data->f32_min);
     return PDSP_OK;
 }
 
-pdsp_extern pdsp_f32_t pdsp_setp_step(pdsp_setp_t *ps_state)
+pdsp_extern pdsp_f32_t pdsp_setp_step(pdsp_setp_t *ps_data)
 {
-    PDSP_ASSERT(ps_state != NULL);
-    ps_state->f32_x1 = ps_state->f32_dest;
-    return ps_state->f32_x1;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    ps_data->ps_var->f32_x1 = ps_data->ps_var->f32_dest;
+    return ps_data->ps_var->f32_x1;
 }
 
-pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_state,
-                                       const pdsp_setp_param_t *ps_param,
+pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_data,
                                        pdsp_f32_t f32_value)
 {
-    PDSP_ASSERT((ps_state != NULL) && (ps_param != NULL));
-    ps_state->f32_x1 =
-        pdsp_maxf(pdsp_minf(f32_value, ps_param->f32_max), ps_param->f32_min);
-    return ps_state->f32_x1;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    ps_data->ps_var->f32_x1 =
+        pdsp_maxf(pdsp_minf(f32_value, ps_data->f32_max), ps_data->f32_min);
+    return ps_data->ps_var->f32_x1;
 }
 
-pdsp_extern pdsp_bool_t pdsp_setp_reached(pdsp_setp_t *ps_state,
+pdsp_extern pdsp_bool_t pdsp_setp_reached(pdsp_setp_t *ps_data,
                                           pdsp_f32_t f32_tol)
 {
-    PDSP_ASSERT(ps_state != NULL);
-    return (pdsp_bool_t)(fabsf(ps_state->f32_x1 - ps_state->f32_dest) <
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    return (pdsp_bool_t)(pdsp_absf(ps_data->ps_var->f32_x1 - ps_data->ps_var->f32_dest) <
                          f32_tol);
 }
 

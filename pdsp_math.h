@@ -85,6 +85,8 @@
 #define pdsp_minf(x, y) fminf((x), (y))
 /** Floating point maximum function macro */
 #define pdsp_maxf(x, y) fmaxf((x), (y))
+/** Floating point maximum function macro */
+#define pdsp_absf(x) fabsf((x))
 /** Floating point division */
 #define pdsp_divf(x, y) ((x) / (y))
 /** Sine function macro */
@@ -102,6 +104,7 @@
 #elif defined(__TMS320C2000__)
 #define pdsp_minf(x, y) __fmin((x), (y))
 #define pdsp_maxf(x, y) __fmax((x), (y))
+#define pdsp_absf(x, y) fabsf((x), (y))
 #define pdsp_divf(x, y) __divf32((x), (y))
 #define pdsp_sinf(x) __sin((x))
 #define pdsp_sinpuf(x) __sinpuf32((x))

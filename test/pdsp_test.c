@@ -843,6 +843,123 @@ void test_delay(void)
     PDSP_ASSERT(pdsp_delayrf_bool(&delay0, PDSP_TRUE) == PDSP_TRUE);
 }
 
+void test_setp(void)
+{
+    printf("-- void test_setp(void) --\n");
+    pdsp_setp_var_t setp_var = {0};
+    pdsp_setp_t setp = {.ps_var = &setp_var,
+                        .f32_min = 0.0f,
+                        .f32_max = 10.0f,
+                        .f32_step = 1.0f};
+    pdsp_setp_init(&setp);
+    PDSP_ASSERT(setp_var.f32_dest == 0.0f);
+    PDSP_ASSERT(setp_var.f32_x1 == 0.0f);
+    /* ramp */
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_TRUE);
+    pdsp_setp_set_dest(&setp, 3.5f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_ramp(&setp) == 1.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_ramp(&setp) == 2.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_ramp(&setp) == 3.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_ramp(&setp) == 3.5f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_TRUE);
+    /* step */
+    pdsp_setp_init(&setp);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_TRUE);
+    pdsp_setp_set_dest(&setp, 3.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_step(&setp) == 3.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_TRUE);
+    /* exp */
+    setp.f32_step = 0.5f;
+    pdsp_setp_init(&setp);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_TRUE);
+    pdsp_setp_set_dest(&setp, 8.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_exp(&setp) == (4.0f));
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_exp(&setp) == 6.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_exp(&setp) == 7.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_exp(&setp) == 7.5f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_exp(&setp) == 7.75f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.1f) == PDSP_FALSE);
+    PDSP_ASSERT(pdsp_setp_exp(&setp) == 7.875f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.2f) == PDSP_TRUE);
+    /* reset */
+    PDSP_ASSERT(pdsp_setp_reset(&setp, 8.0f) == 8.0f);
+    PDSP_ASSERT(pdsp_setp_reached(&setp, 0.001f) == PDSP_TRUE);
+    PDSP_ASSERT(pdsp_setp_reset(&setp, 80.0f) == 10.0f);
+    /* macro */
+    pdsp_macro_setp_t setpm = {.f32_dest = 0.0f,
+                               .f32_x1 = 0.0f,
+                               .f32_min = 0.0f,
+                               .f32_max = 10.0f,
+                               .f32_step = 1.0f};
+    pdsp_macro_setp_init(setpm);
+    PDSP_ASSERT(setpm.f32_dest == 0.0f);
+    PDSP_ASSERT(setpm.f32_x1 == 0.0f);
+    /* macro ramp */
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_TRUE);
+    pdsp_macro_setp_set_dest(setpm, 3.5f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_ramp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 1.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_ramp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 2.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_ramp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 3.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_ramp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 3.5f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_TRUE);
+    /* macro step */
+    pdsp_macro_setp_init(setpm);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_TRUE);
+    pdsp_macro_setp_set_dest(setpm, 3.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_step(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 3.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_TRUE);
+    /* macro exp */
+    setpm.f32_step = 0.5f;
+    pdsp_macro_setp_init(setpm);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_TRUE);
+    pdsp_macro_setp_set_dest(setpm, 8.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_exp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 4.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_exp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 6.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_exp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 7.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_exp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 7.5f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_exp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 7.75f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.1f) == PDSP_FALSE);
+    pdsp_macro_setp_exp(setpm);
+    PDSP_ASSERT(setpm.f32_x1 == 7.875f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.2f) == PDSP_TRUE);
+    /* macro reset */
+    pdsp_macro_setp_reset(setpm, 8.0f);
+    PDSP_ASSERT(setpm.f32_x1 == 8.0f);
+    PDSP_ASSERT(pdsp_macro_setp_reached(setpm, 0.001f) == PDSP_TRUE);
+    pdsp_macro_setp_reset(setpm, 80.0f);
+    PDSP_ASSERT(setpm.f32_x1 == 10.0f);
+}
+
 void test_pi(void)
 {
     printf("-- void test_pi(void) --\n");
@@ -1424,6 +1541,7 @@ int main()
     test_rollavg();
     test_rollrms();
     test_delay();
+    test_setp();
     test_pi();
     test_bit_read_write();
     test_signal_read_write();

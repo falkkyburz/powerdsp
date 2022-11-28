@@ -5,7 +5,7 @@ TARGET=pdsp_test
 CC=gcc
 SIZE=size
 OBJDUMP=objdump
-CFLAGS=-Wall
+CFLAGS=-Wall -O0
 INC=-I.\
 
 .PHONY: all

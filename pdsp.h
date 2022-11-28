@@ -609,9 +609,20 @@ typedef struct pdsp_pi_tag
     pdsp_f32_t f32_min;
 } pdsp_pi_t;
 
-/** Set point parameter struct. */
-typedef struct pdsp_setp_param_tag
+/** Set point state memory struct. */
+typedef struct pdsp_setp_var_tag
 {
+    /** State memory for set point generator. */
+    pdsp_f32_t f32_x1;
+    /** Set point destination. */
+    pdsp_f32_t f32_dest;
+} pdsp_setp_var_t;
+
+/** Set point parameter struct. */
+typedef struct  
+{
+    /** Pointer to variable struct. */
+    pdsp_setp_var_t *ps_var;
     /** Set point minimum value. */
     pdsp_f32_t f32_min;
     /** Set point maximum value. */
@@ -619,15 +630,6 @@ typedef struct pdsp_setp_param_tag
     /** Absolute step size for ramp. First relative step for exponential
      * process. */
     pdsp_f32_t f32_step;
-} pdsp_setp_param_t;
-
-/** Set point state memory struct. */
-typedef struct pdsp_setp_tag
-{
-    /** State memory for set point generator. */
-    pdsp_f32_t f32_x1;
-    /** Set point destination. */
-    pdsp_f32_t f32_dest;
 } pdsp_setp_t;
 
 /** Sine generator parameter struct */
@@ -2117,66 +2119,58 @@ pdsp_extern void pdsp_pi_set(pdsp_pi_t *ps_data, pdsp_f32_t f32_out);
 
 /**
  * @brief Initialize set point processor struct.
- * @param ps_state Set point state memory struct.
+ * @param ps_data Pointer to set point state memory struct.
  */
-pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_state);
+pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_data);
 
 /**
  * @brief Calculate simple set point processor generating a ramp.
  * @details
- * @param ps_state Set point state memory struct.
- * @param ps_param Set point parameter struct.
+ * @param ps_data Pointer to set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
-pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_state,
-                                      const pdsp_setp_param_t *ps_param);
+pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_data);
 
 /**
  * @brief Calculate simple set point processor generating an exponential
  * settling process.
- * @param ps_state Set point state memory struct.
- * @param ps_param Set point parameter struct.
+ * @param ps_data Pointer to set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
-pdsp_extern pdsp_f32_t pdsp_setp_exp(pdsp_setp_t *ps_state,
-                                     const pdsp_setp_param_t *ps_param);
+pdsp_extern pdsp_f32_t pdsp_setp_exp(pdsp_setp_t *ps_data);
 
 /**
  * @brief Set destination of simple set point processor.
- * @param ps_state Set point state memory struct.
- * @param ps_param Set point parameter struct.
+ * @param ps_data Pointer to set point state memory struct.
  * @param f32_dest Set point destination.
  * @returns pdsp_status_t PDSP_OK
  */
-pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_state,
-                                             const pdsp_setp_param_t *ps_param,
+pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_data,
                                              pdsp_f32_t f32_dest);
 
 /**
  * @brief Set the state to the destination.
- * @param ps_state Set point state memory struct.
+ * @param ps_data Pointer to set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
-pdsp_extern pdsp_f32_t pdsp_setp_step(pdsp_setp_t *ps_state);
+pdsp_extern pdsp_f32_t pdsp_setp_step(pdsp_setp_t *ps_data);
 
 /**
  * @brief Set the state to a defined value.
- * @param ps_state Set point state memory struct.
- * @param ps_param Set point parameter struct.
+ * @param ps_data Pointer to set point state memory struct.
  * @param f32_value Set point value to step to.
  * @returns pdsp_f32_t Set point output.
  */
-pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_state,
-                                       const pdsp_setp_param_t *ps_param,
+pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_data,
                                        pdsp_f32_t f32_value);
 
 /**
  * @brief Set point reached.
- * @param ps_state Set point state memory struct.
+ * @param ps_data Pointer to set point state memory struct.
  * @param f32_tol Tolerance for detection.
  * @returns pdsp_bool_t
  */
-pdsp_extern pdsp_bool_t pdsp_setp_reached(pdsp_setp_t *ps_state,
+pdsp_extern pdsp_bool_t pdsp_setp_reached(pdsp_setp_t *ps_data,
                                           pdsp_f32_t f32_tol);
 
 /**

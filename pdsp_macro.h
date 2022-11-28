@@ -1028,71 +1028,70 @@ typedef struct pdsp_macro_log32_tag
 
 /**
  * @brief (macro) Initialize set point processor struct.
- * @param s_state Set point state memory struct.
+ * @param s_data Set point state memory struct.
  */
-#define pdsp_macro_setp_init(s_state)                                          \
-    (s_state).f32_x1 = 0.0f;                                                   \
-    (s_state).f32_dest = 0.0f
+#define pdsp_macro_setp_init(s_data)                                           \
+    (s_data).f32_x1 = 0.0f;                                                    \
+    (s_data).f32_dest = 0.0f
 
 /**
  * @brief (macro) Calculate simple set point processor generating a ramp.
  * @details
- * @param s_state Set point state memory struct.
+ * @param s_data Set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
-#define pdsp_macro_setp_ramp(s_state)                                          \
-    (s_state).f32_x1 =                                                         \
-        (s_state).f32_x1 +                                                     \
-        pdsp_maxf(pdsp_minf((s_state).f32_dest - (s_state).f32_x1,             \
-                            (s_data).f32_step),                                \
-                  -(s_data).f32_step)
+#define pdsp_macro_setp_ramp(s_data)                                           \
+    (s_data).f32_x1 = (s_data).f32_x1 +                                        \
+                      pdsp_maxf(pdsp_minf((s_data).f32_dest - (s_data).f32_x1, \
+                                          (s_data).f32_step),                  \
+                                -(s_data).f32_step)
 
 /**
  * @brief (macro) Calculate simple set point processor generating an exponential
  * settling process.
- * @param s_state Set point state memory struct.
+ * @param s_data Set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
-#define pdsp_macro_setp_exp(s_state)                                           \
-    (s_state).f32_x1 =                                                         \
-        (s_state).f32_x1 +                                                     \
-        (s_state).f32_step * ((s_state).f32_dest - (s_state).f32_x1)
+#define pdsp_macro_setp_exp(s_data)                                            \
+    (s_data).f32_x1 =                                                          \
+        (s_data).f32_x1 +                                                      \
+        (s_data).f32_step * ((s_data).f32_dest - (s_data).f32_x1)
 
 /**
  * @brief (macro) Set destination of simple set point processor.
- * @param s_state Set point state memory struct.
- * @param f32_dest Set point destination.
+ * @param s_data Set point state memory struct.
+ * @param dest Set point destination.
  * @returns pdsp_status_t PDSP_OK
  */
-#define pdsp_macro_setp_set_dest(s_state, f32_dest)                            \
-    (s_state).f32_dest =                                                       \
-        pdsp_maxf(pdsp_minf((f32_dest), (s_data).f32_max), (s_data).f32_min)
+#define pdsp_macro_setp_set_dest(s_data, dest)                                 \
+    (s_data).f32_dest =                                                        \
+        pdsp_maxf(pdsp_minf((dest), (s_data).f32_max), (s_data).f32_min)
 
 /**
  * @brief (macro) Set the state to the destination.
- * @param s_state Set point state memory struct.
+ * @param s_data Set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
-#define pdsp_macro_setp_step(s_state) (s_state).f32_x1 = (s_state).f32_dest
+#define pdsp_macro_setp_step(s_data) (s_data).f32_x1 = (s_data).f32_dest
 
 /**
  * @brief (macro) Set the state to a defined value.
- * @param s_state Set point state memory struct.
- * @param f32_value Set point value to step to.
+ * @param s_data Set point state memory struct.
+ * @param value Set point value to step to.
  * @returns pdsp_f32_t Set point output.
  */
-#define pdsp_macrosetp_reset(s_state, f32_value)                               \
-    (s_state).f32_x1 = pdsp_maxf(pdsp_minf((f32_value), (s_state).f32_max),    \
-                                 (s_state).f32_min)
+#define pdsp_macro_setp_reset(s_data, value)                                   \
+    (s_data).f32_x1 =                                                          \
+        pdsp_maxf(pdsp_minf((value), (s_data).f32_max), (s_data).f32_min)
 
 /**
  * @brief (macro) Set point reached.
- * @param s_state Set point state memory struct.
- * @param f32_tol Tolerance for detection.
+ * @param s_data Set point state memory struct.
+ * @param tol Tolerance for detection.
  * @returns pdsp_bool_t
  */
-#define pdsp_macro_setp_reached(s_state, f32_tol)                              \
-    (pdsp_bool_t)(fabsf((s_state).f32_x1 - (s_state).f32_dest) < (f32_tol))
+#define pdsp_macro_setp_reached(s_data, tol)                                   \
+    (pdsp_bool_t)(pdsp_absf((s_data).f32_x1 - (s_data).f32_dest) < (tol))
 
 /**
  * @brief Clear all data in the SFRA struct.
