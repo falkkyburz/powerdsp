@@ -68,6 +68,19 @@ typedef struct pdsp_macro_hyst_tag
     pdsp_f32_t f32_high;
 } pdsp_macro_hyst_t;
 
+/** (macro) Debounce based on counter parameter struct */
+typedef struct pdsp_macro_debounce_cnt_tag
+{
+    /** Debounce status state variable. */
+    pdsp_bool_t b_state;
+    /** Debounce time state variable. */
+    pdsp_u16_t u16_count;
+    /** Debounce detection count. High transition. */
+    pdsp_u16_t u16_cnt_high;
+    /** Debounce recovery count. Low transition. */
+    pdsp_u16_t u16_cnt_low;
+} pdsp_macro_debounce_cnt_t;
+
 /** (macro) Char queue parameters. */
 typedef struct pdsp_macro_queue_tag
 {
@@ -417,6 +430,44 @@ typedef struct pdsp_macro_log32_tag
     else if ((f32_in) < (s_data).f32_low)                                      \
     {                                                                          \
         (s_data).b_state = PDSP_FALSE;                                         \
+    }
+
+/**
+ * @brief (macro) Counter based debounce function clear.
+ * @param s_data Hysteresis state struct.
+ */
+#define pdsp_macro_debounce_cnt_clear(s_data)                                  \
+    (s_data).b_state = PDSP_FALSE;                                             \
+    (s_data).u16_count = 0U
+
+/**
+ * @brief (macro) Counter based debouncing function with detecting and
+ * recovering count.
+ * @param s_data Hysteresis state struct.
+ * @param in Input condition.
+ */
+#define pdsp_macro_debounce_cnt(s_data, in)                                    \
+    if (!((s_data).b_state) && (in))                                           \
+    {                                                                          \
+        (s_data).u16_count++;                                                  \
+        if ((s_data).u16_count > (s_data).u16_cnt_high)                        \
+        {                                                                      \
+            (s_data).b_state = PDSP_TRUE;                                      \
+            (s_data).u16_count = 0U;                                           \
+        }                                                                      \
+    }                                                                          \
+    else if (((s_data).b_state) && !(in))                                      \
+    {                                                                          \
+        (s_data).u16_count++;                                                  \
+        if ((s_data).u16_count > (s_data).u16_cnt_low)                         \
+        {                                                                      \
+            (s_data).b_state = PDSP_FALSE;                                     \
+            (s_data).u16_count = 0U;                                           \
+        }                                                                      \
+    }                                                                          \
+    else                                                                       \
+    {                                                                          \
+        (s_data).u16_count = 0U;                                               \
     }
 
 /**

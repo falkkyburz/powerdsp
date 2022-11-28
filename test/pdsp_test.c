@@ -373,6 +373,36 @@ void test_debounce(void)
     PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_TRUE) == PDSP_TRUE);
+    /*macro*/
+    pdsp_macro_debounce_cnt_t debouncem = {
+        .u16_count = 0, .u16_cnt_high = 2U, .u16_cnt_low = 2U, .b_state = 0};
+    pdsp_macro_debounce_cnt_clear(debouncem);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_FALSE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_FALSE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_TRUE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_TRUE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_TRUE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_TRUE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_TRUE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_TRUE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_FALSE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_TRUE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_FALSE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_TRUE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_FALSE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_FALSE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_TRUE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_TRUE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_FALSE);
+    pdsp_macro_debounce_cnt(debouncem, PDSP_TRUE);
+    PDSP_ASSERT(debouncem.b_state == PDSP_TRUE);
 }
 
 void test_robust(void)
