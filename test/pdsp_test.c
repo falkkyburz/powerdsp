@@ -161,7 +161,7 @@ void test_map_idx(void)
 
 void test_interpolate_2d(void)
 {
-    printf("-- void pdsp_interpolate_2d(void) --\n");
+    printf("-- void test_interpolate_2d(void) --\n");
     const pdsp_f32_t xarr[5] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f};
     const pdsp_f32_t yarr[5] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f};
     const pdsp_f32_t yarrn[5] = {0.0f, -1.0f, -2.0f, -3.0f, -4.0f};
@@ -261,9 +261,7 @@ void test_array_linlogspace(void)
 void test_hysteresis_value(void)
 {
     printf("-- void test_hysteresis_value(void) --\n");
-    pdsp_hyst_var_t hyst_var = {0};
-    pdsp_hyst_t hyst = {
-        .ps_var = &hyst_var, .f32_low = -1.0f, .f32_high = 1.0f};
+    pdsp_hyst_t hyst = {.b_state = 0, .f32_low = -1.0f, .f32_high = 1.0f};
     pdsp_hysteresis_value_clear(&hyst);
     PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_hysteresis_value(&hyst, -2.0f) == PDSP_FALSE);
@@ -309,11 +307,11 @@ void test_hysteresis_value(void)
 void test_hysteresis_list(void)
 {
     printf("-- void test_hysteresis_list(void) --\n");
-    pdsp_f32_t af32_steps[4] = {0.0f, 1.0f, 2.0f, 3.0f};
-    pdsp_hyst_list_var_t hyst_var = {0};
-    pdsp_hyst_list_t hyst = {.ps_var = &hyst_var,
-                             .f32_hyst = 0.2f,
-                             .af32_thres = af32_steps,
+    pdsp_f32_t af32_hyst_dn[4] = {0.0f, 0.8f, 1.8f, 2.8f};
+    pdsp_f32_t af32_hyst_up[4] = {1.2f, 2.2f, 3.2f, 4.0f};
+    pdsp_hyst_list_t hyst = {.u16_state = 0,
+                             .af32_thres_up = af32_hyst_up,
+                             .af32_thres_dn = af32_hyst_dn,
                              .u16_size = 4};
     pdsp_hysteresis_list_clear(&hyst);
     PDSP_ASSERT(pdsp_hysteresis_list(&hyst, 0.0f) == 0U);
@@ -336,8 +334,8 @@ void test_hysteresis_list(void)
 void test_debounce(void)
 {
     printf("-- void test_debounce(void) --\n");
-    pdsp_debounce_var_t hyst_var = {0};
-    pdsp_debounce_t hyst = {.ps_var = &hyst_var,
+    pdsp_debounce_t hyst = {.b_state = 0,
+                            .f32_time = 0.0f,
                             .f32_t_step = 1.0f,
                             .f32_t_high = 2.0f,
                             .f32_t_low = 2.0f};
@@ -356,9 +354,8 @@ void test_debounce(void)
     PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_debounce(&hyst, PDSP_TRUE) == PDSP_TRUE);
 
-    pdsp_debounce_cnt_var_t debounce_var = {0};
-    const pdsp_debounce_cnt_t debounce = {
-        .ps_var = &debounce_var, .u16_cnt_high = 2U, .u16_cnt_low = 2U};
+    pdsp_debounce_cnt_t debounce = {
+        .b_state = 0, .u16_count = 0, .u16_cnt_high = 2U, .u16_cnt_low = 2U};
     pdsp_debounce_cnt_clear(&debounce);
     PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_FALSE);
     PDSP_ASSERT(pdsp_debounce_cnt(&debounce, PDSP_FALSE) == PDSP_FALSE);
@@ -412,8 +409,8 @@ void test_robust(void)
     pdsp_f32_t af32_thres_dn[4] = {0.0f, 0.5f, 1.5f, 2.0f};
     pdsp_f32_t af32_time_up[4] = {2.0f, 2.0f, 2.0f, 2.0f};
     pdsp_f32_t af32_time_dn[4] = {2.0f, 2.0f, 2.0f, 2.0f};
-    pdsp_robust_var_t rbst_var = {0};
-    pdsp_robust_t rbst = {.ps_var = &rbst_var,
+    pdsp_robust_t rbst = {.u16_state = 0,
+                          .f32_time = 0.0f,
                           .f32_t_step = 1.0f,
                           .af32_thres_up = af32_thres_up,
                           .af32_thres_dn = af32_thres_dn,
@@ -661,11 +658,10 @@ void test_minmax(void)
 void test_expavg(void)
 {
     printf("-- void test_expavg(void) --\n");
-    pdsp_expavg_var_t expavg_var;
-    const pdsp_expavg_t expavg = {.ps_var = &expavg_var, .f32_tau = 0.5f};
+    pdsp_expavg_t expavg = {.f32_out = 0.0f, .f32_tau = 0.5f};
     pdsp_f32_t out;
     pdsp_expavg_clear(&expavg);
-    PDSP_ASSERT(expavg_var.f32_x1 == 0.0f);
+    PDSP_ASSERT(expavg.f32_out == 0.0f);
     out = pdsp_expavg(&expavg, 1.0);
     PDSP_ASSERT(out == 0.5f);
     out = pdsp_expavg(&expavg, 1.0);
@@ -679,8 +675,7 @@ void test_expavg(void)
     if (fp != NULL)
     {
         int i;
-        pdsp_expavg_var_t expavg_var_csv;
-        pdsp_expavg_t expavg_csv = {.ps_var = &expavg_var_csv, .f32_tau = 0.0f};
+        pdsp_expavg_t expavg_csv = {.f32_out = 0.0f, .f32_tau = 0.0f};
         /* Set tau to 1/(2*pi*1)=0.159s */
         pdsp_expavg_c2d(&expavg_csv, 0.01f, 1.0f);
         pdsp_expavg_clear(&expavg_csv);

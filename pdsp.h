@@ -89,58 +89,37 @@ typedef pdsp_i32_t (*pdsp_pi32_func_t)(void);
 /** Function pointer (pointer to f32 function) */
 typedef pdsp_f32_t (*pdsp_pf32_func_t)(void);
 
-/** Hysteresis value variable struct. */
-typedef struct pdsp_hyst_var_tag
-{
-    /** Hysteresis state variable. */
-    pdsp_bool_t b_state;
-} pdsp_hyst_var_t;
-
 /** Hysteresis value struct. */
 typedef struct pdsp_hyst_tag
 {
-    /** Pointer to hysteresis variable struct. */
-    pdsp_hyst_var_t *ps_var;
+    /** Hysteresis state variable. */
+    pdsp_bool_t b_state;
     /** Lower hysteresis threshold. */
     pdsp_f32_t f32_low;
     /** Higher hysteresis threshold. */
     pdsp_f32_t f32_high;
 } pdsp_hyst_t;
 
-/** Hysteresis list variable struct. */
-typedef struct pdsp_hyst_list_var_tag
-{
-    /** Hysteresis state variable. */
-    pdsp_u16_t u16_state;
-} pdsp_hyst_list_var_t;
-
 /** Hysteresis list struct. */
 typedef struct pdsp_hyst_list_tag
 {
-    /** Pointer to hysteresis variable struct. */
-    pdsp_hyst_list_var_t *ps_var;
-    /** Hysteresis value, applied left/right of the threshold. */
-    pdsp_f32_t f32_hyst;
-    /** Hysteresis threshold list. */
-    pdsp_f32_t *af32_thres;
+    /** Hysteresis state variable. */
+    pdsp_u16_t u16_state;
+    /** Robust state threshold up list. */
+    pdsp_f32_t *af32_thres_up;
+    /** Robust state threshold down list. */
+    pdsp_f32_t *af32_thres_dn;
     /** Hysteresis threshold list length. */
     pdsp_u16_t u16_size;
 } pdsp_hyst_list_t;
 
-/** Debounce status struct */
-typedef struct pdsp_debounce_var_tag
+/** Debounce parameter struct */
+typedef struct pdsp_debounce_tag
 {
     /** Debounce status state variable. */
     pdsp_bool_t b_state;
     /** Debounce time state variable. */
     pdsp_f32_t f32_time;
-} pdsp_debounce_var_t;
-
-/** Debounce parameter struct */
-typedef struct pdsp_debounce_tag
-{
-    /** Pointer to pdsp_debounce_var_t struct. */
-    pdsp_debounce_var_t *ps_var;
     /** Debounce time step. */
     pdsp_f32_t f32_t_step;
     /** Debounce detection time. High transition. */
@@ -149,40 +128,26 @@ typedef struct pdsp_debounce_tag
     pdsp_f32_t f32_t_low;
 } pdsp_debounce_t;
 
-/** Debounce based on counter status struct */
-typedef struct pdsp_debounce_cnt_var_tag
+/** Debounce based on counter parameter struct */
+typedef struct pdsp_debounce_cnt_tag
 {
     /** Debounce status state variable. */
     pdsp_bool_t b_state;
     /** Debounce time state variable. */
     pdsp_u16_t u16_count;
-} pdsp_debounce_cnt_var_t;
-
-/** Debounce based on counter parameter struct */
-typedef struct pdsp_debounce_cnt_tag
-{
-    /** Pointer to pdsp_debounce_var_t struct. */
-    pdsp_debounce_cnt_var_t *ps_var;
     /** Debounce detection count. High transition. */
     pdsp_u16_t u16_cnt_high;
     /** Debounce recovery count. Low transition. */
     pdsp_u16_t u16_cnt_low;
 } pdsp_debounce_cnt_t;
 
-/** Robust status struct */
-typedef struct pdsp_robust_var_tag
+/** Robust parameter struct */
+typedef struct pdsp_robust_tag
 {
     /** Robust status state variable and list index. */
     pdsp_u16_t u16_state;
     /** Robust time state variable. */
     pdsp_f32_t f32_time;
-} pdsp_robust_var_t;
-
-/** Robust parameter struct */
-typedef struct pdsp_robust_tag
-{
-    /** Pointer to pdsp_robust_var_t struct. */
-    pdsp_robust_var_t *ps_var;
     /** Robust time step. */
     pdsp_f32_t f32_t_step;
     /** Robust state threshold up list. */
@@ -301,18 +266,11 @@ typedef struct pdsp_minmax_var_tag
     pdsp_f32_t f32_delta;
 } pdsp_minmax_var_t;
 
-/** Exponential average state memory. */
-typedef struct pdsp_expavg_var_tag
-{
-    /** Exponential average state variable. */
-    pdsp_f32_t f32_x1;
-} pdsp_expavg_var_t;
-
 /** Exponential average parameter struct. */
 typedef struct pdsp_expavg_tag
 {
-    /** Pointer to pdsp_expavg_var_t. */
-    pdsp_expavg_var_t *ps_var;
+    /** Exponential average state variable and output. */
+    pdsp_f32_t f32_out;
     /** Exponential average factor. */
     pdsp_f32_t f32_tau;
 } pdsp_expavg_t;
@@ -474,73 +432,115 @@ typedef struct pdsp_rollsum_tag
 } pdsp_rollsum_t;
 
 /** EVSE communication standard. */
-typedef enum
+typedef enum pdsp_llc_std_enum
 {
     /** EVSE standard is IEC. */
-    PDSP_EVSE_LLC_STD_IEC,
+    PDSP_LLC_STD_IEC,
     /** EVSE standard is SAE. */
-    PDSP_EVSE_LLC_STD_SAE,
+    PDSP_LLC_STD_SAE,
     /** EVSE standard is GBT. */
-    PDSP_EVSE_LLC_STD_GBT
-} pdsp_evse_llc_std_e;
+    PDSP_LLC_STD_GBT
+} pdsp_llc_std_e;
 
-/** EVSE communication state. */
-typedef enum
+/** Supply equipment ready. */
+typedef enum pdsp_llc_se_ready_enum
 {
-    /** EVSE control pilot state A1. EV not connected. 12V DC */
-    PDSP_EVSE_LLC_STATE_A,
-    /** EVSE control pilot state B1. EV connected, not ready. 9V DC */
-    PDSP_EVSE_LLC_STATE_B1,
-    /** EVSE control pilot state B2. EV connected, not ready, 9V 1kHz PWM. */
-    PDSP_EVSE_LLC_STATE_B2,
-    /** EVSE control pilot state C1. EV connected, ready, 6V DC. */
-    PDSP_EVSE_LLC_STATE_C1,
-    /** EVSE control pilot state C2. EV connected, ready, 6V 1kHz PWM. */
-    PDSP_EVSE_LLC_STATE_C2,
-    /** EVSE control pilot state D1. EV connected, ready, 3V DC, ventilation
-       requested. */
-    PDSP_EVSE_LLC_STATE_D1,
-    /** EVSE control pilot state D2. EV connected, ready, 3V 1kHz PWM
-       ventilation reuested, PWM enabled. */
-    PDSP_EVSE_LLC_STATE_D2,
-    /** EVSE control pilot state E. EVSE error, 0V DC. */
-    PDSP_EVSE_LLC_STATE_E,
-    /** EVSE control pilot state F. EVSE not available, -12V DC. */
-    PDSP_EVSE_LLC_STATE_F
-} pdsp_evse_llc_state_e;
+    /** EVSE not ready. */
+    PDSP_LLC_SE_NOT_READY,
+    /** EVSE ready. */
+    PDSP_LLC_SE_READY,
+    /** EVSE fault. */
+    PDSP_LLC_SE_FAULT
+} pdsp_llc_se_ready_e;
 
-/** EVSE control pilot duty cycle. */
-typedef enum
+/** EVSE ready. */
+typedef enum pdsp_llc_ev_ready_enum
 {
-    /** EVSE control pilot duty state. */
-    PDSP_EVSE_LLC_HLC_REQUEST,
-    PDSP_EVSE_LLC_NORMAL,
-    PDSP_EVSE_LLC_ILLEGAL
-} pdsp_evse_llc_duty_state_e;
+    /** EV not ready. */
+    PDSP_LLC_EV_NOT_READY,
+    /** EV ready. */
+    PDSP_LLC_EV_READY,
+    /** EV fault. */
+    PDSP_LLC_EV_FAULT
+} pdsp_llc_ev_ready_e;
+
+/** EVSE proximity pilot resistance 100 Ohm. */
+#define PDSP_LLC_PP_100OHM 0U
+/** EVSE proximity pilot resistance 150 Ohm. */
+#define PDSP_LLC_PP_150OHM 1U
+/** EVSE proximity pilot resistance 220 Ohm. */
+#define PDSP_LLC_PP_220OHM 2U
+/** EVSE proximity pilot resistance 480 Ohm. */
+#define PDSP_LLC_PP_480OHM 3U
+/** EVSE proximity pilot resistance 680 Ohm. */
+#define PDSP_LLC_PP_680OHM 4U
+/** EVSE proximity pilot resistance 1500 Ohm. */
+#define PDSP_LLC_PP_1500OHM 5U
+/** EVSE proximity pilot resistance size. */
+#define PDSP_LLC_PP_SIZE 6U
+
+/** EVSE control pilot state A1. EV not connected. 12V DC */
+#define PDSP_LLC_CP_STATE_A 0U
+/** EVSE control pilot state B1. EV connected, not ready. 9V DC */
+#define PDSP_LLC_CP_STATE_B1 1U
+/** EVSE control pilot state B2. EV connected, not ready, 9V 1kHz PWM. */
+#define PDSP_LLC_CP_STATE_B2 2U
+/** EVSE control pilot state C1. EV connected, ready, 6V DC. */
+#define PDSP_LLC_CP_STATE_C1 3U
+/** EVSE control pilot state C2. EV connected, ready, 6V 1kHz PWM. */
+#define PDSP_LLC_CP_STATE_C2 4U
+/** EVSE control pilot state D1. EV connected, ready, 3V DC, ventilation
+   requested. */
+#define PDSP_LLC_CP_STATE_D1 5U
+/** EVSE control pilot state D2. EV connected, ready, 3V 1kHz PWM
+   ventilation requested, PWM enabled. */
+#define PDSP_LLC_CP_STATE_D2 6U
+/** EVSE control pilot state E. EVSE error, 0V DC. */
+#define PDSP_LLC_CP_STATE_E 7U
+/** EVSE control pilot state F. EVSE not available, -12V DC. */
+#define PDSP_LLC_CP_STATE_F 8U
+
+/** EVSE control pilot duty state for HLC request. */
+#define PDSP_LLC_CP_DUTY_HLC_REQUEST 0U
+/** EVSE control pilot duty state is normal. */
+#define PDSP_LLC_CP_DUTY_NORMAL 1U
+/** EVSE control pilot duty state is illegal. */
+#define PDSP_LLC_CP_DUTY_ILLEGAL 2U
+/** EVSE control pilot duty size */
+#define PDSP_LLC_CP_DUTY_SIZE 3U
 
 /** Low level EVSE communication variable struct. */
-typedef struct pdsp_evse_llc_var_tag
+typedef struct pdsp_llc_tag
 {
-    /** Current limit from control pilot. */
-    pdsp_f32_t cp_curr_lim;
+    /** Measured proximity resistance. */
+    pdsp_expavg_t pp_resistance;
+    /** Proximity resistance converted state. */
+    pdsp_hyst_list_t pp_resistance_state;
     /** Current limit from proximity resistor. */
-    pdsp_f32_t pp_curr_lim;
+    pdsp_f32_t f32_pp_current_limit;
+    /** Measured duty cycle exact. */
+    pdsp_expavg_t cp_duty;
+    /** Measured duty cycle as integer 0% - 100%. */
+    pdsp_u16_t u16_cp_duty;
+    /** Measured positive amplitude. */
+    pdsp_expavg_t cp_voltage_max;
+    /** Measured negative amplitude. */
+    pdsp_expavg_t cp_voltage_min;
+    /** Current limit from control pilot. */
+    pdsp_f32_t f32_cp_current_limit;
     /** Low level communication state. */
-    pdsp_evse_llc_state_e cp_state;
+    pdsp_u16_t u16_cp_state;
     /** Duty cycle state. */
-    pdsp_evse_llc_duty_state_e duty_state;
+    pdsp_hyst_list_t cp_duty_state;
     /** Plug detection result. */
-    pdsp_bool_t plug_detected;
-} pdsp_evse_llc_var_t;
-
-/** Low level EVSE communication data struct. */
-typedef struct pdsp_evse_llc_tag
-{
-    /** Pointer to variable struct. */
-    pdsp_evse_llc_var_t *ps_var;
+    pdsp_bool_t b_plug_detected;
+    /** EVSE ready status. */
+    pdsp_llc_ev_ready_e e_ev_ready;
+    /** EV ready status. */
+    pdsp_llc_se_ready_e e_se_ready;
     /** EVSE communication standard. */
-    pdsp_evse_llc_std_e std;
-} pdsp_evse_llc_t;
+    pdsp_llc_std_e std;
+} pdsp_llc_t;
 
 /** Signal delay data variable struct. */
 typedef struct pdsp_delayrf_bool_var_tag
@@ -619,7 +619,7 @@ typedef struct pdsp_setp_var_tag
 } pdsp_setp_var_t;
 
 /** Set point parameter struct. */
-typedef struct  
+typedef struct pdsp_setp_tag
 {
     /** Pointer to variable struct. */
     pdsp_setp_var_t *ps_var;
@@ -1300,7 +1300,17 @@ pdsp_extern void pdsp_array_logspace_f32(pdsp_f32_t af32_out[],
  * @brief Value hysteresis function clear.
  * @param ps_data Hysteresis state struct.
  */
-pdsp_extern void pdsp_hysteresis_value_clear(const pdsp_hyst_t *ps_data);
+pdsp_extern void pdsp_hysteresis_value_clear(pdsp_hyst_t *ps_data);
+
+/**
+ * @brief Value hysteresis function clear.
+ * @param ps_data Hysteresis state struct.
+ * @param f32_low Low hysteresis threshold.
+ * @param f32_high High hysteresis threshold.
+ */
+pdsp_extern void pdsp_hysteresis_value_init(pdsp_hyst_t *ps_data,
+                                            pdsp_f32_t f32_low,
+                                            pdsp_f32_t f32_high);
 
 /**
  * @brief Value hysteresis function.
@@ -1315,14 +1325,26 @@ pdsp_extern void pdsp_hysteresis_value_clear(const pdsp_hyst_t *ps_data);
  * @param f32_in Value input.
  * @return pdsp_bool_t State output.
  */
-pdsp_extern pdsp_bool_t pdsp_hysteresis_value(const pdsp_hyst_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_hysteresis_value(pdsp_hyst_t *ps_data,
                                               pdsp_f32_t f32_in);
 
 /**
  * @brief Value list hysteresis function clear.
  * @param ps_data Hysteresis state struct.
+ * @param af32_thres_up Hysteresis upper threshold list.
+ * @param af32_thres_dn Hysteresis lower threshold list.
+ * @param u16_size Size of threshold array.
  */
-pdsp_extern void pdsp_hysteresis_list_clear(const pdsp_hyst_list_t *ps_data);
+pdsp_extern void pdsp_hysteresis_list_init(pdsp_hyst_list_t *ps_data,
+                                           pdsp_f32_t *af32_thres_up,
+                                           pdsp_f32_t *af32_thres_dn,
+                                           pdsp_u16_t u16_size);
+
+/**
+ * @brief Value list hysteresis function clear.
+ * @param ps_data Hysteresis state struct.
+ */
+pdsp_extern void pdsp_hysteresis_list_clear(pdsp_hyst_list_t *ps_data);
 
 /**
  * @brief Value list hysteresis function.
@@ -1343,14 +1365,14 @@ pdsp_extern void pdsp_hysteresis_list_clear(const pdsp_hyst_list_t *ps_data);
  * @param f32_in Value input.
  * @return pdsp_u16_t State output.
  */
-pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
+pdsp_extern pdsp_u16_t pdsp_hysteresis_list(pdsp_hyst_list_t *ps_data,
                                             pdsp_f32_t f32_in);
 
 /**
  * @brief Time hysteresis function clear.
  * @param ps_data Hysteresis state struct.
  */
-pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data);
+pdsp_extern void pdsp_debounce_clear(pdsp_debounce_t *ps_data);
 
 /**
  * @brief Condition/time hysteresis function with detecting and recovering time.
@@ -1358,14 +1380,14 @@ pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data);
  * @param b_in Input condition.
  * @return pdsp_bool_t Status output.
  */
-pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_debounce(pdsp_debounce_t *ps_data,
                                       pdsp_bool_t b_in);
 
 /**
  * @brief Counter based debounce function clear.
  * @param ps_data Hysteresis state struct.
  */
-pdsp_extern void pdsp_debounce_cnt_clear(const pdsp_debounce_cnt_t *ps_data);
+pdsp_extern void pdsp_debounce_cnt_clear(pdsp_debounce_cnt_t *ps_data);
 
 /**
  * @brief Counter based debouncing function with detecting and recovering count.
@@ -1373,14 +1395,14 @@ pdsp_extern void pdsp_debounce_cnt_clear(const pdsp_debounce_cnt_t *ps_data);
  * @param b_in Input condition.
  * @return pdsp_bool_t Status output.
  */
-pdsp_extern pdsp_bool_t pdsp_debounce_cnt(const pdsp_debounce_cnt_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_debounce_cnt(pdsp_debounce_cnt_t *ps_data,
                                           pdsp_bool_t b_in);
 
 /**
  * @brief Robust function clear.
  * @param ps_data Robust state struct.
  */
-pdsp_extern void pdsp_robust_clear(const pdsp_robust_t *ps_data);
+pdsp_extern void pdsp_robust_clear(pdsp_robust_t *ps_data);
 
 /**
  * @brief Robust function.
@@ -1404,8 +1426,7 @@ pdsp_extern void pdsp_robust_clear(const pdsp_robust_t *ps_data);
  * @param f32_in Value input.
  * @return pdsp_u16_t State output.
  */
-pdsp_extern pdsp_u16_t pdsp_robust(const pdsp_robust_t *ps_data,
-                                   pdsp_f32_t f32_in);
+pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in);
 
 /**
  * @brief Write bit in pdsp_u16_t variable.
@@ -1649,6 +1670,72 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data);
  */
 
 /**
+ * @brief Initialize the low level communication module.
+ * @param ps_data Low level communication data struct.
+ * @param f32_pp_filter_tau Filter parameter for pp measurement.
+ * @param f32_cp_filter_tau Filter parameter for cp measurement.
+ * @param af32_pp_thres_dn Hysteresis values for pp resistance detection.
+ * @param af32_pp_thres_up Hysteresis values for pp resistance detection.
+ * @param af32_cp_duty_thres_dn Hysteresis values for cp resistance detection.
+ * @param af32_cp_duty_thres_up Hysteresis values for cp resistance detection.
+ */
+pdsp_extern void
+pdsp_llc_init(pdsp_llc_t *ps_data, pdsp_f32_t f32_pp_filter_tau,
+              pdsp_f32_t f32_cp_filter_tau, pdsp_f32_t *af32_pp_thres_dn,
+              pdsp_f32_t *af32_pp_thres_up, pdsp_f32_t *af32_cp_duty_thres_dn,
+              pdsp_f32_t *af32_cp_duty_thres_up);
+
+/**
+ * @brief Run the periodic task of the low level communication module.
+ * @param ps_data Low level communication data struct.
+ */
+pdsp_extern void pdsp_llc_run(pdsp_llc_t *ps_data);
+
+/**
+ * @brief Set the cp and pp values from measurement.
+ * @param ps_data Low level communication data struct.
+ * @param f32_pp_resistance PP resistance.
+ * @param f32_cp_duty CP duty cycle.
+ * @param f32_cp_voltage_max CP positive voltage amplitude.
+ * @param f32_cp_voltage_min CP negative voltage amplitude.
+ */
+pdsp_extern void pdsp_llc_set_values(pdsp_llc_t *ps_data,
+                                     pdsp_f32_t f32_pp_resistance,
+                                     pdsp_f32_t f32_cp_duty,
+                                     pdsp_f32_t f32_cp_voltage_max,
+                                     pdsp_f32_t f32_cp_voltage_min);
+
+/**
+ * @brief Set the ev ready status.
+ * @param ps_data Low level communication data struct.
+ * @param e_ev_ready EV ready status.
+ */
+pdsp_extern void pdsp_llc_set_ev_ready(pdsp_llc_t *ps_data,
+                                       pdsp_llc_ev_ready_e e_ev_ready);
+
+/**
+ * @brief Get the evse ready status.
+ * @param ps_data Low level communication data struct.
+ * @returns pdsp_llc_se_ready_e EVSE ready status.
+ */
+pdsp_extern pdsp_llc_se_ready_e pdsp_llc_get_se_ready(pdsp_llc_t *ps_data);
+
+/**
+ * @brief Get the plug status.
+ * @param ps_data Low level communication data struct.
+ * @returns pdsp_bool_t No plug detected = 0, Plug detected = 1
+ */
+pdsp_extern pdsp_bool_t pdsp_llc_get_plug_detected(pdsp_llc_t *ps_data);
+
+/**
+ * @brief Get the cp status.
+ * @param ps_data Low level communication data struct.
+ * @returns pdsp_llc_duty_state_e Duty cycle state.
+ */
+pdsp_extern pdsp_u16_t
+pdsp_llc_get_cp_duty_state(pdsp_llc_t *ps_data);
+
+/**
  * @brief Apply gain / offset to raw signal with extended override capability.
  * @param ps_data Signal data struct.
  * @param f32_raw Raw input signal.
@@ -1737,10 +1824,17 @@ pdsp_extern void pdsp_expavg_c2d(pdsp_expavg_t *ps_data, pdsp_f32_t f32_ts,
                                  pdsp_f32_t f32_fc);
 
 /**
- * @brief Initialize / Clear simple exponential average struct.
+ * @brief Initialize the simple exponential average struct.
+ * @param ps_data Filter state variable struct.
+ * @param f32_tau Filter parameter.
+ */
+pdsp_extern void pdsp_expavg_init(pdsp_expavg_t *ps_data, pdsp_f32_t f32_tau);
+
+/**
+ * @brief Clear the simple exponential average struct.
  * @param ps_data Filter state variable struct.
  */
-pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data);
+pdsp_extern void pdsp_expavg_clear(pdsp_expavg_t *ps_data);
 
 /**
  * @brief Exponential moving average filter.
@@ -1748,8 +1842,7 @@ pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data);
  * @param f32_in Filter input.
  * @returns pdsp_f32_t Filter output.
  */
-pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
-                                   pdsp_f32_t f32_in);
+pdsp_extern pdsp_f32_t pdsp_expavg(pdsp_expavg_t *ps_data, pdsp_f32_t f32_in);
 
 /**
  * @brief Convert continuous H(s) to H(1/z) for 1P1Z transfer function using

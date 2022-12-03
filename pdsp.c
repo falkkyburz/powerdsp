@@ -433,204 +433,211 @@ pdsp_extern void pdsp_array_logspace_f32(pdsp_f32_t af32_out[],
     }
 }
 
-pdsp_extern void pdsp_hysteresis_value_clear(const pdsp_hyst_t *ps_data)
+pdsp_extern void pdsp_hysteresis_value_clear(pdsp_hyst_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
-    ps_data->ps_var->b_state = PDSP_FALSE;
+    ps_data->b_state = PDSP_FALSE;
 }
 
-pdsp_extern pdsp_bool_t pdsp_hysteresis_value(const pdsp_hyst_t *ps_data,
+pdsp_extern void pdsp_hysteresis_value_init(pdsp_hyst_t *ps_data,
+                                            pdsp_f32_t f32_low,
+                                            pdsp_f32_t f32_high)
+{
+    ps_data->b_state = PDSP_FALSE;
+    ps_data->f32_low = f32_low;
+    ps_data->f32_high = f32_high;
+}
+
+pdsp_extern pdsp_bool_t pdsp_hysteresis_value(pdsp_hyst_t *ps_data,
                                               pdsp_f32_t f32_in)
 {
-    static pdsp_hyst_var_t *ps_var;
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    ps_var = ps_data->ps_var;
+    PDSP_ASSERT(ps_data != NULL);
     /* PDSP_FALSE or OFF state */
     if (f32_in > ps_data->f32_high)
     {
-        ps_var->b_state = PDSP_TRUE;
+        ps_data->b_state = PDSP_TRUE;
     }
     /* PDSP_TRUE or ON state */
     else if (f32_in < ps_data->f32_low)
     {
-        ps_var->b_state = PDSP_FALSE;
+        ps_data->b_state = PDSP_FALSE;
     }
     /* else: state does not change */
-    return ps_var->b_state;
+    return ps_data->b_state;
 }
 
-pdsp_extern void pdsp_hysteresis_list_clear(const pdsp_hyst_list_t *ps_data)
+pdsp_extern void pdsp_hysteresis_list_clear(pdsp_hyst_list_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
-    ps_data->ps_var->u16_state = 0U;
+    ps_data->u16_state = 0U;
 }
 
-pdsp_extern pdsp_u16_t pdsp_hysteresis_list(const pdsp_hyst_list_t *ps_data,
+pdsp_extern void pdsp_hysteresis_list_init(pdsp_hyst_list_t *ps_data,
+                                           pdsp_f32_t *af32_thres_up,
+                                           pdsp_f32_t *af32_thres_dn,
+                                           pdsp_u16_t u16_size)
+{
+    ps_data->u16_state = 0U;
+    ps_data->af32_thres_up = af32_thres_up;
+    ps_data->af32_thres_dn = af32_thres_dn;
+    ps_data->u16_size = u16_size;
+}
+
+pdsp_extern pdsp_u16_t pdsp_hysteresis_list(pdsp_hyst_list_t *ps_data,
                                             pdsp_f32_t f32_in)
 {
-    static pdsp_hyst_list_var_t *ps_var;
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    ps_var = ps_data->ps_var;
+    PDSP_ASSERT(ps_data != NULL);
     /* upper boundary breached --> */
-    if (f32_in >
-        (ps_data->af32_thres[ps_var->u16_state + 1] + ps_data->f32_hyst))
+    if (f32_in > ps_data->af32_thres_up[ps_data->u16_state])
     {
-        if (ps_var->u16_state < ps_data->u16_size - 2)
+        if (ps_data->u16_state < ps_data->u16_size - 2)
         {
-            ps_var->u16_state++;
+            ps_data->u16_state++;
         }
     }
     /* <-- lower boundary breached */
-    else if (f32_in <
-             (ps_data->af32_thres[ps_var->u16_state] - ps_data->f32_hyst))
+    else if (f32_in < ps_data->af32_thres_dn[ps_data->u16_state])
     {
-        if (ps_var->u16_state > 0U)
+        if (ps_data->u16_state > 0U)
         {
-            ps_var->u16_state--;
+            ps_data->u16_state--;
         }
     }
     /* else: state does not change */
-    return ps_var->u16_state;
+    return ps_data->u16_state;
 }
 
-pdsp_extern void pdsp_debounce_clear(const pdsp_debounce_t *ps_data)
+pdsp_extern void pdsp_debounce_clear(pdsp_debounce_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
-    ps_data->ps_var->b_state = PDSP_FALSE;
-    ps_data->ps_var->f32_time = 0.0f;
+    ps_data->b_state = PDSP_FALSE;
+    ps_data->f32_time = 0.0f;
 }
 
-pdsp_extern pdsp_bool_t pdsp_debounce(const pdsp_debounce_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_debounce(pdsp_debounce_t *ps_data,
                                       pdsp_bool_t b_in)
 {
-    static pdsp_debounce_var_t *ps_var;
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    ps_var = ps_data->ps_var;
+    PDSP_ASSERT(ps_data != NULL);
     /* PDSP_FALSE or OFF state */
-    if (!(ps_var->b_state) && b_in)
+    if (!(ps_data->b_state) && b_in)
     {
-        ps_var->f32_time += ps_data->f32_t_step;
-        if (ps_var->f32_time > ps_data->f32_t_high)
+        ps_data->f32_time += ps_data->f32_t_step;
+        if (ps_data->f32_time > ps_data->f32_t_high)
         {
-            ps_var->b_state = PDSP_TRUE;
-            ps_var->f32_time = 0.0f;
+            ps_data->b_state = PDSP_TRUE;
+            ps_data->f32_time = 0.0f;
         }
     }
     /* PDSP_TRUE or ON state */
-    else if ((ps_var->b_state) && !b_in)
+    else if ((ps_data->b_state) && !b_in)
     {
-        ps_var->f32_time += ps_data->f32_t_step;
-        if (ps_var->f32_time > ps_data->f32_t_low)
+        ps_data->f32_time += ps_data->f32_t_step;
+        if (ps_data->f32_time > ps_data->f32_t_low)
         {
-            ps_var->b_state = PDSP_FALSE;
-            ps_var->f32_time = 0.0f;
+            ps_data->b_state = PDSP_FALSE;
+            ps_data->f32_time = 0.0f;
         }
     }
     /* PDSP_FALSE && !b_in || PDSP_TRUE && b_in */
     else
     {
-        ps_var->f32_time = 0.0f;
+        ps_data->f32_time = 0.0f;
     }
-    return ps_var->b_state;
+    return ps_data->b_state;
 }
 
-pdsp_extern void pdsp_debounce_cnt_clear(const pdsp_debounce_cnt_t *ps_data)
+pdsp_extern void pdsp_debounce_cnt_clear(pdsp_debounce_cnt_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
-    ps_data->ps_var->b_state = PDSP_FALSE;
-    ps_data->ps_var->u16_count = 0U;
+    ps_data->b_state = PDSP_FALSE;
+    ps_data->u16_count = 0U;
 }
 
-pdsp_extern pdsp_bool_t pdsp_debounce_cnt(const pdsp_debounce_cnt_t *ps_data,
+pdsp_extern pdsp_bool_t pdsp_debounce_cnt(pdsp_debounce_cnt_t *ps_data,
                                           pdsp_bool_t b_in)
 {
-    static pdsp_debounce_cnt_var_t *ps_var;
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    ps_var = ps_data->ps_var;
+    PDSP_ASSERT(ps_data != NULL);
     /* PDSP_FALSE or OFF state */
-    if (!(ps_var->b_state) && b_in)
+    if (!(ps_data->b_state) && b_in)
     {
-        ps_var->u16_count++;
-        if (ps_var->u16_count > ps_data->u16_cnt_high)
+        ps_data->u16_count++;
+        if (ps_data->u16_count > ps_data->u16_cnt_high)
         {
-            ps_var->b_state = PDSP_TRUE;
-            ps_var->u16_count = 0U;
+            ps_data->b_state = PDSP_TRUE;
+            ps_data->u16_count = 0U;
         }
     }
     /* PDSP_TRUE or ON state */
-    else if ((ps_var->b_state) && !b_in)
+    else if ((ps_data->b_state) && !b_in)
     {
-        ps_var->u16_count++;
-        if (ps_var->u16_count > ps_data->u16_cnt_low)
+        ps_data->u16_count++;
+        if (ps_data->u16_count > ps_data->u16_cnt_low)
         {
-            ps_var->b_state = PDSP_FALSE;
-            ps_var->u16_count = 0U;
+            ps_data->b_state = PDSP_FALSE;
+            ps_data->u16_count = 0U;
         }
     }
     /* PDSP_FALSE && !b_in || PDSP_TRUE && b_in */
     else
     {
-        ps_var->u16_count = 0U;
+        ps_data->u16_count = 0U;
     }
-    return ps_var->b_state;
+    return ps_data->b_state;
 }
 
-pdsp_extern void pdsp_robust_clear(const pdsp_robust_t *ps_data)
+pdsp_extern void pdsp_robust_clear(pdsp_robust_t *ps_data)
 {
     PDSP_ASSERT(ps_data != NULL);
-    ps_data->ps_var->u16_state = 0U;
-    ps_data->ps_var->f32_time = 0.0f;
+    ps_data->u16_state = 0U;
+    ps_data->f32_time = 0.0f;
 }
 
-pdsp_extern pdsp_u16_t pdsp_robust(const pdsp_robust_t *ps_data,
-                                   pdsp_f32_t f32_in)
+pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in)
 {
-    static pdsp_robust_var_t *ps_var;
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    ps_var = ps_data->ps_var;
+    PDSP_ASSERT(ps_data != NULL);
     /* upper boundary breached --> */
-    if (f32_in > ps_data->af32_thres_up[ps_var->u16_state])
+    if (f32_in > ps_data->af32_thres_up[ps_data->u16_state])
     {
         /* count up if below last state */
-        if (ps_var->u16_state < ps_data->u16_size - 1)
+        if (ps_data->u16_state < ps_data->u16_size - 1)
         {
-            ps_var->f32_time += ps_data->f32_t_step;
+            ps_data->f32_time += ps_data->f32_t_step;
         }
         /* upper debounce time elapsed */
-        if (ps_var->f32_time > ps_data->af32_time_up[ps_var->u16_state])
+        if (ps_data->f32_time > ps_data->af32_time_up[ps_data->u16_state])
         {
-            if (ps_var->u16_state < ps_data->u16_size - 1)
+            if (ps_data->u16_state < ps_data->u16_size - 1)
             {
-                ps_var->u16_state++;
+                ps_data->u16_state++;
             }
-            ps_var->f32_time = 0.0f;
+            ps_data->f32_time = 0.0f;
         }
     }
     /* <-- lower boundary breached */
-    else if (f32_in < ps_data->af32_thres_dn[ps_var->u16_state])
+    else if (f32_in < ps_data->af32_thres_dn[ps_data->u16_state])
     {
         /* count up if above first state */
-        if (ps_var->u16_state > 0U)
+        if (ps_data->u16_state > 0U)
         {
-            ps_var->f32_time += ps_data->f32_t_step;
+            ps_data->f32_time += ps_data->f32_t_step;
         }
         /* lower debounce time elapsed */
-        if (ps_var->f32_time > ps_data->af32_time_dn[ps_var->u16_state])
+        if (ps_data->f32_time > ps_data->af32_time_dn[ps_data->u16_state])
         {
-            if (ps_var->u16_state > 0U)
+            if (ps_data->u16_state > 0U)
             {
-                ps_var->u16_state--;
+                ps_data->u16_state--;
             }
-            ps_var->f32_time = 0.0f;
+            ps_data->f32_time = 0.0f;
         }
     }
     /* boundaries not breached */
     else
     {
-        ps_var->f32_time = 0.0f;
+        ps_data->f32_time = 0.0f;
     }
 
-    return ps_var->u16_state;
+    return ps_data->u16_state;
 }
 
 pdsp_extern void pdsp_bit_write_u16(pdsp_u16_t *pu16_mem, pdsp_u16_t u16_bit,
@@ -885,6 +892,71 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data)
 SIGNAL
 -----------------------------------------------------------------------------*/
 
+pdsp_extern void
+pdsp_llc_init(pdsp_llc_t *ps_data, pdsp_f32_t f32_pp_filter_tau,
+              pdsp_f32_t f32_cp_filter_tau, pdsp_f32_t *af32_pp_thres_dn,
+              pdsp_f32_t *af32_pp_thres_up, pdsp_f32_t *af32_cp_duty_thres_dn,
+              pdsp_f32_t *af32_cp_duty_thres_up)
+{
+    pdsp_expavg_init(&ps_data->pp_resistance, f32_pp_filter_tau);
+    pdsp_hysteresis_list_init(&ps_data->pp_resistance_state, af32_pp_thres_up,
+                              af32_pp_thres_dn, PDSP_LLC_PP_SIZE);
+    pdsp_expavg_init(&ps_data->cp_duty, f32_cp_filter_tau);
+    pdsp_expavg_init(&ps_data->cp_voltage_max, f32_cp_filter_tau);
+    pdsp_expavg_init(&ps_data->cp_voltage_min, f32_cp_filter_tau);
+    ps_data->f32_cp_current_limit = 0.0f;
+    ps_data->f32_pp_current_limit = 0.0f;
+    ps_data->u16_cp_state = PDSP_LLC_CP_STATE_A;
+    pdsp_hysteresis_list_init(&ps_data->cp_duty_state, af32_cp_duty_thres_up,
+                              af32_cp_duty_thres_dn, PDSP_LLC_CP_DUTY_SIZE);
+    ps_data->b_plug_detected = PDSP_FALSE;
+    ps_data->e_ev_ready = PDSP_LLC_EV_NOT_READY;
+    ps_data->e_se_ready = PDSP_LLC_SE_NOT_READY;
+}
+
+pdsp_extern void pdsp_llc_run(pdsp_llc_t *ps_data)
+{
+    ps_data->f32_cp_current_limit = 0.0f;
+    ps_data->f32_pp_current_limit = 0.0f;
+    ps_data->b_plug_detected = PDSP_FALSE;
+    ps_data->e_ev_ready = PDSP_LLC_EV_NOT_READY;
+    ps_data->e_se_ready = PDSP_LLC_SE_NOT_READY;
+}
+
+pdsp_extern void pdsp_llc_set_values(pdsp_llc_t *ps_data,
+                                     pdsp_f32_t f32_pp_resistance,
+                                     pdsp_f32_t f32_cp_duty,
+                                     pdsp_f32_t f32_cp_voltage_max,
+                                     pdsp_f32_t f32_cp_voltage_min)
+{
+    pdsp_expavg(&ps_data->pp_resistance, f32_pp_resistance);
+    pdsp_expavg(&ps_data->cp_duty, f32_cp_duty);
+    pdsp_expavg(&ps_data->cp_voltage_max, f32_cp_voltage_max);
+    pdsp_expavg(&ps_data->cp_voltage_min, f32_cp_voltage_min);
+}
+
+pdsp_extern void pdsp_llc_set_ev_ready(pdsp_llc_t *ps_data,
+                                       pdsp_llc_ev_ready_e e_ev_ready)
+{
+    ps_data->e_ev_ready = e_ev_ready;
+}
+
+pdsp_extern pdsp_llc_se_ready_e pdsp_llc_get_se_ready(pdsp_llc_t *ps_data)
+{
+    return ps_data->e_se_ready;
+}
+
+pdsp_extern pdsp_bool_t pdsp_llc_get_plug_detected(pdsp_llc_t *ps_data)
+{
+    return ps_data->b_plug_detected;
+}
+
+pdsp_extern pdsp_u16_t
+pdsp_llc_get_cp_duty_state(pdsp_llc_t *ps_data)
+{
+    return ps_data->cp_duty_state.u16_state;
+}
+
 pdsp_extern pdsp_f32_t pdsp_ain(pdsp_ain_var_t *ps_data, pdsp_f32_t f32_raw)
 {
     PDSP_ASSERT(ps_data != NULL);
@@ -976,19 +1048,24 @@ pdsp_extern void pdsp_expavg_c2d(pdsp_expavg_t *ps_data, pdsp_f32_t f32_ts,
     ps_data->f32_tau = f32_ts * 2.0f * PDSP_PI_F * f32_fc;
 }
 
-pdsp_extern void pdsp_expavg_clear(const pdsp_expavg_t *ps_data)
+pdsp_extern void pdsp_expavg_init(pdsp_expavg_t *ps_data, pdsp_f32_t f32_tau)
 {
     PDSP_ASSERT(ps_data != NULL);
-    ps_data->ps_var->f32_x1 = 0.0f;
+    ps_data->f32_out = 0.0f;
+    ps_data->f32_tau = f32_tau;
 }
 
-pdsp_extern pdsp_f32_t pdsp_expavg(const pdsp_expavg_t *ps_data,
-                                   pdsp_f32_t f32_in)
+pdsp_extern void pdsp_expavg_clear(pdsp_expavg_t *ps_data)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
-    ps_data->ps_var->f32_x1 +=
-        ps_data->f32_tau * (f32_in - ps_data->ps_var->f32_x1);
-    return ps_data->ps_var->f32_x1;
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->f32_out = 0.0f;
+}
+
+pdsp_extern pdsp_f32_t pdsp_expavg(pdsp_expavg_t *ps_data, pdsp_f32_t f32_in)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->f32_out += ps_data->f32_tau * (f32_in - ps_data->f32_out);
+    return ps_data->f32_out;
 }
 
 pdsp_extern void pdsp_1p1z_c2d(pdsp_1p1z_t *ps_coeff_in,
@@ -1487,7 +1564,7 @@ pdsp_extern void pdsp_pi_set(pdsp_pi_t *ps_data, pdsp_f32_t f32_out)
 
 pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_data)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_data->ps_var->f32_x1 = 0.0f;
     ps_data->ps_var->f32_dest = 0.0f;
 }
@@ -1495,31 +1572,29 @@ pdsp_extern void pdsp_setp_init(pdsp_setp_t *ps_data)
 pdsp_extern pdsp_f32_t pdsp_setp_ramp(pdsp_setp_t *ps_data)
 {
     static pdsp_setp_var_t *ps_var;
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_var = ps_data->ps_var;
     ps_var->f32_x1 =
-        ps_var->f32_x1 +
-        pdsp_maxf(pdsp_minf(ps_var->f32_dest - ps_var->f32_x1,
-                            ps_data->f32_step),
-                  -ps_data->f32_step);
+        ps_var->f32_x1 + pdsp_maxf(pdsp_minf(ps_var->f32_dest - ps_var->f32_x1,
+                                             ps_data->f32_step),
+                                   -ps_data->f32_step);
     return ps_var->f32_x1;
 }
 
 pdsp_extern pdsp_f32_t pdsp_setp_exp(pdsp_setp_t *ps_data)
 {
     static pdsp_setp_var_t *ps_var;
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_var = ps_data->ps_var;
-    ps_var->f32_x1 =
-        ps_var->f32_x1 +
-        ps_data->f32_step * (ps_var->f32_dest - ps_var->f32_x1);
+    ps_var->f32_x1 = ps_var->f32_x1 +
+                     ps_data->f32_step * (ps_var->f32_dest - ps_var->f32_x1);
     return ps_var->f32_x1;
 }
 
 pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_data,
                                              pdsp_f32_t f32_dest)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_data->ps_var->f32_dest =
         pdsp_maxf(pdsp_minf(f32_dest, ps_data->f32_max), ps_data->f32_min);
     return PDSP_OK;
@@ -1527,7 +1602,7 @@ pdsp_extern pdsp_status_t pdsp_setp_set_dest(pdsp_setp_t *ps_data,
 
 pdsp_extern pdsp_f32_t pdsp_setp_step(pdsp_setp_t *ps_data)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_data->ps_var->f32_x1 = ps_data->ps_var->f32_dest;
     return ps_data->ps_var->f32_x1;
 }
@@ -1535,7 +1610,7 @@ pdsp_extern pdsp_f32_t pdsp_setp_step(pdsp_setp_t *ps_data)
 pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_data,
                                        pdsp_f32_t f32_value)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     ps_data->ps_var->f32_x1 =
         pdsp_maxf(pdsp_minf(f32_value, ps_data->f32_max), ps_data->f32_min);
     return ps_data->ps_var->f32_x1;
@@ -1544,9 +1619,9 @@ pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_data,
 pdsp_extern pdsp_bool_t pdsp_setp_reached(pdsp_setp_t *ps_data,
                                           pdsp_f32_t f32_tol)
 {
-    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var  != NULL));
-    return (pdsp_bool_t)(pdsp_absf(ps_data->ps_var->f32_x1 - ps_data->ps_var->f32_dest) <
-                         f32_tol);
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    return (pdsp_bool_t)(pdsp_absf(ps_data->ps_var->f32_x1 -
+                                   ps_data->ps_var->f32_dest) < f32_tol);
 }
 
 pdsp_extern pdsp_status_t pdsp_saw_init(pdsp_saw_t *ps_state)
