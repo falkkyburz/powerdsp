@@ -640,6 +640,56 @@ pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in)
     return ps_data->u16_state;
 }
 
+pdsp_extern void pdsp_edge_delay_init(pdsp_edge_delay_t *ps_data,
+                                      pdsp_u16_t u16_state,
+                                      pdsp_u16_t u16_red_count,
+                                      pdsp_u16_t u16_fed_count)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->u16_state = u16_state;
+    ps_data->u16_count = 0;
+    ps_data->u16_red_count = u16_red_count;
+    ps_data->u16_fed_count = u16_fed_count;
+}
+
+pdsp_extern pdsp_u16_t pdsp_edge_delay(pdsp_edge_delay_t *ps_data,
+                                       pdsp_u16_t u16_in)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    /* rising edge detected */
+    if (u16_in > ps_data->u16_state)
+    {
+
+        if (ps_data->u16_count < ps_data->u16_red_count)
+        {
+            ps_data->u16_count++;
+        }
+        else
+        {
+            ps_data->u16_count = 0;
+            ps_data->u16_state = u16_in;
+        }
+    }
+    /* falling edge detected */
+    else if (u16_in < ps_data->u16_state)
+    {
+        if (ps_data->u16_count < ps_data->u16_fed_count)
+        {
+            ps_data->u16_count++;
+        }
+        else
+        {
+            ps_data->u16_count = 0;
+            ps_data->u16_state = u16_in;
+        }
+    }
+    else
+    {
+        ps_data->u16_count = 0;
+    }
+    return ps_data->u16_state;
+}
+
 pdsp_extern void pdsp_bit_write_u16(pdsp_u16_t *pu16_mem, pdsp_u16_t u16_bit,
                                     pdsp_bool_t b_value)
 {
@@ -892,12 +942,15 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data)
 SIGNAL
 -----------------------------------------------------------------------------*/
 
-pdsp_extern void
-pdsp_llc_init(pdsp_llc_t *ps_data, pdsp_f32_t f32_pp_filter_tau,
-              pdsp_f32_t f32_cp_filter_tau, pdsp_f32_t *af32_pp_thres_dn,
-              pdsp_f32_t *af32_pp_thres_up, pdsp_f32_t *af32_cp_duty_thres_dn,
-              pdsp_f32_t *af32_cp_duty_thres_up)
+pdsp_extern void pdsp_llc_init(pdsp_llc_t *ps_data, pdsp_llc_std_e e_std,
+                               pdsp_f32_t f32_pp_filter_tau,
+                               pdsp_f32_t f32_cp_filter_tau,
+                               pdsp_f32_t *af32_pp_thres_dn,
+                               pdsp_f32_t *af32_pp_thres_up,
+                               pdsp_f32_t *af32_cp_duty_thres_dn,
+                               pdsp_f32_t *af32_cp_duty_thres_up)
 {
+    ps_data->e_std = e_std;
     pdsp_expavg_init(&ps_data->pp_resistance, f32_pp_filter_tau);
     pdsp_hysteresis_list_init(&ps_data->pp_resistance_state, af32_pp_thres_up,
                               af32_pp_thres_dn, PDSP_LLC_PP_SIZE);
@@ -912,6 +965,8 @@ pdsp_llc_init(pdsp_llc_t *ps_data, pdsp_f32_t f32_pp_filter_tau,
     ps_data->b_plug_detected = PDSP_FALSE;
     ps_data->e_ev_ready = PDSP_LLC_EV_NOT_READY;
     ps_data->e_se_ready = PDSP_LLC_SE_NOT_READY;
+    ps_data->b_s2_normal = PDSP_FALSE;
+    ps_data->b_s2_ventilation = PDSP_FALSE;
 }
 
 pdsp_extern void pdsp_llc_run(pdsp_llc_t *ps_data)
@@ -951,10 +1006,19 @@ pdsp_extern pdsp_bool_t pdsp_llc_get_plug_detected(pdsp_llc_t *ps_data)
     return ps_data->b_plug_detected;
 }
 
-pdsp_extern pdsp_u16_t
-pdsp_llc_get_cp_duty_state(pdsp_llc_t *ps_data)
+pdsp_extern pdsp_u16_t pdsp_llc_get_cp_duty_state(pdsp_llc_t *ps_data)
 {
     return ps_data->cp_duty_state.u16_state;
+}
+
+pdsp_extern pdsp_bool_t pdsp_llc_get_s2_normal_status(pdsp_llc_t *ps_data)
+{
+    return ps_data->b_s2_normal;
+}
+
+pdsp_extern pdsp_bool_t pdsp_llc_get_s2_ventilation_status(pdsp_llc_t *ps_data)
+{
+    return ps_data->b_s2_ventilation;
 }
 
 pdsp_extern pdsp_f32_t pdsp_ain(pdsp_ain_var_t *ps_data, pdsp_f32_t f32_raw)

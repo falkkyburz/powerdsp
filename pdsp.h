@@ -162,6 +162,19 @@ typedef struct pdsp_robust_tag
     pdsp_u16_t u16_size;
 } pdsp_robust_t;
 
+/** Edge delay struct. */
+typedef struct pdsp_edge_delay_tag
+{
+    /** Edge delay state variable. */
+    pdsp_i16_t u16_state;
+    /** Counter state variable. */
+    pdsp_i16_t u16_count;
+    /** Rising edge delay count. */
+    pdsp_i16_t u16_red_count;
+    /** Falling edge delay count. */
+    pdsp_i16_t u16_fed_count;
+} pdsp_edge_delay_t;
+
 /** Integer queue struct */
 typedef struct pdsp_queue_var_tag
 {
@@ -464,20 +477,34 @@ typedef enum pdsp_llc_ev_ready_enum
     PDSP_LLC_EV_FAULT
 } pdsp_llc_ev_ready_e;
 
+/** EVSE proximity pilot resistance <100 Ohm. */
+#define PDSP_LLC_PP_LOW 0U
 /** EVSE proximity pilot resistance 100 Ohm. */
-#define PDSP_LLC_PP_100OHM 0U
+#define PDSP_LLC_PP_100OHM 1U
+/** EVSE proximity pilot resistance illegal. */
+#define PDSP_LLC_PP_ERROR0 2U
 /** EVSE proximity pilot resistance 150 Ohm. */
-#define PDSP_LLC_PP_150OHM 1U
+#define PDSP_LLC_PP_150OHM 3U
+/** EVSE proximity pilot resistance illegal. */
+#define PDSP_LLC_PP_ERROR1 4U
 /** EVSE proximity pilot resistance 220 Ohm. */
-#define PDSP_LLC_PP_220OHM 2U
+#define PDSP_LLC_PP_220OHM 5U
+/** EVSE proximity pilot resistance illegal. */
+#define PDSP_LLC_PP_ERROR2 6U
 /** EVSE proximity pilot resistance 480 Ohm. */
-#define PDSP_LLC_PP_480OHM 3U
+#define PDSP_LLC_PP_480OHM 7U
+/** EVSE proximity pilot resistance illegal. */
+#define PDSP_LLC_PP_ERROR3 8U
 /** EVSE proximity pilot resistance 680 Ohm. */
-#define PDSP_LLC_PP_680OHM 4U
+#define PDSP_LLC_PP_680OHM 9U
+/** EVSE proximity pilot resistance illegal. */
+#define PDSP_LLC_PP_ERROR4 10U
 /** EVSE proximity pilot resistance 1500 Ohm. */
-#define PDSP_LLC_PP_1500OHM 5U
+#define PDSP_LLC_PP_1500OHM 11U
+/** EVSE proximity pilot resistance >1500 Ohm. */
+#define PDSP_LLC_PP_HIGH 12U
 /** EVSE proximity pilot resistance size. */
-#define PDSP_LLC_PP_SIZE 6U
+#define PDSP_LLC_PP_SIZE 13U
 
 /** EVSE control pilot state A1. EV not connected. 12V DC */
 #define PDSP_LLC_CP_STATE_A 0U
@@ -500,18 +527,24 @@ typedef enum pdsp_llc_ev_ready_enum
 /** EVSE control pilot state F. EVSE not available, -12V DC. */
 #define PDSP_LLC_CP_STATE_F 8U
 
-/** EVSE control pilot duty state for HLC request. */
-#define PDSP_LLC_CP_DUTY_HLC_REQUEST 0U
-/** EVSE control pilot duty state is normal. */
-#define PDSP_LLC_CP_DUTY_NORMAL 1U
 /** EVSE control pilot duty state is illegal. */
-#define PDSP_LLC_CP_DUTY_ILLEGAL 2U
+#define PDSP_LLC_CP_DUTY_ILLEGAL_LOW 0U
+/** EVSE control pilot duty state for HLC request. */
+#define PDSP_LLC_CP_DUTY_HLC_REQUEST 1U
+/** EVSE control pilot duty state is illegal. */
+#define PDSP_LLC_CP_DUTY_ILLEGAL_MID 2U
+/** EVSE control pilot duty state is normal. */
+#define PDSP_LLC_CP_DUTY_NORMAL 3U
+/** EVSE control pilot duty state is illegal. */
+#define PDSP_LLC_CP_DUTY_ILLEGAL_HIGH 4U
 /** EVSE control pilot duty size */
-#define PDSP_LLC_CP_DUTY_SIZE 3U
+#define PDSP_LLC_CP_DUTY_SIZE 5U
 
 /** Low level EVSE communication variable struct. */
 typedef struct pdsp_llc_tag
 {
+    /** EVSE communication standard. */
+    pdsp_llc_std_e e_std;
     /** Measured proximity resistance. */
     pdsp_expavg_t pp_resistance;
     /** Proximity resistance converted state. */
@@ -538,8 +571,10 @@ typedef struct pdsp_llc_tag
     pdsp_llc_ev_ready_e e_ev_ready;
     /** EV ready status. */
     pdsp_llc_se_ready_e e_se_ready;
-    /** EVSE communication standard. */
-    pdsp_llc_std_e std;
+    /** LLO S2 switch 6V status output. */
+    pdsp_bool_t b_s2_normal;
+    /** LLO S2 switch 6V status output with ventilation. */
+    pdsp_bool_t b_s2_ventilation;
 } pdsp_llc_t;
 
 /** Signal delay data variable struct. */
@@ -1317,7 +1352,7 @@ pdsp_extern void pdsp_hysteresis_value_init(pdsp_hyst_t *ps_data,
  * @details Changes to high state if input is greater than the high threshold.
  * Changes to low state if input is less than the low threshold. No action if
  * value is between the low and high threshold.
- * Ouptut:      false   true
+ * Oupput:      false   true
  *                |<------|------- f32_high
  *              dn|       |up
  * f32_low -------|------>|
@@ -1427,6 +1462,41 @@ pdsp_extern void pdsp_robust_clear(pdsp_robust_t *ps_data);
  * @return pdsp_u16_t State output.
  */
 pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in);
+
+/**
+ * @brief Edge delay init function.
+ * @details Delays a state change on the input by a count.
+ * @param ps_data Data struct.
+ * @param u16_red_count Rising edge delay count.
+ * @param u16_fed_count Falling edge delay count.
+ * @param u16_state Initial state.
+ */
+pdsp_extern void pdsp_edge_delay_init(pdsp_edge_delay_t *ps_data,
+                                      pdsp_u16_t u16_state,
+                                      pdsp_u16_t u16_red_count,
+                                      pdsp_u16_t u16_fed_count);
+
+/**
+ * @brief Edge delay function.
+ * @details Delays a state change on the input by a count. Rising edge delay
+ * (red) and falling edge delay (fed) count can be set independently.
+ * 1           |----------------------|                     |----|
+ *   in        |                      |                     |    |
+ * 0 ----------|                      |---------------------|    |------------
+ *              < red >                <    fed    >
+ * 1                   |----------------------------|
+ *   state             |                            |
+ * 0 ------------------|                            |-------------------------
+ *   cnt  00000012345670000000000000000123456789012300000000123450000000000000
+ * If no edge delay is required, the count can be set to 0.
+ * High pulses that are shorter than u16_red_count will not change the state.
+ * Low pulses that are shorter than u16_fed_count will not change the state.
+ * @param ps_data Data struct.
+ * @param u16_in State input.
+ * @return pdsp_u16_t State output.
+ */
+pdsp_extern pdsp_u16_t pdsp_edge_delay(pdsp_edge_delay_t *ps_data,
+                                       pdsp_u16_t u16_in);
 
 /**
  * @brief Write bit in pdsp_u16_t variable.
@@ -1672,6 +1742,7 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data);
 /**
  * @brief Initialize the low level communication module.
  * @param ps_data Low level communication data struct.
+ * @param e_std Low level communication standard.
  * @param f32_pp_filter_tau Filter parameter for pp measurement.
  * @param f32_cp_filter_tau Filter parameter for cp measurement.
  * @param af32_pp_thres_dn Hysteresis values for pp resistance detection.
@@ -1679,11 +1750,13 @@ pdsp_extern pdsp_u64_t pdsp_queue_pop_u64(const pdsp_queue_t *ps_data);
  * @param af32_cp_duty_thres_dn Hysteresis values for cp resistance detection.
  * @param af32_cp_duty_thres_up Hysteresis values for cp resistance detection.
  */
-pdsp_extern void
-pdsp_llc_init(pdsp_llc_t *ps_data, pdsp_f32_t f32_pp_filter_tau,
-              pdsp_f32_t f32_cp_filter_tau, pdsp_f32_t *af32_pp_thres_dn,
-              pdsp_f32_t *af32_pp_thres_up, pdsp_f32_t *af32_cp_duty_thres_dn,
-              pdsp_f32_t *af32_cp_duty_thres_up);
+pdsp_extern void pdsp_llc_init(pdsp_llc_t *ps_data, pdsp_llc_std_e e_std,
+                               pdsp_f32_t f32_pp_filter_tau,
+                               pdsp_f32_t f32_cp_filter_tau,
+                               pdsp_f32_t *af32_pp_thres_dn,
+                               pdsp_f32_t *af32_pp_thres_up,
+                               pdsp_f32_t *af32_cp_duty_thres_dn,
+                               pdsp_f32_t *af32_cp_duty_thres_up);
 
 /**
  * @brief Run the periodic task of the low level communication module.
@@ -1732,8 +1805,21 @@ pdsp_extern pdsp_bool_t pdsp_llc_get_plug_detected(pdsp_llc_t *ps_data);
  * @param ps_data Low level communication data struct.
  * @returns pdsp_llc_duty_state_e Duty cycle state.
  */
-pdsp_extern pdsp_u16_t
-pdsp_llc_get_cp_duty_state(pdsp_llc_t *ps_data);
+pdsp_extern pdsp_u16_t pdsp_llc_get_cp_duty_state(pdsp_llc_t *ps_data);
+
+/**
+ * @brief Get the normal S2 status output.
+ * @param ps_data Low level communication data struct.
+ * @returns pdsp_bool_t S2 status.
+ */
+pdsp_extern pdsp_bool_t pdsp_llc_get_s2_normal_status(pdsp_llc_t *ps_data);
+
+/**
+ * @brief Get the ventilation S2 status output.
+ * @param ps_data Low level communication data struct.
+ * @returns pdsp_bool_t S2 status.
+ */
+pdsp_extern pdsp_bool_t pdsp_llc_get_s2_ventilation_status(pdsp_llc_t *ps_data);
 
 /**
  * @brief Apply gain / offset to raw signal with extended override capability.

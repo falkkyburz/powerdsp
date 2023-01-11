@@ -515,6 +515,59 @@ void test_robust(void)
     PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
 }
 
+void test_edge_delay(void)
+{
+    printf("-- void test_edge_delay(void) --\n");
+    pdsp_edge_delay_t redfed;
+    pdsp_edge_delay_init(&redfed, 0, 2, 4);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    pdsp_edge_delay_init(&redfed, 0, 0, 0);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    pdsp_edge_delay_init(&redfed, 0, 1, 2);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 0U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 1U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 2U) == 1U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 2U) == 2U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 2U) == 2U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 2U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 2U);
+    PDSP_ASSERT(pdsp_edge_delay(&redfed, 0U) == 0U);
+}
+
 void test_status(void)
 {
     printf("-- void test_status(void) --\n");
@@ -1553,6 +1606,7 @@ int main()
     test_hysteresis_list();
     test_debounce();
     test_robust();
+    test_edge_delay();
     test_status();
     test_mean();
     test_queue();
