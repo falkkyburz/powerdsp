@@ -166,14 +166,29 @@ typedef struct pdsp_robust_tag
 typedef struct pdsp_edge_delay_tag
 {
     /** Edge delay state variable. */
-    pdsp_i16_t u16_state;
+    pdsp_u16_t u16_state;
     /** Counter state variable. */
-    pdsp_i16_t u16_count;
+    pdsp_u16_t u16_count;
     /** Rising edge delay count. */
-    pdsp_i16_t u16_red_count;
+    pdsp_u16_t u16_red_count;
     /** Falling edge delay count. */
-    pdsp_i16_t u16_fed_count;
+    pdsp_u16_t u16_fed_count;
 } pdsp_edge_delay_t;
+
+/** Monoflop struct. */
+typedef struct pdsp_monoflop_tag
+{
+    /** Monoflop state variable. */
+    pdsp_bool_t b_trig_mem;
+    /** Counter state variable. */
+    pdsp_u16_t u16_count;
+    /** Monoflop duration count. */
+    pdsp_u16_t u16_duration;
+    /** Monoflop off state. */
+    pdsp_u16_t u16_state_off;
+    /** Monoflop on state. */
+    pdsp_u16_t u16_state_on;
+} pdsp_monoflop_t;
 
 /** Integer queue struct */
 typedef struct pdsp_queue_var_tag
@@ -1497,6 +1512,36 @@ pdsp_extern void pdsp_edge_delay_init(pdsp_edge_delay_t *ps_data,
  */
 pdsp_extern pdsp_u16_t pdsp_edge_delay(pdsp_edge_delay_t *ps_data,
                                        pdsp_u16_t u16_in);
+
+/**
+ * @brief Monoflop init function.
+ * @param ps_data Data struct.
+ * @param u16_duration Duration of the monoflop.
+ * @param u16_state_off On state of the monoflop.
+ * @param u16_state_on On state of the monoflop.
+ */
+pdsp_extern void pdsp_monoflop_init(pdsp_monoflop_t *ps_data,
+                                    pdsp_u16_t u16_duration,
+                                    pdsp_u16_t u16_state_off,
+                                    pdsp_u16_t u16_state_on);
+
+/**
+ * @brief Non-retriggerable monoflop function.
+ * @param ps_data Data struct.
+ * @param b_trig Rising edge sensitive trigger input.
+ * @return
+ */
+pdsp_extern pdsp_u16_t pdsp_monoflop(pdsp_monoflop_t *ps_data,
+                                     pdsp_bool_t b_trig);
+
+/**
+ * @brief Retriggerable monoflop function.
+ * @param ps_data Data struct.
+ * @param b_trig Rising edge sensitive trigger input.
+ * @return
+ */
+pdsp_extern pdsp_u16_t pdsp_monoflop_rtr(pdsp_monoflop_t *ps_data,
+                                     pdsp_bool_t b_trig);
 
 /**
  * @brief Write bit in pdsp_u16_t variable.

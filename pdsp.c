@@ -690,6 +690,66 @@ pdsp_extern pdsp_u16_t pdsp_edge_delay(pdsp_edge_delay_t *ps_data,
     return ps_data->u16_state;
 }
 
+pdsp_extern void pdsp_monoflop_init(pdsp_monoflop_t *ps_data,
+                                    pdsp_u16_t u16_duration,
+                                    pdsp_u16_t u16_state_off,
+                                    pdsp_u16_t u16_state_on)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->b_trig_mem = PDSP_FALSE;
+    ps_data->u16_count = 0;
+    ps_data->u16_duration = u16_duration;
+    ps_data->u16_state_off = u16_state_off;
+    ps_data->u16_state_on = u16_state_on;
+}
+
+pdsp_extern pdsp_u16_t pdsp_monoflop(pdsp_monoflop_t *ps_data,
+                                     pdsp_bool_t b_trig)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    if ((b_trig == PDSP_TRUE) && (ps_data->b_trig_mem == PDSP_FALSE) &&
+        (ps_data->u16_count == 0U))
+    {
+        ps_data->u16_count = ps_data->u16_duration;
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_on;
+    }
+    if (ps_data->u16_count > 0U)
+    {
+        ps_data->u16_count--;
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_on;
+    }
+    else
+    {
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_off;
+    }
+}
+
+pdsp_extern pdsp_u16_t pdsp_monoflop_rtr(pdsp_monoflop_t *ps_data,
+                                         pdsp_bool_t b_trig)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    if ((b_trig == PDSP_TRUE) && (ps_data->b_trig_mem == PDSP_FALSE))
+    {
+        ps_data->u16_count = ps_data->u16_duration;
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_on;
+    }
+    if (ps_data->u16_count > 0U)
+    {
+        ps_data->u16_count--;
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_on;
+    }
+    else
+    {
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_off;
+    }
+}
+
 pdsp_extern void pdsp_bit_write_u16(pdsp_u16_t *pu16_mem, pdsp_u16_t u16_bit,
                                     pdsp_bool_t b_value)
 {
