@@ -39,12 +39,11 @@ info: $(BUILD)\pdsp.o $(BUILD)\pdsp_test.o
 .PHONY: clean
 clean:
 	if exist $(BUILD) rmdir /s /q $(BUILD)
-	del doxylog.txt
 	if exist html rmdir /s /q html
 
 help:
 	$(info Generate help:)
-	doxygen Doxyfile > doxylog.txt
+	doxygen Doxyfile > .\build\doxylog.txt
 
 run: $(BUILD)\$(TARGET)
 	$(info Run target:)
