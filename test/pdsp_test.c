@@ -792,7 +792,7 @@ void test_expavg(void)
     out = pdsp_expavg(&expavg, 1.0);
     PDSP_ASSERT(out >= 0.999f);
     /* Plot the exponential average function. */
-    FILE *fp = fopen("./test/test_expavg.csv", "w");
+    FILE *fp = fopen("./build/test_expavg.csv", "w");
     if (fp != NULL)
     {
         int i;

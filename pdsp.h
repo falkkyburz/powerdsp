@@ -1404,14 +1404,16 @@ pdsp_extern void pdsp_hysteresis_list_clear(pdsp_hyst_list_t *ps_data);
  * high threshold. There are size - 2 states. This design will only jump 1 state
  * per call. Example with threshold array V size equal to four (lower bound,
  * first threshold, second threshold, upper bound):
+ * @code
  * "V0"       "V1-th"    "V1+th"   "V2-th"    "V2+th"      "V3"
  *                                    |<---------|---"S2"---->
  *                                  dn|          |up
  *              |<---------|---"S1"---|--------->|
  *            dn|          |up
  *  <----"S0"---|--------->|
+ * @endcode
  * X axis: Input, Y axis: Output (state)
- * @param ps_data Data struct.
+ *  @param ps_data Data struct.
  * @param f32_in Value input.
  * @return pdsp_u16_t State output.
  */
@@ -1463,6 +1465,7 @@ pdsp_extern void pdsp_robust_clear(pdsp_robust_t *ps_data);
  * high threshold or the debounce timer is not elapsed. This design will only
  * jump 1 state per call. Example with threshold array size equal to four
  * (S0, S1, S2, S3):
+ * @code
  * "S0L"    "S1L"     "S0H"     "S2L"     "S1H"    "S3L"     "S2H"     "S3H"
  *                                                   |<--------|--"S3"-->|
  *                                               tddn|         |tdup
@@ -1471,6 +1474,7 @@ pdsp_extern void pdsp_robust_clear(pdsp_robust_t *ps_data);
  *            |<--------|--"S1"---|-------->|
  *        tddn|         |tdup
  *  |<--"S0"--|-------->|
+ * @endcode
  * X axis: Input, Y axis: Output (state)
  * @param ps_data Data struct.
  * @param f32_in Value input.
@@ -1495,6 +1499,7 @@ pdsp_extern void pdsp_edge_delay_init(pdsp_edge_delay_t *ps_data,
  * @brief Edge delay function.
  * @details Delays a state change on the input by a count. Rising edge delay
  * (red) and falling edge delay (fed) count can be set independently.
+ * @code
  * 1           |----------------------|                     |----|
  *   in        |                      |                     |    |
  * 0 ----------|                      |---------------------|    |------------
@@ -1502,7 +1507,7 @@ pdsp_extern void pdsp_edge_delay_init(pdsp_edge_delay_t *ps_data,
  * 1                   |----------------------------|
  *   state             |                            |
  * 0 ------------------|                            |-------------------------
- *   cnt  00000012345670000000000000000123456789012300000000123450000000000000
+ * @endcode
  * If no edge delay is required, the count can be set to 0.
  * High pulses that are shorter than u16_red_count will not change the state.
  * Low pulses that are shorter than u16_fed_count will not change the state.
