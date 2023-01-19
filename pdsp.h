@@ -190,6 +190,21 @@ typedef struct pdsp_monoflop_tag
     pdsp_u16_t u16_state_on;
 } pdsp_monoflop_t;
 
+/** Pulse generator struct. */
+typedef struct pdsp_pulse_t
+{
+    /** Counter state variable. */
+    pdsp_u16_t u16_count;
+    /** Pulse on count. */
+    pdsp_u16_t u16_count_on;
+    /** Pulse off count. */
+    pdsp_u16_t u16_count_per;
+    /** Pulse on state. */
+    pdsp_u16_t u16_state_on;
+    /** Pulse off state. */
+    pdsp_u16_t u16_state_off;
+} pdsp_pulse_t;
+
 /** Integer queue struct */
 typedef struct pdsp_queue_var_tag
 {
@@ -1546,7 +1561,36 @@ pdsp_extern pdsp_u16_t pdsp_monoflop(pdsp_monoflop_t *ps_data,
  * @return
  */
 pdsp_extern pdsp_u16_t pdsp_monoflop_rtr(pdsp_monoflop_t *ps_data,
-                                     pdsp_bool_t b_trig);
+                                         pdsp_bool_t b_trig);
+
+/**
+ * @brief Dual edge triggered retriggerable monoflop function.
+ * @param ps_data Data struct.
+ * @param b_trig Rising edge sensitive trigger input.
+ * @return
+ */
+pdsp_extern pdsp_u16_t pdsp_monoflop_rtr_det(pdsp_monoflop_t *ps_data,
+                                             pdsp_bool_t b_trig);
+/**
+ * @brief Pulse generator initialization.
+ * @param ps_data Data struct.
+ * @param u16_count_on On time count.
+ * @param u16_count_per Period count.
+ * @param u16_state_on On state output.
+ * @param u16_state_off Off state output.
+ */
+pdsp_extern void pdsp_pulse_init(pdsp_pulse_t *ps_data,
+                                       pdsp_u16_t u16_count_on,
+                                       pdsp_u16_t u16_count_per,
+                                       pdsp_u16_t u16_state_on,
+                                       pdsp_u16_t u16_state_off);
+
+/**
+ * @brief Pulse generator function.
+ * @param ps_data Data struct.
+ * @return pdsp_u16_t 
+ */
+pdsp_extern pdsp_u16_t pdsp_pulse(pdsp_pulse_t *ps_data);
 
 /**
  * @brief Write bit in pdsp_u16_t variable.

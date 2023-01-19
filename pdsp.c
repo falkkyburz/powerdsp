@@ -750,6 +750,62 @@ pdsp_extern pdsp_u16_t pdsp_monoflop_rtr(pdsp_monoflop_t *ps_data,
     }
 }
 
+pdsp_extern pdsp_u16_t pdsp_monoflop_rtr_det(pdsp_monoflop_t *ps_data,
+                                             pdsp_bool_t b_trig)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    if (b_trig != ps_data->b_trig_mem)
+    {
+        ps_data->u16_count = ps_data->u16_duration;
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_on;
+    }
+    if (ps_data->u16_count > 0U)
+    {
+        ps_data->u16_count--;
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_on;
+    }
+    else
+    {
+        ps_data->b_trig_mem = b_trig;
+        return ps_data->u16_state_off;
+    }
+}
+
+pdsp_extern void pdsp_pulse_init(pdsp_pulse_t *ps_data, pdsp_u16_t u16_count_on,
+                                 pdsp_u16_t u16_count_per,
+                                 pdsp_u16_t u16_state_on,
+                                 pdsp_u16_t u16_state_off)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->u16_count = 0;
+    ps_data->u16_count_on = u16_count_on;
+    ps_data->u16_count_per = u16_count_per;
+    ps_data->u16_state_on = u16_state_on;
+    ps_data->u16_state_off = u16_state_off;
+}
+
+pdsp_extern pdsp_u16_t pdsp_pulse(pdsp_pulse_t *ps_data)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    if (ps_data->u16_count < ps_data->u16_count_on)
+    {
+        ps_data->u16_count++;
+        return ps_data->u16_state_on;
+    }
+    else
+    {
+        ps_data->u16_count++;
+        if (ps_data->u16_count >= ps_data->u16_count_per)
+        {
+                ps_data->u16_count = 0;
+        }
+        return ps_data->u16_state_off;
+    }
+
+}
+
 pdsp_extern void pdsp_bit_write_u16(pdsp_u16_t *pu16_mem, pdsp_u16_t u16_bit,
                                     pdsp_bool_t b_value)
 {

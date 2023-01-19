@@ -634,6 +634,70 @@ void test_monoflop(void)
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
+    pdsp_monoflop_init(&mf, 4, 0, 1);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 0U);
+    /* trig */
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 0U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 0U);
+    /* trig */
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 0U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 0U);
+    /* trig */
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_TRUE) == 1U);
+    /* retrigger */
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 0U);
+    PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 0U);
+}
+
+void test_pulse(void)
+{
+    printf("-- void test_pulse(void) --\n");
+    pdsp_pulse_t pulse;
+    pdsp_pulse_init(&pulse, 1, 2, 1, 0);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    pdsp_pulse_init(&pulse, 2, 4, 1, 0);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    pdsp_pulse_init(&pulse, 1, 3, 1, 0);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 1U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
+    PDSP_ASSERT(pdsp_pulse(&pulse) == 0U);
 }
 
 void test_status(void)
@@ -1676,6 +1740,7 @@ int main()
     test_robust();
     test_edge_delay();
     test_monoflop();
+    test_pulse();
     test_status();
     test_mean();
     test_queue();
