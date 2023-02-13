@@ -102,36 +102,90 @@ void test_i16_to_string(void)
     PDSP_ASSERT(strcmp(out, ":  6666, -1111:") == 0);
 }
 
-void test_u16_to_hex(void)
+void test_u16_to_base16(void)
 {
-    printf("-- void test_u16_to_hex(void) --\n");
-    pdsp_char_t out[16] = {0};
-    pdsp_char_t *pos = &out[0];
-    *pos++ = ':';
-    pos = pdsp_u16_to_hex(0x1337, pos, PDSP_FALSE);
-    *pos++ = ',';
-    pos = pdsp_u16_to_hex(0xB00B, pos, PDSP_FALSE);
-    *pos++ = ',';
-    pos = pdsp_u16_to_hex(0xB, pos, PDSP_FALSE);
-    *pos++ = ',';
-    pos = pdsp_u16_to_hex(0xBB, pos, PDSP_FALSE);
-    *pos++ = ',';
-    pos = pdsp_u16_to_hex(0xB0B, pos, PDSP_FALSE);
-    *pos++ = ':';
-    PDSP_ASSERT(strcmp(out, ":1337,B00B,B,BB,B0B:") == 0);
-}
-
-void test_u64_to_hex(void)
-{
-    printf("-- void test_u64_to_hex(void) --\n");
+    printf("-- void test_u16_to_base16(void) --\n");
     pdsp_char_t out[64] = {0};
     pdsp_char_t *pos = &out[0];
     *pos++ = ':';
-    pos = pdsp_u64_to_hex(0x0123456789ABCDEF, pos);
+    pos = pdsp_u16_to_base16_alt(0x1337, pos, PDSP_FALSE);
     *pos++ = ',';
-    pos = pdsp_u64_to_hex(0xAFFAFFAFFAFFAFFA, pos);
+    pos = pdsp_u16_to_base16_alt(0xB00B, pos, PDSP_FALSE);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base16_alt(0xB, pos, PDSP_FALSE);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base16_alt(0xBB, pos, PDSP_FALSE);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base16_alt(0xB0B, pos, PDSP_FALSE);
     *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":1337,B00B,B,BB,B0B:") == 0);
+    pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u16_to_base16(pos, 0x1337);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base16(pos, 0xB00B);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base16(pos, 0xB);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base16(pos, 0xBB);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base16(pos, 0xB0B);
+    *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":1337,B00B,000B,00BB,0B0B:") == 0);
+}
+
+void test_u32_to_base16(void)
+{
+    printf("-- void test_u32_to_base16(void) --\n");
+    pdsp_char_t out[64] = {0};
+    pdsp_char_t *pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u32_to_base16(pos, 0x13371337);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base16(pos, 0xB00B);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base16(pos, 0xB);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base16(pos, 0xBB);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base16(pos, 0xB0B);
+    *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":13371337,0000B00B,0000000B,000000BB,00000B0B:") ==
+                0);
+}
+
+void test_u64_to_base16(void)
+{
+    printf("-- void test_u64_to_base16(void) --\n");
+    pdsp_char_t out[64] = {0};
+    pdsp_char_t *pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u64_to_base16_alt(0x0123456789ABCDEF, pos);
+    *pos++ = ',';
+    pos = pdsp_u64_to_base16_alt(0xAFFAFFAFFAFFAFFA, pos);
+    *pos++ = ':';
+    *pos++ = 0;
     PDSP_ASSERT(strcmp(out, ":0123456789ABCDEF,AFFAFFAFFAFFAFFA:") == 0);
+    pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u64_to_base16(pos, 0x0123456789ABCDEF);
+    *pos++ = ',';
+    pos = pdsp_u64_to_base16(pos, 0xAFFAFFAFFAFFAFFA);
+    *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":0123456789ABCDEF,AFFAFFAFFAFFAFFA:") == 0);
+    pdsp_u64_t data[] = {0x0123456789ABCDEF, 0xAFFAFFAFFAFFAFFA};
+    pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u8_to_base16(pos, (pdsp_u8_t *)&data[0], 8);
+    *pos++ = ',';
+    pos = pdsp_u8_to_base16(pos, (pdsp_u8_t *)&data[1], 8);
+    *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":EFCDAB8967452301,FAAFFFFAAFFFFAAF:") == 0);
 }
 
 void test_map(void)
@@ -1726,8 +1780,9 @@ int main()
     test_stopwatch();
     test_call_i16_func();
     test_i16_to_string();
-    test_u16_to_hex();
-    test_u64_to_hex();
+    test_u16_to_base16();
+    test_u32_to_base16();
+    test_u64_to_base16();
     test_map();
     test_map_idx();
     test_array_set();

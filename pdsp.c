@@ -45,6 +45,10 @@ static const pdsp_u16_t pdsp_mask_i16[16] = {
     0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F, 0x00FF,
     0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF};
 
+static pdsp_char_t pdsp_base16_map[16] = {'0', '1', '2', '3', '4', '5',
+                                          '6', '7', '8', '9', 'A', 'B',
+                                          'C', 'D', 'E', 'F'};
+
 /*==============================================================================
  PRIVATE FUNCTION PROTOTYPES
  =============================================================================*/
@@ -232,7 +236,67 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
 }
 
 pdsp_extern pdsp_char_t *
-pdsp_u16_to_hex(pdsp_u16_t u16_in, pdsp_char_t *ach_out, pdsp_bool_t b_len4)
+pdsp_u8_to_base16(pdsp_char_t *dest, const pdsp_u8_t *src, size_t size_src)
+{
+
+    PDSP_ASSERT((dest != NULL) && (src != NULL));
+    for (; size_src > 0; size_src--)
+    {
+        *dest++ = pdsp_base16_map[(((*src) >> 4) & 0xF)];
+        *dest++ = pdsp_base16_map[((*src++) & 0xF)];
+    }
+    return dest;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u16_to_base16(pdsp_char_t *dest, pdsp_u16_t src)
+{
+    PDSP_ASSERT(dest != NULL);
+    *dest++ = pdsp_base16_map[((src >> 12) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 8) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 4) & 0xF)];
+    *dest++ = pdsp_base16_map[(src & 0xF)];
+    return dest;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u32_to_base16(pdsp_char_t *dest, pdsp_u32_t src)
+{
+    PDSP_ASSERT(dest != NULL);
+    *dest++ = pdsp_base16_map[((src >> 28) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 24) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 20) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 16) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 12) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 8) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 4) & 0xF)];
+    *dest++ = pdsp_base16_map[(src & 0xF)];
+    return dest;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u64_to_base16(pdsp_char_t *dest, pdsp_u64_t src)
+{
+    PDSP_ASSERT(dest != NULL);
+    *dest++ = pdsp_base16_map[((src >> 60) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 56) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 52) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 48) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 44) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 40) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 36) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 32) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 28) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 24) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 20) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 16) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 12) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 8) & 0xF)];
+    *dest++ = pdsp_base16_map[((src >> 4) & 0xF)];
+    *dest++ = pdsp_base16_map[(src & 0xF)];
+    return dest;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u16_to_base16_alt(pdsp_u16_t u16_in,
+                                                pdsp_char_t *ach_out,
+                                                pdsp_bool_t b_len4)
 {
     static pdsp_char_t ch_nibble;
     PDSP_ASSERT(ach_out != NULL);
@@ -281,18 +345,18 @@ pdsp_u16_to_hex(pdsp_u16_t u16_in, pdsp_char_t *ach_out, pdsp_bool_t b_len4)
     return ach_out;
 }
 
-pdsp_extern pdsp_char_t *pdsp_u64_to_hex(pdsp_u64_t u64_in,
-                                         pdsp_char_t *ach_out)
+pdsp_extern pdsp_char_t *pdsp_u64_to_base16_alt(pdsp_u64_t u64_in,
+                                                pdsp_char_t *ach_out)
 {
     PDSP_ASSERT(ach_out != NULL);
-    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 48) & 0xFFFF), ach_out,
-                              PDSP_TRUE);
-    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 32) & 0xFFFF), ach_out,
-                              PDSP_TRUE);
-    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 16) & 0xFFFF), ach_out,
-                              PDSP_TRUE);
-    ach_out = pdsp_u16_to_hex((pdsp_u16_t)((u64_in >> 0) & 0xFFFF), ach_out,
-                              PDSP_TRUE);
+    ach_out = pdsp_u16_to_base16_alt((pdsp_u16_t)((u64_in >> 48) & 0xFFFF),
+                                     ach_out, PDSP_TRUE);
+    ach_out = pdsp_u16_to_base16_alt((pdsp_u16_t)((u64_in >> 32) & 0xFFFF),
+                                     ach_out, PDSP_TRUE);
+    ach_out = pdsp_u16_to_base16_alt((pdsp_u16_t)((u64_in >> 16) & 0xFFFF),
+                                     ach_out, PDSP_TRUE);
+    ach_out = pdsp_u16_to_base16_alt((pdsp_u16_t)((u64_in >> 0) & 0xFFFF),
+                                     ach_out, PDSP_TRUE);
     return ach_out;
 }
 
@@ -799,11 +863,10 @@ pdsp_extern pdsp_u16_t pdsp_pulse(pdsp_pulse_t *ps_data)
         ps_data->u16_count++;
         if (ps_data->u16_count >= ps_data->u16_count_per)
         {
-                ps_data->u16_count = 0;
+            ps_data->u16_count = 0;
         }
         return ps_data->u16_state_off;
     }
-
 }
 
 pdsp_extern void pdsp_bit_write_u16(pdsp_u16_t *pu16_mem, pdsp_u16_t u16_bit,

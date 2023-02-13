@@ -80,6 +80,10 @@ typedef unsigned int pdsp_u32_t;
 typedef short pdsp_i16_t;
 /** 16bit unsigned signed integer type. */
 typedef unsigned short pdsp_u16_t;
+/** 8bit signed integer type. */
+typedef char pdsp_i8_t;
+/** 8bit unsigned signed integer type. */
+typedef unsigned char pdsp_u8_t;
 /** Boolean type. */
 typedef bool pdsp_bool_t;
 /** Size type. */

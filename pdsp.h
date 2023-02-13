@@ -1216,6 +1216,40 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
                                             pdsp_char_t *a6c_out);
 
 /**
+ * @brief Convert u8 data into base16 hex.
+ * @param dest Destination buffer.
+ * @param src Source buffer.
+ * @param size_src Source buffer size.
+ * @return pdsp_char_t*
+ */
+pdsp_extern pdsp_char_t *
+pdsp_u8_to_base16(pdsp_char_t *dest, const pdsp_u8_t *src, size_t size_src);
+
+/**
+ * @brief Convert u16 data into base16 hex.
+ * @param dest Destination buffer.
+ * @param src Source buffer.
+ * @return pdsp_char_t*
+ */
+pdsp_extern pdsp_char_t *pdsp_u16_to_base16(pdsp_char_t *dest, pdsp_u16_t src);
+
+/**
+ * @brief Convert u32 data into base16 hex.
+ * @param dest Destination buffer.
+ * @param src Source buffer.
+ * @return pdsp_char_t*
+ */
+pdsp_extern pdsp_char_t *pdsp_u32_to_base16(pdsp_char_t *dest, pdsp_u32_t src);
+
+/**
+ * @brief Convert u64 data into base16 hex.
+ * @param dest Destination buffer.
+ * @param src Source buffer.
+ * @return pdsp_char_t*
+ */
+pdsp_extern pdsp_char_t *pdsp_u64_to_base16(pdsp_char_t *dest, pdsp_u64_t src);
+
+/**
  * @brief Convert the number u16_in to a hex string.
  * @param u16_in Input number.
  * @param ach_out Output string.
@@ -1223,8 +1257,9 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
  * minimum required length is returned otherwise.
  * @return Pointer to the next element in the string.
  */
-pdsp_extern pdsp_char_t *
-pdsp_u16_to_hex(pdsp_u16_t u16_in, pdsp_char_t *ach_out, pdsp_bool_t b_len4);
+pdsp_extern pdsp_char_t *pdsp_u16_to_base16_alt(pdsp_u16_t u16_in,
+                                                pdsp_char_t *ach_out,
+                                                pdsp_bool_t b_len4);
 
 /**
  * @brief Convert the number u64_in to a length 16 hex string.
@@ -1232,8 +1267,8 @@ pdsp_u16_to_hex(pdsp_u16_t u16_in, pdsp_char_t *ach_out, pdsp_bool_t b_len4);
  * @param ach_out Output string.
  * @return Pointer to the next element in the string.
  */
-pdsp_extern pdsp_char_t *pdsp_u64_to_hex(pdsp_u64_t u64_in,
-                                         pdsp_char_t *ach_out);
+pdsp_extern pdsp_char_t *pdsp_u64_to_base16_alt(pdsp_u64_t u64_in,
+                                                pdsp_char_t *ach_out);
 
 /**
  * @brief Map a value from one range to another (Uses division).
@@ -1579,16 +1614,15 @@ pdsp_extern pdsp_u16_t pdsp_monoflop_rtr_det(pdsp_monoflop_t *ps_data,
  * @param u16_state_on On state output.
  * @param u16_state_off Off state output.
  */
-pdsp_extern void pdsp_pulse_init(pdsp_pulse_t *ps_data,
-                                       pdsp_u16_t u16_count_on,
-                                       pdsp_u16_t u16_count_per,
-                                       pdsp_u16_t u16_state_on,
-                                       pdsp_u16_t u16_state_off);
+pdsp_extern void pdsp_pulse_init(pdsp_pulse_t *ps_data, pdsp_u16_t u16_count_on,
+                                 pdsp_u16_t u16_count_per,
+                                 pdsp_u16_t u16_state_on,
+                                 pdsp_u16_t u16_state_off);
 
 /**
  * @brief Pulse generator function.
  * @param ps_data Data struct.
- * @return pdsp_u16_t 
+ * @return pdsp_u16_t
  */
 pdsp_extern pdsp_u16_t pdsp_pulse(pdsp_pulse_t *ps_data);
 
