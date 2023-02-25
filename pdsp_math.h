@@ -80,7 +80,7 @@
 #define PDSP_3V3_12BIT_F (3.3f / 4096.0f)
 
 /* Floating point functions with intrinsics on MCU. */
-#if defined(_WIN64)
+#ifdef PDSP_HOST
 /** Floating point minimum function macro */
 #define pdsp_minf(x, y) fminf((x), (y))
 /** Floating point maximum function macro */
@@ -99,9 +99,9 @@
 #define pdsp_cospuf(x) cosf((x) / PDSP_2_PI_F)
 /** Square root function */
 #define pdsp_sqrtf(x) sqrtf((x))
-
+#else
 /* Specific intrinsics for C28x */
-#elif defined(__TMS320C2000__)
+#if defined(__TMS320C2000__)
 #define pdsp_minf(x, y) __fmin((x), (y))
 #define pdsp_maxf(x, y) __fmax((x), (y))
 #define pdsp_absf(x, y) fabsf((x), (y))
@@ -118,6 +118,7 @@
 /* Specific intrinsics for ARM */
 
 #endif
+#endif /* PDSP_HOST */
 
 /** @} floatmath */
 
@@ -382,7 +383,7 @@
  * @return Multiplication output.
  * @{
  */
-#if defined(_WIN64)
+#ifdef PDSP_HOST
 /** @brief IQ16 Fixed point multiplication iq0 * iq0 without rounding. */
 #define iq16_mulq0(iq_in0, iq_in1)                                             \
     ((pdsp_i16_t)(((pdsp_i32_t)(iq_in0) * (pdsp_i32_t)(iq_in1))))
@@ -691,8 +692,8 @@
     ((pdsp_i32_t)((((pdsp_i64_t)(iq_in0) * (pdsp_i64_t)(iq_in1)) +             \
                    536870912) >>                                               \
                   30))
-
-#elif defined(__TMS320C2000__)
+#else
+#if defined(__TMS320C2000__)
 /* Specific intrinsics for C28x */
 
 #elif defined(__TMS320C28XX_CLA__)
@@ -702,6 +703,8 @@
 /* Specific intrinsics for ARM */
 
 #endif
+#endif /* PDSP_HOST */
+
 /** @}*/
 
 /**

@@ -507,6 +507,36 @@ typedef enum pdsp_llc_ev_ready_enum
     PDSP_LLC_EV_FAULT
 } pdsp_llc_ev_ready_e;
 
+/** CP state. */
+typedef enum pdsp_llc_cp_state_enum
+{
+    /** EVSE control pilot state A. EV not connected. 12V DC */
+    PDSP_LLC_CP_STATE_A,
+    /** EVSE control pilot state B. EV connected. 9V DC / PWM. */
+    PDSP_LLC_CP_STATE_B,
+    /** EVSE control pilot state C. EV connected, 6V DC / PWM. */
+    PDSP_LLC_CP_STATE_C,
+    /** EVSE control pilot state D. EV connected, needs ventilation, 3V DC /
+       PWM. */
+    PDSP_LLC_CP_STATE_D,
+    /** EVSE control pilot state E. EV connected, EVSE error, 0V DC. */
+    PDSP_LLC_CP_STATE_E,
+    /** EVSE control pilot state F. EV connected, EVSE not available, -12V DC.
+     */
+    PDSP_LLC_CP_STATE_F
+} pdsp_llc_cp_state_e;
+
+/** CP duty cycle. */
+typedef enum pdsp_llc_hlc_request_enum
+{
+    /** EVSE requests high level communication. Duty is 3% to 7%. */
+    PDSP_LLC_HLC_REQUESTED,
+    /** EVSE signals that high level communication is optional. */
+    PDSP_LLC_HLC_OPTIONAL,
+    /** EVSE does not request high level communication. Duty is 10% to 96%*/
+    PDSP_LLC_HLC_NOT_REQUESTED
+} pdsp_llc_hlc_request_e;
+
 /** EVSE proximity pilot resistance <100 Ohm. */
 #define PDSP_LLC_PP_LOW 0U
 /** EVSE proximity pilot resistance 100 Ohm. */
@@ -535,27 +565,6 @@ typedef enum pdsp_llc_ev_ready_enum
 #define PDSP_LLC_PP_HIGH 12U
 /** EVSE proximity pilot resistance size. */
 #define PDSP_LLC_PP_SIZE 13U
-
-/** EVSE control pilot state A1. EV not connected. 12V DC */
-#define PDSP_LLC_CP_STATE_A 0U
-/** EVSE control pilot state B1. EV connected, not ready. 9V DC */
-#define PDSP_LLC_CP_STATE_B1 1U
-/** EVSE control pilot state B2. EV connected, not ready, 9V 1kHz PWM. */
-#define PDSP_LLC_CP_STATE_B2 2U
-/** EVSE control pilot state C1. EV connected, ready, 6V DC. */
-#define PDSP_LLC_CP_STATE_C1 3U
-/** EVSE control pilot state C2. EV connected, ready, 6V 1kHz PWM. */
-#define PDSP_LLC_CP_STATE_C2 4U
-/** EVSE control pilot state D1. EV connected, ready, 3V DC, ventilation
-   requested. */
-#define PDSP_LLC_CP_STATE_D1 5U
-/** EVSE control pilot state D2. EV connected, ready, 3V 1kHz PWM
-   ventilation requested, PWM enabled. */
-#define PDSP_LLC_CP_STATE_D2 6U
-/** EVSE control pilot state E. EVSE error, 0V DC. */
-#define PDSP_LLC_CP_STATE_E 7U
-/** EVSE control pilot state F. EVSE not available, -12V DC. */
-#define PDSP_LLC_CP_STATE_F 8U
 
 /** EVSE control pilot duty state is illegal. */
 #define PDSP_LLC_CP_DUTY_ILLEGAL_LOW 0U

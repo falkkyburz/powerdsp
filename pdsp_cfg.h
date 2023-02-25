@@ -57,6 +57,13 @@
 /*==============================================================================
  AUTOMATIC CONFIGURATION
  =============================================================================*/
+/** Check if we are running on the HOST or the TARGET */
+#if (defined(_WIN64) || defined(_WIN32) || defined(__CYGWIN__) ||              \
+     defined(__linux__) || defined(__unix__))
+#define PDSP_HOST
+#else
+#define PDSP_MCU
+#endif
 
 /** Place PRAGMAs for TMS320 DSP optimization here */
 #if defined(__TMS320C2000__)

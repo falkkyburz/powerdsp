@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
 
 void test_assert_true(void)
 {
@@ -631,17 +632,17 @@ void test_monoflop(void)
     /* trig */
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 1U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 0U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 0U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_FALSE) == 0U);
     /* trig */
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 1U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_FALSE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 0U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_FALSE) == 0U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 1U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_FALSE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_TRUE) == 0U);
     PDSP_ASSERT(pdsp_monoflop(&mf, PDSP_FALSE) == 0U);
 
     pdsp_monoflop_init(&mf, 2, 0, 1);
@@ -649,7 +650,7 @@ void test_monoflop(void)
     /* trig */
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
@@ -668,7 +669,7 @@ void test_monoflop(void)
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     pdsp_monoflop_init(&mf, 0, 0, 1);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
@@ -679,14 +680,14 @@ void test_monoflop(void)
     pdsp_monoflop_init(&mf, 1, 0, 1);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     pdsp_monoflop_init(&mf, 1, 0, 1);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
-    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 1U);
+    PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_FALSE) == 0U);
     PDSP_ASSERT(pdsp_monoflop_rtr(&mf, PDSP_TRUE) == 1U);
     pdsp_monoflop_init(&mf, 4, 0, 1);
     PDSP_ASSERT(pdsp_monoflop_rtr_det(&mf, PDSP_FALSE) == 0U);

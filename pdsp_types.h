@@ -36,13 +36,13 @@
 /*==============================================================================
  INCLUDE FILES
  =============================================================================*/
+#include "pdsp_cfg.h"
 #include <stdbool.h>
 #include <stddef.h>
 
 /*==============================================================================
  CONFIGURATION
  =============================================================================*/
-
 
 /*==============================================================================
  PUBLIC TYPES
@@ -59,9 +59,7 @@
 #define PDSP_FALSE 0
 
 /* Fixed and floating point types */
-#if defined(_WIN64)
-/** Defined if compiling on host */
-#define PDSP_HOST
+#ifdef PDSP_HOST
 /** Floating point rounding behavior is set to round to nearest. */
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 /** 64bit unsigned integer type.  */
@@ -90,8 +88,8 @@ typedef bool pdsp_bool_t;
 typedef size_t pdsp_size_t;
 /** Char type. */
 typedef char pdsp_char_t;
-#elif defined(__TMS320C2000__)
-#define PDSP_MCU
+#else
+#if defined(__TMS320C2000__)
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 typedef unsigned long long pdsp_u64_t;
 typedef long long pdsp_i64_t;
@@ -109,6 +107,7 @@ typedef char pdsp_char_t;
 #elif defined(__arm__)
 #define PDSP_ARM
 #endif
+#endif /* PDSP_HOST */
 
 /** PDSP status for function return value. */
 typedef enum pdsp_status_tag

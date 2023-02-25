@@ -16,6 +16,13 @@
         "sogi",
         "srec",
         "srecord"
-    ]
+    ],
+    "files.associations": {
+        "pdsp_math.h": "c",
+        "pdsp_types.h": "c",
+        "pdsp_cfg.h": "c",
+        "math.h": "c",
+        "corecrt_math.h": "c"
+    }
 
 }

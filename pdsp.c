@@ -781,6 +781,9 @@ pdsp_extern pdsp_u16_t pdsp_monoflop(pdsp_monoflop_t *ps_data,
     if (ps_data->u16_count > 0U)
     {
         ps_data->u16_count--;
+    }
+    if (ps_data->u16_count > 0U)
+    {
         ps_data->b_trig_mem = b_trig;
         return ps_data->u16_state_on;
     }
@@ -804,6 +807,9 @@ pdsp_extern pdsp_u16_t pdsp_monoflop_rtr(pdsp_monoflop_t *ps_data,
     if (ps_data->u16_count > 0U)
     {
         ps_data->u16_count--;
+    }
+    if (ps_data->u16_count > 0U)
+    {
         ps_data->b_trig_mem = b_trig;
         return ps_data->u16_state_on;
     }
