@@ -5,8 +5,8 @@ TARGET=pdsp_test
 CC=gcc
 SIZE=size
 OBJDUMP=objdump
-CFLAGS=-Wall -O0
-INC=-I .
+CFLAGS=-Wall -O0 -Werror -Wextra
+INC=-I./
 
 .PHONY: all
 all: clean prepare $(BUILD)/$(TARGET) info help run
@@ -14,12 +14,16 @@ all: clean prepare $(BUILD)/$(TARGET) info help run
 prepare: clean
 	mkdir $(BUILD)
 
-$(BUILD)/$(TARGET): $(BUILD)/pdsp.o $(BUILD)/pdsp_test.o
+$(BUILD)/$(TARGET): $(BUILD)/pdsp.o $(BUILD)/pdsp_test.o $(BUILD)/pdsp_assert.o
 	$(info Link target:)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(BUILD)/pdsp.o: $(SRC)/pdsp.c
 	$(info Compile pdsp.c:)
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+
+$(BUILD)/pdsp_assert.o: $(SRC)/pdsp_assert.c
+	$(info Compile pdsp_assert.c:)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 $(BUILD)/pdsp_test.o: $(TEST)/pdsp_test.c

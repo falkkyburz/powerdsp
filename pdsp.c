@@ -34,6 +34,9 @@
  INCLUDE FILES
  =============================================================================*/
 #include "pdsp.h"
+#include "pdsp_assert.h"
+#include "pdsp_cfg.h"
+#include "pdsp_types.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -41,6 +44,10 @@
 /*==============================================================================
  GLOBAL CONSTANTS
  =============================================================================*/
+#ifdef PDSP_ASSERT_LIST
+static pdsp_char_t *pdsp_assert_filename = "pdsp.c";
+#endif
+
 static const pdsp_u16_t pdsp_mask_i16[16] = {
     0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F, 0x00FF,
     0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF};
@@ -48,6 +55,13 @@ static const pdsp_u16_t pdsp_mask_i16[16] = {
 static pdsp_char_t pdsp_base16_map[16] = {'0', '1', '2', '3', '4', '5',
                                           '6', '7', '8', '9', 'A', 'B',
                                           'C', 'D', 'E', 'F'};
+
+static pdsp_char_t pdsp_base64_map[64] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
 /*==============================================================================
  PRIVATE FUNCTION PROTOTYPES
@@ -88,13 +102,13 @@ pdsp_extern pdsp_u32_t pdsp_stopwatch_stop(const pdsp_stopwatch_t *ps_data,
 
 pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
                                           pdsp_size_t s_size,
-                                          pdsp_i16_t i16_idx,
+                                          pdsp_u16_t u16_idx,
                                           pdsp_i16_t *i16_out)
 {
     PDSP_ASSERT((apf_list != NULL) && (i16_out != NULL) && s_size);
-    if ((apf_list[i16_idx] != PDSP_NULL) && (i16_idx < s_size))
+    if ((apf_list[u16_idx] != PDSP_NULL) && (u16_idx < s_size))
     {
-        *i16_out = apf_list[i16_idx]();
+        *i16_out = apf_list[u16_idx]();
         return PDSP_OK;
     }
     return PDSP_ILLEGAL;
@@ -275,22 +289,46 @@ pdsp_extern pdsp_char_t *pdsp_u32_to_base16(pdsp_char_t *dest, pdsp_u32_t src)
 pdsp_extern pdsp_char_t *pdsp_u64_to_base16(pdsp_char_t *dest, pdsp_u64_t src)
 {
     PDSP_ASSERT(dest != NULL);
-    *dest++ = pdsp_base16_map[((src >> 60) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 56) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 52) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 48) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 44) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 40) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 36) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 32) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 28) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 24) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 20) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 16) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 12) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 8) & 0xF)];
-    *dest++ = pdsp_base16_map[((src >> 4) & 0xF)];
-    *dest++ = pdsp_base16_map[(src & 0xF)];
+    dest = pdsp_u32_to_base16(dest, (src >> 32) & 0xFFFFFFFF);
+    dest = pdsp_u32_to_base16(dest, src & 0xFFFFFFFF);
+    return dest;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u16_to_base64(pdsp_char_t *dest, pdsp_u16_t src)
+{
+    PDSP_ASSERT(dest != NULL);
+    *dest++ = pdsp_base64_map[((src >> 10) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 4) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src << 2) & 0x3F)];
+    return dest;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u32_to_base64(pdsp_char_t *dest, pdsp_u32_t src)
+{
+    PDSP_ASSERT(dest != NULL);
+    *dest++ = pdsp_base64_map[((src >> 26) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 20) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 14) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 8) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 2) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src << 4) & 0x3F)];
+    return dest;
+}
+
+pdsp_extern pdsp_char_t *pdsp_u64_to_base64(pdsp_char_t *dest, pdsp_u64_t src)
+{
+    PDSP_ASSERT(dest != NULL);
+    *dest++ = pdsp_base64_map[((src >> 58) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 52) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 46) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 40) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 34) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 28) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 22) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 16) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 10) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src >> 4) & 0x3F)];
+    *dest++ = pdsp_base64_map[((src << 2) & 0x3F)];
     return dest;
 }
 

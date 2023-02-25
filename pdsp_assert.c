@@ -1,8 +1,7 @@
-/** @file pdsp_cfg.h
+/** @file pdsp_assert.c
  *
  * @author Falk Kyburz
- * @brief Configuration for pdsp module. This file is meant to be edited by the
- * user.
+ * @brief On board charger power train control module.
  *
  * @copyright
  * This is free and unencumbered software released into the public domain.
@@ -31,54 +30,45 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-#ifndef PDSP_CFG_H
-#define PDSP_CFG_H
+/*==============================================================================
+ INCLUDE FILES
+ =============================================================================*/
+#include "pdsp_cfg.h"
+#include "pdsp_types.h"
+#include "pdsp_assert.h"
+
+
 
 /*==============================================================================
- USER CONFIGURATION
+ GLOBAL CONSTANTS
  =============================================================================*/
-
-/** Set assert function. Select one. */
-//#define PDSP_ASSERT_OFF
-#define PDSP_ASSERT_PRINT
-//#define PDSP_ASSERT_LIST
-//#define PDSP_ASSERT_BLOCK
-
-/** Uncomment to set all functions to static and include them in the pdsp.h
- * file. */
-// #define PDSP_STATIC_FUNCTIONS
-
-/** Use floating point math. */
-#define PDSP_USE_FLOATING_POINT
-
-/** Use fixed point math. */
-#define PDSP_USE_FIXED_POINT
+#ifdef PDSP_ASSERT_LIST
+pdsp_assert_t pdsp_assert_list[PDSP_ASSERT_LIST_SIZE];
+pdsp_u16_t pdsp_assert_idx;
+#endif /* PDSP_ASSERT_LIST */
 
 /*==============================================================================
- AUTOMATIC CONFIGURATION
+ PRIVATE FUNCTIOS PROTOTYPES
  =============================================================================*/
-/** Check if we are running on the HOST or the TARGET */
-#if (defined(_WIN64) || defined(_WIN32) || defined(__CYGWIN__) ||              \
-     defined(__linux__) || defined(__unix__))
-#define PDSP_HOST
-#else
-#define PDSP_MCU
-#endif
 
-/** Place PRAGMAs for TMS320 DSP optimization here */
-#if defined(__TMS320C2000__)
-#pragma CODE_SECTION(pdsp_stopwatch_start, ".TI.ramfunc")
-#pragma CODE_SECTION(pdsp_stopwatch_stop, ".TI.ramfunc")
-#endif
 
-/** Macro for for inline function definition in the header file. */
-#define pdsp_inline __attribute__((always_inline)) static inline
+/*==============================================================================
+ PRIVATE FUNCTIO PROTOTYPES
+ =============================================================================*/
 
-/* Set pdsp_extern macro according to PDSP_STATIC_FUNCTIONS */
-#ifdef PDSP_STATIC_FUNCTIONS
-#define pdsp_extern static
-#else
-#define pdsp_extern extern
-#endif
 
-#endif /* PDSP_CFG_H */
+/*==============================================================================
+ GLOBAL FUNCTIOS
+ =============================================================================*/
+
+#ifdef PDSP_ASSERT_LIST
+void pdsp_assert_list_print(void)
+{
+    pdsp_i16_t i = 0;
+    for (i = 0; i < pdsp_assert_idx; i++)
+    {
+        printf("   #%i File: %s Line: %i", i, pdsp_assert_list[i].file,
+               pdsp_assert_list[i].line);
+    }
+}
+#endif /* PDSP_ASSERT_LIST */

@@ -37,8 +37,8 @@
  INCLUDE FILES
  =============================================================================*/
 #include "pdsp_cfg.h"
-#include "pdsp_math.h"
 #include "pdsp_types.h"
+#include "pdsp_math.h"
 #include <math.h>
 
 /*==============================================================================

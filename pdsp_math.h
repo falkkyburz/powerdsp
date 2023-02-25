@@ -57,7 +57,7 @@
 /** Float literal holding 2*PI. */
 #define PDSP_2_PI_F (6.28318530718f)
 /** Float literal holding 1/(2*PI). */
-#define PDSP_2_PI_INV_F (1.0f / 6.28318530718f)
+#define PDSP_2_PI_INV_F (0.15915494309f)
 /** Float literal holding 2*PI/3. */
 #define PDSP_2_PI_3_F (2.09439510239f)
 /** Float literal holding 4*PI/3. */
@@ -92,11 +92,11 @@
 /** Sine function macro */
 #define pdsp_sinf(x) sinf((x))
 /** Sine function macro PU */
-#define pdsp_sinpuf(x) sinf((x) / PDSP_2_PI_F)
+#define pdsp_sinpuf(x) sinf((x) * PDSP_2_PI_INV_F)
 /** Cosine function macro */
 #define pdsp_cosf(x) cosf((x))
 /** Cosine function macro PU */
-#define pdsp_cospuf(x) cosf((x) / PDSP_2_PI_F)
+#define pdsp_cospuf(x) cosf((x) * PDSP_2_PI_INV_F)
 /** Square root function */
 #define pdsp_sqrtf(x) sqrtf((x))
 #else

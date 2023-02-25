@@ -21,8 +21,9 @@
         "pdsp_math.h": "c",
         "pdsp_types.h": "c",
         "pdsp_cfg.h": "c",
-        "math.h": "c",
-        "corecrt_math.h": "c"
+        "pdsp.h": "c",
+        "pdsp_inline.h": "c",
+        "pdsp_macro.h": "c",
+        "pdsp_assert.h": "c"
     }
-
 }

@@ -37,8 +37,8 @@
  INCLUDE FILES
  =============================================================================*/
 #include "pdsp_cfg.h"
-#include "pdsp_math.h"
 #include "pdsp_types.h"
+#include "pdsp_math.h"
 #include <math.h>
 
 /*==============================================================================
@@ -1186,14 +1186,14 @@ pdsp_extern pdsp_u32_t pdsp_stopwatch_stop(const pdsp_stopwatch_t *ps_data,
  *
  * @param apf_list List of function pointers.
  * @param s_size Array size.
- * @param i16_idx Index for the function pointer array.
+ * @param u16_idx Index for the function pointer array.
  * @param i16_out Return value of the called function.
  * @return pdsp_i16_t Returns PDSP_OK, except if the table entry was NULL or the
  * index is out or range, then PDSP_ILLEGAL is returned.
  */
 pdsp_extern pdsp_i16_t pdsp_call_i16_func(const pdsp_pi16_func_t apf_list[],
                                           pdsp_size_t s_size,
-                                          pdsp_i16_t i16_idx,
+                                          pdsp_u16_t u16_idx,
                                           pdsp_i16_t *i16_out);
 
 /**
@@ -1225,7 +1225,7 @@ pdsp_extern pdsp_char_t *pdsp_i16_to_string(pdsp_i16_t i16_in,
                                             pdsp_char_t *a6c_out);
 
 /**
- * @brief Convert u8 data into base16 hex.
+ * @brief Convert u8 data into base16.
  * @param dest Destination buffer.
  * @param src Source buffer.
  * @param size_src Source buffer size.
@@ -1235,7 +1235,7 @@ pdsp_extern pdsp_char_t *
 pdsp_u8_to_base16(pdsp_char_t *dest, const pdsp_u8_t *src, size_t size_src);
 
 /**
- * @brief Convert u16 data into base16 hex.
+ * @brief Convert u16 data into base16.
  * @param dest Destination buffer.
  * @param src Source buffer.
  * @return pdsp_char_t*
@@ -1243,7 +1243,7 @@ pdsp_u8_to_base16(pdsp_char_t *dest, const pdsp_u8_t *src, size_t size_src);
 pdsp_extern pdsp_char_t *pdsp_u16_to_base16(pdsp_char_t *dest, pdsp_u16_t src);
 
 /**
- * @brief Convert u32 data into base16 hex.
+ * @brief Convert u32 data into base16.
  * @param dest Destination buffer.
  * @param src Source buffer.
  * @return pdsp_char_t*
@@ -1251,12 +1251,36 @@ pdsp_extern pdsp_char_t *pdsp_u16_to_base16(pdsp_char_t *dest, pdsp_u16_t src);
 pdsp_extern pdsp_char_t *pdsp_u32_to_base16(pdsp_char_t *dest, pdsp_u32_t src);
 
 /**
- * @brief Convert u64 data into base16 hex.
+ * @brief Convert u64 data into base16.
  * @param dest Destination buffer.
  * @param src Source buffer.
  * @return pdsp_char_t*
  */
 pdsp_extern pdsp_char_t *pdsp_u64_to_base16(pdsp_char_t *dest, pdsp_u64_t src);
+
+/**
+ * @brief Convert u16 data into base64.
+ * @param dest Destination buffer.
+ * @param src Source buffer.
+ * @return pdsp_char_t*
+ */
+pdsp_extern pdsp_char_t *pdsp_u16_to_base64(pdsp_char_t *dest, pdsp_u16_t src);
+
+/**
+ * @brief Convert u32 data into base64.
+ * @param dest Destination buffer.
+ * @param src Source buffer.
+ * @return pdsp_char_t*
+ */
+pdsp_extern pdsp_char_t *pdsp_u32_to_base64(pdsp_char_t *dest, pdsp_u32_t src);
+
+/**
+ * @brief Convert u64 data into base64.
+ * @param dest Destination buffer.
+ * @param src Source buffer.
+ * @return pdsp_char_t*
+ */
+pdsp_extern pdsp_char_t *pdsp_u64_to_base64(pdsp_char_t *dest, pdsp_u64_t src);
 
 /**
  * @brief Convert the number u16_in to a hex string.

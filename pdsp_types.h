@@ -90,6 +90,7 @@ typedef size_t pdsp_size_t;
 typedef char pdsp_char_t;
 #else
 #if defined(__TMS320C2000__)
+#define PDSP_C28X
 #define F32_TO_INT_ROUNDS_TOWARDS_ZERO
 typedef unsigned long long pdsp_u64_t;
 typedef long long pdsp_i64_t;
@@ -103,7 +104,7 @@ typedef int pdsp_bool_t;
 typedef size_t pdsp_size_t;
 typedef char pdsp_char_t;
 #elif defined(__TMS320C28XX_CLA__)
-#define PDSP_CLA
+#define PDSP_C28XCLA
 #elif defined(__arm__)
 #define PDSP_ARM
 #endif

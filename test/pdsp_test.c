@@ -31,12 +31,19 @@
  */
 
 #include "pdsp.h"
+#include "pdsp_assert.h"
+#include "pdsp_cfg.h"
 #include "pdsp_inline.h"
 #include "pdsp_macro.h"
+#include "pdsp_types.h"
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <errno.h>
+
+#ifdef PDSP_ASSERT_LIST
+static pdsp_char_t *pdsp_assert_filename = "pdsp_test.c";
+#endif
 
 void test_assert_true(void)
 {
@@ -187,6 +194,60 @@ void test_u64_to_base16(void)
     *pos++ = ':';
     *pos++ = 0;
     PDSP_ASSERT(strcmp(out, ":EFCDAB8967452301,FAAFFFFAAFFFFAAF:") == 0);
+}
+
+void test_u16_to_base64(void)
+{
+    printf("-- void test_u16_to_base64(void) --\n");
+    pdsp_char_t out[64] = {0};
+    pdsp_char_t *pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u16_to_base64(pos, 0x1337);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base64(pos, 0xB00B);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base64(pos, 0xB);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base64(pos, 0xBB);
+    *pos++ = ',';
+    pos = pdsp_u16_to_base64(pos, 0xB0B);
+    *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":Ezc,sAs,AAs,ALs,Cws:") == 0);
+}
+
+void test_u32_to_base64(void)
+{
+    printf("-- void test_u32_to_base64(void) --\n");
+    pdsp_char_t out[64] = {0};
+    pdsp_char_t *pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u32_to_base64(pos, 0x13371337);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base64(pos, 0xB00B);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base64(pos, 0xB);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base64(pos, 0xBB);
+    *pos++ = ',';
+    pos = pdsp_u32_to_base64(pos, 0xB0B);
+    *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":EzcTNw,AACwCw,AAAACw,AAAAuw,AAALCw:") == 0);
+}
+
+void test_u64_to_base64(void)
+{
+    printf("-- void test_u64_to_base64(void) --\n");
+    pdsp_char_t out[64] = {0};
+    pdsp_char_t *pos = &out[0];
+    *pos++ = ':';
+    pos = pdsp_u64_to_base64(pos, 0x0123456789ABCDEF);
+    *pos++ = ',';
+    pos = pdsp_u64_to_base64(pos, 0xAFFAFFAFFAFFAFFA);
+    *pos++ = ':';
+    *pos++ = 0;
+    PDSP_ASSERT(strcmp(out, ":ASNFZ4mrze8,r/r/r/r/r/o:") == 0);
 }
 
 void test_map(void)
@@ -1774,9 +1835,16 @@ void test_log32(void)
     PDSP_ASSERT(loga.u16_count_add == 0U);
 }
 
+void test_assert_print(void)
+{
+    printf("-- void test_assert_print(void) --\n");
+#ifdef PDSP_ASSERT_LIST
+    pdsp_assert_list_print();
+#endif
+}
+
 int main()
 {
-
     test_assert_true();
     test_stopwatch();
     test_call_i16_func();
@@ -1784,6 +1852,9 @@ int main()
     test_u16_to_base16();
     test_u32_to_base16();
     test_u64_to_base16();
+    test_u16_to_base64();
+    test_u32_to_base64();
+    test_u64_to_base64();
     test_map();
     test_map_idx();
     test_array_set();
@@ -1817,6 +1888,6 @@ int main()
     test_fault();
     test_fixmath();
     test_log32();
-
+    test_assert_print();
     return 0;
 }
