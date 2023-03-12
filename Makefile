@@ -6,7 +6,7 @@ CC=gcc
 SIZE=size
 OBJDUMP=objdump
 CFLAGS=-Wall -O0 -Werror -Wextra
-INC=-I./
+INC=-I.
 
 .PHONY: all
 all: clean prepare $(BUILD)/$(TARGET) info help run

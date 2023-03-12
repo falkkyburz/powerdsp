@@ -25,5 +25,18 @@
         "pdsp_inline.h": "c",
         "pdsp_macro.h": "c",
         "pdsp_assert.h": "c"
+    },
+    "terminal.integrated.profiles.windows": {
+        "MSYS2_MINGW64": {
+            "path": "C:\\msys64\\usr\\bin\\bash.exe",
+            "args": [
+                "--login",
+                "-i"
+            ],
+            "env": {
+                "MSYSTEM": "MINGW64",
+                "CHERE_INVOKING": "1"
+            }
+        }
     }
 }
