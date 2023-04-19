@@ -5,6 +5,7 @@
         "delayrf",
         "dpll",
         "expavg",
+        "fdbk",
         "hyst",
         "linspace",
         "monoflop",

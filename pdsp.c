@@ -1355,6 +1355,21 @@ pdsp_extern pdsp_f32_t pdsp_expavg(pdsp_expavg_t *ps_data, pdsp_f32_t f32_in)
     return ps_data->f32_out;
 }
 
+pdsp_extern pdsp_f32_t pdsp_smoothstep(pdsp_f32_t f32_x0, pdsp_f32_t f32_x1,
+                                       pdsp_f32_t f32_x)
+{
+    if (f32_x < f32_x0)
+        return 0;
+
+    if (f32_x >= f32_x1)
+        return 1;
+
+    // Scale/bias into [0..1] range
+    f32_x = (f32_x - f32_x0) / (f32_x1 - f32_x0);
+
+    return f32_x * f32_x * (3 - 2 * f32_x);
+}
+
 pdsp_extern void pdsp_1p1z_c2d(pdsp_1p1z_t *ps_coeff_in,
                                pdsp_1p1z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts)
 {
@@ -1909,6 +1924,61 @@ pdsp_extern pdsp_bool_t pdsp_setp_reached(pdsp_setp_t *ps_data,
     PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
     return (pdsp_bool_t)(pdsp_absf(ps_data->ps_var->f32_x1 -
                                    ps_data->ps_var->f32_dest) < f32_tol);
+}
+
+pdsp_extern void pdsp_setp_smooth_init(pdsp_setp_smooth_t *ps_data)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_data->ps_var->f32_x1 = 1.0f;
+    ps_data->ps_var->f32_dx1 = 0.1f;
+    ps_data->ps_var->f32_x2 = 0.0f;
+    ps_data->ps_var->f32_start = 0.0f;
+    ps_data->ps_var->f32_dest = 0.0f;
+    ps_data->ps_var->f32_dest_pend = 0.0f;
+}
+
+pdsp_extern pdsp_f32_t pdsp_setp_smooth(pdsp_setp_smooth_t *ps_data)
+{
+    static pdsp_setp_smooth_var_t *ps_var;
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_var = ps_data->ps_var;
+    if ((ps_var->f32_x1 == 1.0f) && (ps_var->f32_dest != ps_var->f32_dest_pend))
+    {
+        ps_var->f32_x1 = 0.0f;
+        ps_var->f32_start = ps_var->f32_dest;
+        ps_var->f32_dest = ps_var->f32_dest_pend;
+    }
+    /* https://en.wikipedia.org/wiki/Smoothstep */
+    ps_var->f32_x2 =
+        ps_var->f32_x1 * ps_var->f32_x1 * (3.0f - 2.0f * ps_var->f32_x1);
+    ps_var->f32_x1 = fmin(fmax(ps_var->f32_x1 + ps_var->f32_dx1, 0.0f), 1.0f);
+    return ps_var->f32_start + (ps_var->f32_x2 * ps_var->f32_dest) -
+           (ps_var->f32_x2 * ps_var->f32_start);
+}
+
+pdsp_extern pdsp_status_t pdsp_setp_smooth_set_dest(pdsp_setp_smooth_t *ps_data,
+                                                    pdsp_f32_t f32_dest)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_data->ps_var->f32_dest_pend =
+        pdsp_maxf(pdsp_minf(f32_dest, ps_data->f32_max), ps_data->f32_min);
+    return PDSP_OK;
+}
+
+pdsp_extern pdsp_status_t pdsp_setp_smooth_set_time(pdsp_setp_smooth_t *ps_data,
+                                                    pdsp_f32_t f32_time)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    ps_data->ps_var->f32_dx1 =
+        ps_data->f32_ts / fmax(f32_time, ps_data->f32_ts);
+    return PDSP_OK;
+}
+
+pdsp_extern pdsp_bool_t pdsp_setp_smooth_reached(pdsp_setp_smooth_t *ps_data,
+                                                 pdsp_f32_t f32_tol)
+{
+    PDSP_ASSERT((ps_data != NULL) && (ps_data->ps_var != NULL));
+    return (pdsp_bool_t)(pdsp_absf(ps_data->ps_var->f32_x1 - 1.0f) < f32_tol);
 }
 
 pdsp_extern pdsp_status_t pdsp_saw_init(pdsp_saw_t *ps_state)

@@ -37,8 +37,8 @@
  INCLUDE FILES
  =============================================================================*/
 #include "pdsp_cfg.h"
-#include "pdsp_types.h"
 #include "pdsp_math.h"
+#include "pdsp_types.h"
 #include <math.h>
 
 /*==============================================================================
@@ -701,10 +701,40 @@ typedef struct pdsp_setp_tag
     pdsp_f32_t f32_min;
     /** Set point maximum value. */
     pdsp_f32_t f32_max;
-    /** Absolute step size for ramp. First relative step for exponential
-     * process. */
+    /** Absolute step size for ramp and smooth. First relative step for
+     * exponential process. */
     pdsp_f32_t f32_step;
 } pdsp_setp_t;
+
+/** Smooth set point state memory struct. */
+typedef struct pdsp_setp_smooth_var_tag
+{
+    /** State memory 0.0f - 1.0f, equivalent to time. */
+    pdsp_f32_t f32_x1;
+    /** Time step. */
+    pdsp_f32_t f32_dx1;
+    /** Set point output. */
+    pdsp_f32_t f32_x2;
+    /** Set point start. */
+    pdsp_f32_t f32_start;
+    /** Set point destination. */
+    pdsp_f32_t f32_dest;
+    /** Pending set point destination. */
+    pdsp_f32_t f32_dest_pend;
+} pdsp_setp_smooth_var_t;
+
+/** Set point parameter struct. */
+typedef struct pdsp_setp_smooth_tag
+{
+    /** Pointer to variable struct. */
+    pdsp_setp_smooth_var_t *ps_var;
+    /** Set point minimum value. */
+    pdsp_f32_t f32_min;
+    /** Set point maximum value. */
+    pdsp_f32_t f32_max;
+    /** Sample time of this function.*/
+    pdsp_f32_t f32_ts;
+} pdsp_setp_smooth_t;
 
 /** Sine generator parameter struct */
 typedef struct pdsp_saw_param_tag
@@ -2092,6 +2122,17 @@ pdsp_extern void pdsp_expavg_clear(pdsp_expavg_t *ps_data);
 pdsp_extern pdsp_f32_t pdsp_expavg(pdsp_expavg_t *ps_data, pdsp_f32_t f32_in);
 
 /**
+ * @brief Smoothstep function
+ * @details https://en.wikipedia.org/wiki/Smoothstep
+ * @param f32_start start x of the smoothstep.
+ * @param f32_end end x of the smoothstep.
+ * @param f32_x state variable.
+ * @returns pdsp_f32_t smoothstep output.
+ */
+pdsp_extern pdsp_f32_t pdsp_smoothstep(pdsp_f32_t f32_start, pdsp_f32_t f32_end,
+                                       pdsp_f32_t f32_x);
+
+/**
  * @brief Convert continuous H(s) to H(1/z) for 1P1Z transfer function using
  * bilinear transform.
  * @details Transfer function:
@@ -2512,6 +2553,57 @@ pdsp_extern pdsp_f32_t pdsp_setp_reset(pdsp_setp_t *ps_data,
  */
 pdsp_extern pdsp_bool_t pdsp_setp_reached(pdsp_setp_t *ps_data,
                                           pdsp_f32_t f32_tol);
+
+/**
+ * @brief Initialize smoothstep set point processor struct.
+ * @param ps_data Pointer to smoothstep set point state memory struct.
+ */
+pdsp_extern void pdsp_setp_smooth_init(pdsp_setp_smooth_t *ps_data);
+
+/**
+ * @brief Calculate simple set point processor generating a smoothstep.
+ * @param ps_data Pointer to smoothstep set point state memory struct.
+ * @returns pdsp_f32_t Set point output.
+ */
+pdsp_extern pdsp_f32_t pdsp_setp_smooth(pdsp_setp_smooth_t *ps_data);
+
+/**
+ * @brief Set destination of smoothstep set point processor.
+ * @details If a transition is currently under way, the destination is pending
+ * and will be executed after the current one is finished.
+ * @param ps_data Pointer to smoothstep set point state memory struct.
+ * @param f32_dest Set point destination.
+ * @returns pdsp_status_t PDSP_OK
+ */
+pdsp_extern pdsp_status_t pdsp_setp_smooth_set_dest(pdsp_setp_smooth_t *ps_data,
+                                                    pdsp_f32_t f32_dest);
+
+/**
+ * @brief Set destination of smoothstep set point processor.
+ * @param ps_data Pointer to smoothstep set point state memory struct.
+ * @param f32_time Set point transition time.
+ * @returns pdsp_status_t PDSP_OK
+ */
+pdsp_extern pdsp_status_t pdsp_setp_smooth_set_time(pdsp_setp_smooth_t *ps_data,
+                                                    pdsp_f32_t f32_time);
+
+/**
+ * @brief Set the smoothstep state to a defined value.
+ * @param ps_data Pointer to set point state memory struct.
+ * @param f32_value Set point value to step to between 0.0f and 1.0f.
+ * @returns pdsp_f32_t Set point output.
+ */
+pdsp_extern pdsp_f32_t pdsp_setp_smooth_reset(pdsp_setp_smooth_t *ps_data,
+                                              pdsp_f32_t f32_value);
+
+/**
+ * @brief Smoothstep set point reached.
+ * @param ps_data Pointer to smoothstep set point state memory struct.
+ * @param f32_tol Tolerance for detection in percent.
+ * @returns pdsp_bool_t
+ */
+pdsp_extern pdsp_bool_t pdsp_setp_smooth_reached(pdsp_setp_smooth_t *ps_data,
+                                                 pdsp_f32_t f32_tol);
 
 /**
  * @brief Initialize saw wave generator struct.
