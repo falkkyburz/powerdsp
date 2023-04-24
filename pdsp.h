@@ -2135,18 +2135,53 @@ pdsp_extern pdsp_f32_t pdsp_smoothstep(pdsp_f32_t f32_start, pdsp_f32_t f32_end,
 /**
  * @brief Convert continuous H(s) to H(1/z) for 1P1Z transfer function using
  * bilinear transform.
- * @details Transfer function:
+ * @details Bilinear transform: https://en.wikipedia.org/wiki/Bilinear_transform
+ * In the DSP world, the z-transform friendly z^-1 is used instead of z.
+ *
+ * Transfer function in s-domain:
  *        b1*s + b0
  * H(s) = ---------
  *        a1*s + a0
  *
- *        2  (1 - z^-1)
- * >> s = -- ----------
- *        ts (1 + z^-1)
+ *        2  (1 - z^-1)                            2
+ * >> s = -- ---------- with the  abbreviation K = --
+ *        ts (1 + z^-1)                            ts
  *
- *           B1*z^-1 + B0
- * H(z^-1) = ------------
- *           A1*z^-1 + 1
+ * Transfer function in z-domain (goal):
+ *        B1*z^-1 + B0
+ * H(z) = ------------
+ *        A1*z^-1 + 1
+ *
+ * First step: Replace the s with the bilinear formula and multiply numerator
+ * and denominator with the highest power of (1 + z^-1)^(highest power of s):
+ *        b1*K*(1 - z^-1) + b0*(1 + z^-1)
+ * H(z) = -------------------------------
+ *        a1*K*(1 - z^-1) + a0*(1 + z^-1)
+ *
+ * Second Step: Multiply out all terms:
+ *        b1*K - b1*K*z^-1 + b0 + b0*z^-1
+ * H(z) = -------------------------------
+ *        a1*K - a1*K*z^-1 + a0 + a0*z^-1
+ *
+ * Third Step: Sort the terms:
+ *        (b0 - b1*K)*z^-1 + (b0 + b1*K)
+ * H(z) = ------------------------------
+ *        (a0 - a1*K)*z^-1 + (a0 + a1*K)
+ *
+ * Fourth Step: Multiply the numerator and denominator  by 1/(a0 + a1*K) to get
+ * the 1:
+ *                   1
+ * Set a0_inv = -----------
+ *              (a0 + a1*K)
+ *        a0_inv*(b0 - b1*K)*z^-1 + a0_inv*(b0 + b1*K)
+ * H(z) = --------------------------------------------
+ *        a0_inv*(a0 - a1*K)*z^-1 +         1
+ *
+ * This result in the coefficients:
+ * B0 = a0_inv*(b0 + b1*K)
+ * B1 = a0_inv*(b0 - b1*K)
+ * A1 = a0_inv*(a0 - a1*K)
+ *
  * @param ps_coeff_in Input transfer function H(s) coefficients.
  * @param ps_coeff_out Input transfer function H(s) coefficients.
  * @param f32_ts Sampling time
@@ -2158,18 +2193,74 @@ pdsp_extern void pdsp_1p1z_c2d(pdsp_1p1z_t *ps_coeff_in,
 /**
  * @brief Convert continuous H(s) to H(1/z) for 2P2Z transfer function using
  * bilinear transform.
- * @details Transfer function:
+ * @details Bilinear transform: https://en.wikipedia.org/wiki/Bilinear_transform
+ * In the DSP world, the z-transform friendly z^-1 is used instead of z.
+ *
+ * Transfer function in s-domain:
  *        b2*s^2 + b1*s + b0
  * H(s) = ------------------
  *        a2*s^2 + a1*s + a0
  *
- *        2  (1 - z^-1)
- * >> s = -- ----------
- *        ts (1 + z^-1)
+ *        2  (1 - z^-1)                            2
+ * >> s = -- ---------- with the  abbreviation K = --
+ *        ts (1 + z^-1)                            ts
  *
- *           B2*z^-1 + B1*z^-1 + B0
- * H(z^-1) = ----------------------
- *           A2*z^-1 + A1*z^-1 + 1
+ * Transfer function in z-domain (goal):
+ *        B2*z^-2 + B1*z^-1 + B0
+ * H(z) = ----------------------
+ *        A2*z^-2 + A1*z^-1 + 1
+ *
+ * First step: Replace the s with the bilinear formula and multiply numerator
+ * and denominator with the highest power of (1 + z^-1)^(highest power of s):
+ *        b2*K^2*(1 - z^-1)^2 + b1*K*(1 - z^-1)*(1 + z^-1) + b0*(1 + z^-1)^2
+ * H(z) = ------------------------------------------------------------------
+ *        a2*K^2*(1 - z^-1)^2 + a1*K*(1 - z^-1)*(1 + z^-1) + a0*(1 + z^-1)^2
+ *
+ * Remember:
+ * - (a + b)^2 = a^2 + 2*a*b + b^2
+ * - (a - b)^2 = a^2 - 2*a*b + b^2
+ * - (a - b)(a + b) = a^2 -b^2
+ *
+ * Second Step: Multiply out all terms:
+ *        b2*K^2 - 2*b2*K^2*z^-1 + b2*K^2*z^-2 + b1*K - b1*K*z^-2 +
+ * H(z) = ---------------------------------------------------------
+ *        a2*K^2 - 2*a2*K^2*z^-1 + a2*K^2*z^-2 + a1*K - a1*K*z^-2 +
+ *
+ *        b0 + 2*b0*z^-1 + b0*z^-2
+ *    ... ------------------------
+          a0 + 2*a0*z^-1 + a0*z^-2
+ *
+ * Third Step: Sort the terms:
+ *        (b0 - b1*K + b2*K^2)*z^-2 + (2*b0 - b1*K - 2*b2*K^2)*z^-1 +
+ * H(z) = -----------------------------------------------------------
+ *        (a0 - a1*K + a2*K^2)*z^-2 + (2*a0 - a1*K - 2*a2*K^2)*z^-1 +
+ *
+ *        (b0 + b1*K + b2*K^2)
+ *    ... ---------------------
+ *        (a0 + a1*K + a2*K^2)
+ *
+ *
+ * Fourth Step: Multiply the numerator and denominator  by 1/(a0 + a1*K) to get
+ * the 1:
+ *                        1
+ * Set a0_inv = --------------------
+ *              (a0 + a1*K + a2*K^2)
+ *
+ *        a0_inv * (b0 - b1*K + b2*K^2)*z^-2 +
+ * H(z) = ------------------------------------
+ *        a0_inv * (a0 - a1*K + a2*K^2)*z^-2 +
+ *
+ *        a0_inv * (2*b0 - b1*K - 2*b2*K^2)*z^-1 + a0_inv * (b0 + b1*K + b2*K^2)
+ *    ... ----------------------------------------------------------------------
+ *        a0_inv * (2*a0 - a1*K - 2*a2*K^2)*z^-1 +          1
+ *
+ * This result in the coefficients:
+ * B0 = a0_inv * (b0 + b1*K + b2*K^2)
+ * B1 = a0_inv * (2*b0 - b1*K - 2*b2*K^2)
+ * B2 = a0_inv * (b0 - b1*K + b2*K^2)
+ * A1 = a0_inv * (2*a0 - a1*K - 2*a2*K^2)
+ * A2 = a0_inv * (a0 - a1*K + a2*K^2)
+ *
  * @param ps_coeff_in Input transfer function H(s) coefficients.
  * @param ps_coeff_out Input transfer function H(s) coefficients.
  * @param f32_ts Sampling time
@@ -2181,18 +2272,106 @@ pdsp_extern void pdsp_2p2z_c2d(pdsp_2p2z_t *ps_coeff_in,
 /**
  * @brief Convert continuous H(s) to H(1/z) for 3P3Z transfer function using
  * bilinear transform.
- * @details Transfer function:
+ * @details Bilinear transform: https://en.wikipedia.org/wiki/Bilinear_transform
+ * In the DSP world, the z-transform friendly z^-1 is used instead of z.
+ *
+ * Transfer function in s-domain:
  *        b3*s^3 + b2*s^2 + b1*s + b0
  * H(s) = ---------------------------
  *        a3*s^3 + a2*s^2 + a1*s + a0
  *
- *        2  (1 - z^-1)
- * >> s = -- ----------
- *        ts (1 + z^-1)
+ *        2  (1 - z^-1)                            2
+ * >> s = -- ---------- with the  abbreviation K = --
+ *        ts (1 + z^-1)                            ts
  *
+ * Transfer function in z-domain (goal):
  *           B3*z^-1 + B2*z^-1 + B1*z^-1 + B0
  * H(z^-1) = --------------------------------
  *           A3*z^-1 + A2*z^-1 + A1*z^-1 + 1
+ *
+ * *
+ * First step: Replace the s with the bilinear formula and multiply numerator
+ * and denominator with the highest power of (1 + z^-1)^(highest power of s):
+ *        b3*K^3*(1 - z^-1)^3 + b2*K^2*(1 - z^-1)^2*(1 + z^-1) +
+ * H(z) = ------------------------------------------------------
+ *        a3*K^3*(1 - z^-1)^3 + a2*K^2*(1 - z^-1)^2*(1 + z^-1) +
+ *
+ *        b1*K*(1 - z^-1)*(1 + z^-1)^2 + b0*(1 + z^-1)^3
+ *    ... ----------------------------------------------
+ *        a1*K*(1 - z^-1)*(1 + z^-1)^2 + a0*(1 + z^-1)^3
+ *
+ * Remember (pre-calculated):
+ * - (a + b)^3 = a^3 + 3*a^2*b + 3*a*b^2 + b^3
+ * - (a - b)^3 = a^3 - 3*a^2*b + 3*a*b^2 - b^3
+ * - (a + b)^2*(a - b) = a^3 + a^2*b - a*b^2 - b^3
+ * - (a - b)^2*(a + b) = a^3 - a^2*b - a*b^2 + b^3
+ *
+ * Second Step: Multiply out all terms:
+ *        b3*K^3 - 3*b3*K^3*z^-1 + 3*b3*K^3*z^-2 - b3*K^3*z^-3
+ * H(z) = ----------------------------------------------------
+ *        a3*K^3 - 3*a3*K^3*z^-1 + 3*a3*K^3*z^-2 - a3*K^3*z^-3
+ *
+ *        b2*K^2 - b2*K^2*z^-1 - b2*K^2*z^-2 + b2*K^2*z^-3
+ *    ... ------------------------------------------------
+ *        a2*K^2 - a2*K^2*z^-1 - a2*K^2*z^-2 + a2*K^2*z^-3
+ *
+ *        b1*K + b1*K*z^-1 - b1*K*z^-2 - b1*K*z^-3
+ *    ... ----------------------------------------
+ *        a1*K + a1*K*z^-1 - a1*K*z^-2 - a1*K*z^-3
+ *
+ *        b0 + 3*b0*z^-1 + 3*b0*z^-2 + b0*z^-3
+ *    ... ------------------------------------
+          a0 + 3*a0*z^-1 + 3*a0*z^-2 + a0*z^-3
+ *
+ * Third Step: Sort the terms:
+ *        (b0 - b1*K + b2*K^2 + b3*K^3)*z^-3 +
+ * H(z) = ------------------------------------
+ *        (a0 - a1*K + a2*K^2 + a3*K^3)*z^-3 +
+ *
+ *        (3*b0 - b1*K - b2*K^2 + 3*b3*K^3)*z^-2 +
+ *    ... ----------------------------------------
+ *        (3*a0 - a1*K - a2*K^2 + 3*a3*K^3)*z^-2 +
+ *
+ *        (3*b0 + b1*K - b2*K^2 - 3*b3*K^3)*z^-1 +
+ *    ... -----------------------------------------
+ *        (3*a0 + a1*K - a2*K^2 - 3*a3*K^3)*z^-1 +
+ *
+ *        (b0 + b1*K + b2*K^2 + b3*K^3)
+ *    ... -----------------------------
+ *        (a0 + a1*K + a2*K^2 + a3*K^3)
+ *
+ *
+ * Fourth Step: Multiply the numerator and denominator  by 1/(a0 + a1*K) to get
+ * the 1:
+ *                            1
+ * Set a0_inv = -----------------------------
+ *              (a0 + a1*K + a2*K^2 + a3*K^3)
+ *
+ *        a0_inv * (b0 - b1*K + b2*K^2 + b3*K^3)*z^-3 +
+ * H(z) = ---------------------------------------------
+ *        a0_inv * (a0 - a1*K + a2*K^2 + a3*K^3)*z^-3 +
+ *
+ *        a0_inv * (3*b0 - b1*K - b2*K^2 + 3*b3*K^3)*z^-2 +
+ *    ... -------------------------------------------------
+ *        a0_inv * (3*a0 - a1*K - a2*K^2 + 3*a3*K^3)*z^-2 +
+ *
+ *        a0_inv * (3*b0 + b1*K - b2*K^2 - 3*b3*K^3)*z^-1 +
+ *    ... -------------------------------------------------
+ *        a0_inv * (3*a0 + a1*K - a2*K^2 - 3*a3*K^3)*z^-1 +
+ *
+ *        a0_inv * (b0 + b1*K + b2*K^2 + b3*K^3)
+ *    ... --------------------------------------
+ *                          1
+ *
+ * This result in the coefficients:
+ * B0 = a0_inv * (b0 + b1*K + b2*K^2 + b3*K^3)
+ * B1 = a0_inv * (3*b0 + b1*K - b2*K^2 - 3*b3*K^3)
+ * B2 = a0_inv * (3*b0 - b1*K - b2*K^2 + 3*b3*K^3)
+ * B3 = a0_inv * (b0 - b1*K + b2*K^2 + b3*K^3)
+ * A1 = a0_inv * (3*a0 + a1*K - a2*K^2 - 3*a3*K^3)
+ * A2 = a0_inv * (3*a0 - a1*K - a2*K^2 + 3*a3*K^3)
+ * A3 = a0_inv * (a0 - a1*K + a2*K^2 + a3*K^3)
+ *
  * @param ps_coeff_in Input transfer function H(s) coefficients.
  * @param ps_coeff_out Input transfer function H(s) coefficients.
  * @param f32_ts Sampling time
@@ -2460,6 +2639,62 @@ pdsp_extern void pdsp_dq0_abc_init(pdsp_dq_abc_var_t *ps_var);
 pdsp_extern void pdsp_dq0_abc(pdsp_dq_abc_var_t *ps_var, pdsp_f32_t f32_d,
                               pdsp_f32_t f32_q, pdsp_f32_t f32_z,
                               pdsp_f32_t f32_sin_val, pdsp_f32_t f32_cos_val);
+
+/**
+ * @brief Continuous to discrete function as 1p1z.
+ * @details Interpret PI controller as a 1p1z structure as follows:
+ * 1P1Z Transfer function in s-domain:
+ *        b1*s + b0
+ * H(s) = ---------
+ *        a1*s + a0
+ *
+ * And coefficient comparison (see pdsp_1p1z_c2d()):
+ * K = 2 / ts
+ * a0_inv =  1 / (a0 + a1*K)
+ * B0 = a0_inv*(b0 + b1*K)
+ * B1 = a0_inv*(b0 - b1*K)
+ * A1 = a0_inv*(a0 - a1*K)
+ *
+ * Transfer function in z-domain (goal):
+ *        B1*z^-1 + B0   y(z)
+ * H(z) = ------------ = ----
+ *        A1*z^-1 + 1    e(z)
+ *
+ * Calculate control law:
+ * e(z) * (B1*z^-1 + B0) = y(z) * (A1*z^-1 + 1)
+ * e(z)*B1*z^-1 + e(z)*B0 = y(z)*A1*z^-1 + y(z)
+ * z-Transform: a*X(z) -> a*x[n], a*X(z^-1) -> a*x[n-1]
+ * e[n-1]*B1 + e[n]*B0 = y[n-1]*A1 + y[n]
+ * y[n] = e[n-1]*B1 + e[n]*B0 - y[n-1]*A1
+ *
+ * PI Transfer function in s-domain:
+ * H(s) = kp * (1 + wc / s) -> According to Vorperian
+ *
+ *             s + wc   kp*s + kp*wc
+ * H(s) = kp * ------ = ------------
+ *               s      1*s  +   0
+ *
+ * Coefficient comparison from above:
+ * b1 = kp
+ * b0 = kp * wc
+ * a1 = 1
+ * a0 = 0
+ * For z-domain:
+ * a0_inv = 1/K = ts / 2
+ * B0 = (ts/2)*kp*wc + kp
+ * B1 = (ts/2)*kp*wc - kp
+ * A1 = -1
+ *
+ * Final control law:
+ * y[n] = y[n-1] + e[n]*((ts/2)*kp*wc + kp) + e[n-1]((ts/2)*kp*wc - kp)
+ *
+ * @param kp Controller proportional gain.
+ * @param wc Controller corner frequency.
+ * @param ps_coeff_out Input transfer function H(s) coefficients.
+ * @param f32_ts Sampling time
+ */
+pdsp_extern void pdsp_pi_c2d(pdsp_f32_t kp, pdsp_f32_t wc,
+                             pdsp_1p1z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts);
 
 /**
  * @brief Initialize / clear pi controller struct.

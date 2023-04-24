@@ -1352,6 +1352,7 @@ void test_setp_smooth(void)
     PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_FALSE);
     /* step */
     PDSP_ASSERT(pdsp_setp_smooth(&setp) == 0.625f);
+    pdsp_setp_smooth_set_dest(&setp, 0.0f);
     PDSP_ASSERT(setp_var.f32_x1 == 0.5f);
     PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_FALSE);
     /* step */
@@ -1364,6 +1365,27 @@ void test_setp_smooth(void)
     PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_TRUE);
     /* step */
     PDSP_ASSERT(pdsp_setp_smooth(&setp) == 4.0f);
+    PDSP_ASSERT(setp_var.f32_x1 == 0.25f);
+    PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_FALSE);
+    /* step */
+    PDSP_ASSERT(pdsp_setp_smooth(&setp) == 3.375f);
+    pdsp_setp_smooth_set_dest(&setp, 0.0f);
+    PDSP_ASSERT(setp_var.f32_x1 == 0.5f);
+    PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_FALSE);
+    /* step */
+    PDSP_ASSERT(pdsp_setp_smooth(&setp) == 2.0f);
+    PDSP_ASSERT(setp_var.f32_x1 == 0.75f);
+    PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_FALSE);
+    /* step */
+    PDSP_ASSERT(pdsp_setp_smooth(&setp) == 0.625f);
+    PDSP_ASSERT(setp_var.f32_x1 == 1.0f);
+    PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_TRUE);
+    /* step */
+    PDSP_ASSERT(pdsp_setp_smooth(&setp) == 0.0f);
+    PDSP_ASSERT(setp_var.f32_x1 == 1.0f);
+    PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_TRUE);
+    /* step */
+    PDSP_ASSERT(pdsp_setp_smooth(&setp) == 0.0f);
     PDSP_ASSERT(setp_var.f32_x1 == 1.0f);
     PDSP_ASSERT(pdsp_setp_smooth_reached(&setp, 0.1f) == PDSP_TRUE);
 }

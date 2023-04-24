@@ -1397,15 +1397,17 @@ pdsp_extern void pdsp_2p2z_c2d(pdsp_2p2z_t *ps_coeff_in,
         f32_a0_inv * (ps_coeff_in->f32_b2 * f32_K2 +
                       ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
     /* coeff b1 */
-    ps_coeff_out->f32_b1 = f32_a0_inv * (2.0f * ps_coeff_in->f32_b0 -
-                                         2.0f * ps_coeff_in->f32_b2 * f32_K2);
+    ps_coeff_out->f32_b1 =
+        f32_a0_inv * (2.0f * ps_coeff_in->f32_b0 - ps_coeff_in->f32_b1 * f32_K -
+                      2.0f * ps_coeff_in->f32_b2 * f32_K2);
     /* coeff b2 */
     ps_coeff_out->f32_b2 =
         f32_a0_inv * (ps_coeff_in->f32_b2 * f32_K2 -
                       ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
     /* coeff a1 */
-    ps_coeff_out->f32_a1 = f32_a0_inv * (2.0f * ps_coeff_in->f32_a0 -
-                                         2.0f * ps_coeff_in->f32_a2 * f32_K2);
+    ps_coeff_out->f32_a1 =
+        f32_a0_inv * (2.0f * ps_coeff_in->f32_a0 - ps_coeff_in->f32_a1 * f32_K -
+                      2.0f * ps_coeff_in->f32_a2 * f32_K2);
     /* coeff a2 */
     ps_coeff_out->f32_a2 =
         f32_a0_inv * (ps_coeff_in->f32_a2 * f32_K2 +
@@ -1428,24 +1430,34 @@ pdsp_extern void pdsp_3p3z_c2d(pdsp_3p3z_t *ps_coeff_in,
          ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
     /* coeff b1 */
     ps_coeff_out->f32_b1 =
-        f32_a0_inv * (-3.0f * ps_coeff_in->f32_b3 * f32_K3 -
-                      2.0f * ps_coeff_in->f32_b2 * f32_K2 -
-                      ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
+        f32_a0_inv *
+        (-3.0f * ps_coeff_in->f32_b3 * f32_K3 - ps_coeff_in->f32_b2 * f32_K2 +
+         ps_coeff_in->f32_b1 * f32_K + 3.0f * ps_coeff_in->f32_b0);
     /* coeff b2 */
-    ps_coeff_out->f32_b2 = f32_a0_inv * (3.0f * ps_coeff_in->f32_b3 * f32_K3 +
-                                         ps_coeff_in->f32_b2 * f32_K2);
+    ps_coeff_out->f32_b2 =
+        f32_a0_inv *
+        (3.0f * ps_coeff_in->f32_b3 * f32_K3 - ps_coeff_in->f32_b2 * f32_K2 -
+         ps_coeff_in->f32_b1 * f32_K + 3.0f * ps_coeff_in->f32_b0);
     /* coeff b3 */
-    ps_coeff_out->f32_b3 = f32_a0_inv * (-3.0f * ps_coeff_in->f32_b3 * f32_K3);
+    ps_coeff_out->f32_b3 =
+        f32_a0_inv *
+        (ps_coeff_in->f32_b3 * f32_K3 + ps_coeff_in->f32_b2 * f32_K2 -
+         ps_coeff_in->f32_b1 * f32_K + ps_coeff_in->f32_b0);
     /* coeff a1 */
     ps_coeff_out->f32_a1 =
-        f32_a0_inv * (-3.0f * ps_coeff_in->f32_a3 * f32_K3 -
-                      2.0f * ps_coeff_in->f32_a2 * f32_K2 -
-                      ps_coeff_in->f32_a1 * f32_K + ps_coeff_in->f32_a0);
+        f32_a0_inv *
+        (-3.0f * ps_coeff_in->f32_a3 * f32_K3 - ps_coeff_in->f32_a2 * f32_K2 +
+         ps_coeff_in->f32_a1 * f32_K + 3.0f * ps_coeff_in->f32_a0);
     /* coeff a2 */
-    ps_coeff_out->f32_a2 = f32_a0_inv * (3.0f * ps_coeff_in->f32_a3 * f32_K3 +
-                                         ps_coeff_in->f32_a2 * f32_K2);
+    ps_coeff_out->f32_a2 =
+        f32_a0_inv *
+        (3.0f * ps_coeff_in->f32_a3 * f32_K3 - ps_coeff_in->f32_a2 * f32_K2 -
+         ps_coeff_in->f32_a1 * f32_K + 3.0f * ps_coeff_in->f32_a0);
     /* coeff a3 */
-    ps_coeff_out->f32_a3 = f32_a0_inv * (-3.0f * ps_coeff_in->f32_a3 * f32_K3);
+    ps_coeff_out->f32_a3 =
+        f32_a0_inv *
+        (ps_coeff_in->f32_a3 * f32_K3 + ps_coeff_in->f32_a2 * f32_K2 -
+         ps_coeff_in->f32_a1 * f32_K + ps_coeff_in->f32_a0);
 }
 
 pdsp_extern void pdsp_df21_clear(pdsp_1p1z_var_t *ps_var)
@@ -1757,6 +1769,14 @@ pdsp_extern void pdsp_dq0_abc(pdsp_dq_abc_var_t *ps_var, pdsp_f32_t f32_d,
                     0.5f * f32_z;
     ps_var->f32_c = -0.5f * ps_var->f32_alpha - 0.8660254f * ps_var->f32_beta +
                     0.5f * f32_z;
+}
+
+pdsp_extern void pdsp_pi_c2d(pdsp_f32_t kp, pdsp_f32_t wc,
+                             pdsp_1p1z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts)
+{
+    pdsp_1p1z_t s_in = {
+        .f32_b0 = kp * wc, .f32_b1 = kp, .f32_a0 = 0.0f, .f32_a1 = 1.0f};
+    pdsp_1p1z_c2d(&s_in, ps_coeff_out, f32_ts);
 }
 
 pdsp_extern void pdsp_pi_clear(pdsp_pi_t *ps_data)
