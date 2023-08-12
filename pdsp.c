@@ -742,6 +742,14 @@ pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in)
     return ps_data->u16_state;
 }
 
+pdsp_extern pdsp_f32_t pdsp_backlash(pdsp_backlash_t *ps_data, pdsp_f32_t f32_in)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->f32_state = pdsp_maxf(ps_data->f32_state, f32_in - ps_data->f32_backlash_half);
+    ps_data->f32_state = pdsp_minf(ps_data->f32_state, f32_in + ps_data->f32_backlash_half);
+    return ps_data->f32_state;
+}
+
 pdsp_extern void pdsp_edge_delay_init(pdsp_edge_delay_t *ps_data,
                                       pdsp_u16_t u16_state,
                                       pdsp_u16_t u16_red_count,
@@ -1771,12 +1779,26 @@ pdsp_extern void pdsp_dq0_abc(pdsp_dq_abc_var_t *ps_var, pdsp_f32_t f32_d,
                     0.5f * f32_z;
 }
 
-pdsp_extern void pdsp_pi_c2d(pdsp_f32_t kp, pdsp_f32_t wc,
-                             pdsp_1p1z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts)
+pdsp_extern void pdsp_1p1z_pi_c2d(pdsp_f32_t f32_kp, pdsp_f32_t f32_wc,
+                                  pdsp_1p1z_inv_t *ps_coeff_out,
+                                  pdsp_f32_t f32_ts)
 {
+    PDSP_ASSERT(ps_coeff_out != NULL);
     pdsp_1p1z_t s_in = {
-        .f32_b0 = kp * wc, .f32_b1 = kp, .f32_a0 = 0.0f, .f32_a1 = 1.0f};
+        .f32_b0 = f32_kp * f32_wc, .f32_b1 = f32_kp, .f32_a0 = 0.0f, .f32_a1 = 1.0f};
     pdsp_1p1z_c2d(&s_in, ps_coeff_out, f32_ts);
+}
+
+pdsp_extern void pdsp_pi_b2d(pdsp_f32_t f32_kp, pdsp_f32_t f32_wc,
+                             pdsp_f32_t f32_kp_to_ks, pdsp_f32_t f32_kp_to_ka,
+                             pdsp_pi_err_param_t *ps_param_in_out,
+                             pdsp_f32_t f32_ts)
+{
+    PDSP_ASSERT(ps_param_in_out != NULL);
+    ps_param_in_out->f32_kp = f32_kp;
+    ps_param_in_out->f32_ki = f32_wc * f32_kp * f32_ts;
+    ps_param_in_out->f32_ks = f32_kp * f32_kp_to_ks;
+    ps_param_in_out->f32_ka = f32_kp * f32_kp_to_ka;
 }
 
 pdsp_extern void pdsp_pi_clear(pdsp_pi_t *ps_data)

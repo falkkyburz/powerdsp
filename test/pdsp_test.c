@@ -631,6 +631,34 @@ void test_robust(void)
     PDSP_ASSERT(pdsp_robust(&rbst, -10.0f) == 0U);
 }
 
+void test_backlash(void)
+{
+    printf("-- void test_backlash(void) --\n");
+    pdsp_backlash_t bklsh = {.f32_backlash_half = 2.0f, .f32_state = 0.0f};
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 0.0f) == 0.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 1.0f) == 0.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 2.0f) == 0.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 3.0f) == 1.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 2.0f) == 1.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 1.0f) == 1.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 0.0f) == 1.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -1.0f) == 1.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -2.0f) == 0.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -3.0f) == -1.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -100.0f) == -98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -99.0f) == -98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -98.0f) == -98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -97.0f) == -98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -96.0f) == -98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, -95.0f) == -97.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 100.0f) == 98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 99.0f) == 98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 98.0f) == 98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 97.0f) == 98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 96.0f) == 98.0f);
+    PDSP_ASSERT(pdsp_backlash(&bklsh, 95.0f) == 97.0f);
+}
+
 void test_edge_delay(void)
 {
     printf("-- void test_edge_delay(void) --\n");
@@ -1969,6 +1997,7 @@ int main()
     test_hysteresis_list();
     test_debounce();
     test_robust();
+    test_backlash();
     test_edge_delay();
     test_monoflop();
     test_pulse();

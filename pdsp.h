@@ -162,6 +162,15 @@ typedef struct pdsp_robust_tag
     pdsp_u16_t u16_size;
 } pdsp_robust_t;
 
+/** Backlash struct. */
+typedef struct pdsp_backlash_tag
+{
+    /** Backlash value. */
+    pdsp_f32_t f32_backlash_half;
+    /** State variable. */
+    pdsp_f32_t f32_state;
+} pdsp_backlash_t;
+
 /** Edge delay struct. */
 typedef struct pdsp_edge_delay_tag
 {
@@ -1596,6 +1605,21 @@ pdsp_extern void pdsp_robust_clear(pdsp_robust_t *ps_data);
 pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in);
 
 /**
+ * @brief Backlash function.
+ * @details Introduces backlash or play into an analog value.
+ *       out  in
+ * -------|---->----
+ * ---------|---->--
+ * ---------|--<----
+ * -------<-|-------
+ * ----<----|-------
+ * --<----|---------
+ * @param ps_data Data struct.
+ * @param f32_in Signal input.
+ */
+pdsp_extern pdsp_f32_t pdsp_backlash(pdsp_backlash_t *ps_data, pdsp_f32_t f32_in);
+
+/**
  * @brief Edge delay init function.
  * @details Delays a state change on the input by a count.
  * @param ps_data Data struct.
@@ -2644,6 +2668,7 @@ pdsp_extern void pdsp_dq0_abc(pdsp_dq_abc_var_t *ps_var, pdsp_f32_t f32_d,
  * @brief Continuous to discrete function as 1p1z.
  * @details Interpret PI controller as a 1p1z structure as follows:
  * 1P1Z Transfer function in s-domain:
+ *
  *        b1*s + b0
  * H(s) = ---------
  *        a1*s + a0
@@ -2686,15 +2711,62 @@ pdsp_extern void pdsp_dq0_abc(pdsp_dq_abc_var_t *ps_var, pdsp_f32_t f32_d,
  * A1 = -1
  *
  * Final control law:
- * y[n] = y[n-1] + e[n]*((ts/2)*kp*wc + kp) + e[n-1]((ts/2)*kp*wc - kp)
+ * y[n] = y[n-1] + e[n]*((ts/2)*kp*wc + kp) + e[n-1]*((ts/2)*kp*wc - kp)
+ * y[n] = y[n-1] + e[n]*(ts/2)*kp*wc + e[n]*kp + e[n-1]*(ts/2)*kp*wc - e[n-1]*kp
  *
- * @param kp Controller proportional gain.
- * @param wc Controller corner frequency.
+ * @param f32_kp Controller proportional gain.
+ * @param f32_wc Controller corner frequency.
  * @param ps_coeff_out Input transfer function H(s) coefficients.
  * @param f32_ts Sampling time
  */
-pdsp_extern void pdsp_pi_c2d(pdsp_f32_t kp, pdsp_f32_t wc,
-                             pdsp_1p1z_inv_t *ps_coeff_out, pdsp_f32_t f32_ts);
+pdsp_extern void pdsp_1p1z_pi_c2d(pdsp_f32_t f32_kp, pdsp_f32_t f32_wc,
+                                  pdsp_1p1z_inv_t *ps_coeff_out,
+                                  pdsp_f32_t f32_ts);
+
+/**
+ * @brief Function calculate parameters ki, kp, ks, ka of the PI controller from
+ * bode gain and corner frequency.
+ * @details The PI controller is parallel form and we can derive the
+ * paramerters from the time domain step response.
+ *
+ * See Haager Regelungstechnik 1997, page 62.
+ *
+ * PI controller step response.
+ * y(t)
+ * ^
+ * |           ---- ^
+ * |      ----      | 1
+ * |  ----          |
+ * | |              ^
+ * | |              | kp
+ * |-|--------------|-----> time
+ *   <--1/(wn*kp) -->
+ *
+ * Proportional gain is the same in time domain and sampled controller:
+ * kp = kp
+ * The integral gain can be derived from the step response.
+ * The slope from the graph is
+ * a = dy/dx = wn*kp
+ * The slope from the discrete integrator is
+ * a = wc*kp*ts = ki
+ *
+ * The parallel PI controller control law is composed of two steps:
+ * -> Integrator part:
+ *    f32_x0 += f32_error * f32_ki
+ * -> Sum up integrator part and proportional part:
+ *    f32_out = f32_error * ps_param->f32_kp + ps_var->f32_x0;
+ *
+ * @param f32_kp Controller proportional gain.
+ * @param f32_wc Controller corner frequency.
+ * @param f32_kp_to_ks Gain converting kp to ks, usually set to 1.0f.
+ * @param f32_kp_to_ka Gain converting kp to ka, usually set to 1.0f.
+ * @param ps_param_in_out Input, outoput transfer function H(s) coefficients.
+ * @param f32_ts Sampling time
+ */
+pdsp_extern void pdsp_pi_b2d(pdsp_f32_t f32_kp, pdsp_f32_t f32_wc,
+                             pdsp_f32_t f32_kp_to_ks, pdsp_f32_t f32_kp_to_ka,
+                             pdsp_pi_err_param_t *ps_param_in_out,
+                             pdsp_f32_t f32_ts);
 
 /**
  * @brief Initialize / clear pi controller struct.
