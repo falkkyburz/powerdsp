@@ -263,8 +263,6 @@ typedef struct pdsp_macro_pi_tag
     pdsp_f32_t f32_out;
     /** Size of parameter struct */
     pdsp_i16_t i16_param_size;
-    /** PI controller variable struct. */
-    pdsp_pi_var_t *ps_var;
     /** PI saturation maximum value. */
     pdsp_f32_t f32_max;
     /** PI saturation minimum value. */
@@ -384,7 +382,7 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Stopwatch struct pdsp_macro_stopwatch_t.
  * @param u32_hw_now Current time from the hardware timer.
  */
-#define pdsp_macro_stopwatch_start(s_data, u32_hw_now)                         \
+#define pdsp_macro_stopwatch_start(s_data, u32_hw_now) \
     (s_data).u32_time_mem = (u32_hw_now)
 
 /**
@@ -393,15 +391,15 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Stopwatch parameter struct pdsp_macro_stopwatch_t.
  * @param u32_hw_now Current time from the hardware timer.
  */
-#define pdsp_macro_stopwatch_stop(s_data, u32_hw_now)                          \
-    ((s_data).u32_time_mem < (u32_hw_now))                                     \
-        ? ((u32_hw_now) - (s_data).u32_time_mem)                               \
+#define pdsp_macro_stopwatch_stop(s_data, u32_hw_now) \
+    ((s_data).u32_time_mem < (u32_hw_now))            \
+        ? ((u32_hw_now) - (s_data).u32_time_mem)      \
         : ((u32_hw_now) - (s_data).u32_time_mem + (s_data).u32_hw_max)
 
 /**
  * @brief (macro) Map a value from one range to another (Uses division).
  * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
- * to implement the mapping (interpolation). The output for (x1 - x0) == 0 is y
+ * implement the mapping (interpolation). The output for (x1 - x0) == 0 is y
  * = (y1 - y0) * 0.5.
  * @param f32_in Input value.
  * @param f32_in_lo Input range low value.
@@ -409,12 +407,12 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_out_lo Output range low value.
  * @param f32_out_hi Output range high value.
  */
-#define pdsp_macro_map(f32_in, f32_in_lo, f32_in_hi, f32_out_lo, f32_out_hi)   \
-    (((f32_in_hi) - (f32_in_lo)) == 0.0f)                                      \
-        ? (((f32_out_hi) + (f32_out_lo)) * 0.5f)                               \
-        : ((pdsp_divf(((f32_out_hi) - (f32_out_lo)),                           \
-                      ((f32_in_hi) - (f32_in_lo))) *                           \
-                ((f32_in) - (f32_in_lo)) +                                     \
+#define pdsp_macro_map(f32_in, f32_in_lo, f32_in_hi, f32_out_lo, f32_out_hi) \
+    (((f32_in_hi) - (f32_in_lo)) == 0.0f)                                    \
+        ? (((f32_out_hi) + (f32_out_lo)) * 0.5f)                             \
+        : ((pdsp_divf(((f32_out_hi) - (f32_out_lo)),                         \
+                      ((f32_in_hi) - (f32_in_lo))) *                         \
+                ((f32_in) - (f32_in_lo)) +                                   \
             (f32_out_lo)))
 
 /**
@@ -422,22 +420,22 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Data struct pdsp_macro_hyst_t.
  * @param f32_in Value input.
  */
-#define pdsp_macro_hysteresis_value_run(s_data, f32_in)                        \
-    if ((f32_in) > (s_data).f32_high)                                          \
-    {                                                                          \
-        (s_data).b_state = PDSP_TRUE;                                          \
-    }                                                                          \
-    else if ((f32_in) < (s_data).f32_low)                                      \
-    {                                                                          \
-        (s_data).b_state = PDSP_FALSE;                                         \
+#define pdsp_macro_hysteresis_value_run(s_data, f32_in) \
+    if ((f32_in) > (s_data).f32_high)                   \
+    {                                                   \
+        (s_data).b_state = PDSP_TRUE;                   \
+    }                                                   \
+    else if ((f32_in) < (s_data).f32_low)               \
+    {                                                   \
+        (s_data).b_state = PDSP_FALSE;                  \
     }
 
 /**
  * @brief (macro) Counter based debounce function clear.
  * @param s_data Hysteresis state struct.
  */
-#define pdsp_macro_debounce_cnt_clear(s_data)                                  \
-    (s_data).b_state = PDSP_FALSE;                                             \
+#define pdsp_macro_debounce_cnt_clear(s_data) \
+    (s_data).b_state = PDSP_FALSE;            \
     (s_data).u16_count = 0U
 
 /**
@@ -446,28 +444,28 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Hysteresis state struct.
  * @param in Input condition.
  */
-#define pdsp_macro_debounce_cnt(s_data, in)                                    \
-    if (!((s_data).b_state) && (in))                                           \
-    {                                                                          \
-        (s_data).u16_count++;                                                  \
-        if ((s_data).u16_count > (s_data).u16_cnt_high)                        \
-        {                                                                      \
-            (s_data).b_state = PDSP_TRUE;                                      \
-            (s_data).u16_count = 0U;                                           \
-        }                                                                      \
-    }                                                                          \
-    else if (((s_data).b_state) && !(in))                                      \
-    {                                                                          \
-        (s_data).u16_count++;                                                  \
-        if ((s_data).u16_count > (s_data).u16_cnt_low)                         \
-        {                                                                      \
-            (s_data).b_state = PDSP_FALSE;                                     \
-            (s_data).u16_count = 0U;                                           \
-        }                                                                      \
-    }                                                                          \
-    else                                                                       \
-    {                                                                          \
-        (s_data).u16_count = 0U;                                               \
+#define pdsp_macro_debounce_cnt(s_data, in)             \
+    if (!((s_data).b_state) && (in))                    \
+    {                                                   \
+        (s_data).u16_count++;                           \
+        if ((s_data).u16_count > (s_data).u16_cnt_high) \
+        {                                               \
+            (s_data).b_state = PDSP_TRUE;               \
+            (s_data).u16_count = 0U;                    \
+        }                                               \
+    }                                                   \
+    else if (((s_data).b_state) && !(in))               \
+    {                                                   \
+        (s_data).u16_count++;                           \
+        if ((s_data).u16_count > (s_data).u16_cnt_low)  \
+        {                                               \
+            (s_data).b_state = PDSP_FALSE;              \
+            (s_data).u16_count = 0U;                    \
+        }                                               \
+    }                                                   \
+    else                                                \
+    {                                                   \
+        (s_data).u16_count = 0U;                        \
     }
 
 /**
@@ -476,9 +474,9 @@ typedef struct pdsp_macro_log32_tag
  * @param bit Bit position.
  * @param val Value to write.
  */
-#define pdsp_macro_bit_write(v, bit, val)                                      \
-    (v) &= ~(1 << (bit));                                                      \
-    (v) |= (((val)&1U) << (bit))
+#define pdsp_macro_bit_write(v, bit, val) \
+    (v) &= ~(1 << (bit));                 \
+    (v) |= (((val) & 1U) << (bit))
 
 /**
  * @brief (Macro) Read bit.
@@ -507,7 +505,7 @@ typedef struct pdsp_macro_log32_tag
  * @param mtrue Mask for true values.
  * @param mfalse Mask for false values.
  */
-#define pdsp_macro_mask_get(v, mtrue, mfalse)                                  \
+#define pdsp_macro_mask_get(v, mtrue, mfalse) \
     ((v) & (mtrue)) | ((~(v)) & (mfalse))
 
 /**
@@ -517,7 +515,7 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_weight0 Weight of first sample [0, 1]. Second sample weight is
  * (1-f32_weight0).
  */
-#define pdsp_macro_mean2w_f32(f32_in0, f32_in1, f32_weight0)                   \
+#define pdsp_macro_mean2w_f32(f32_in0, f32_in1, f32_weight0) \
     ((f32_in0) * (f32_weight0)) + ((f32_in1) * (1.0f - (f32_weight0)))
 
 /**
@@ -527,12 +525,12 @@ typedef struct pdsp_macro_log32_tag
  * @param u16_in2 Sample 2.
  * @param u16_in3 Sample 3.
  */
-#define pdsp_macro_mean4_u16(u16_in0, u16_in1, u16_in2, u16_in3)               \
-    0.25f * (pdsp_f32_t)((pdsp_u32_t)(u16_in0) + (pdsp_u32_t)(u16_in1) +       \
+#define pdsp_macro_mean4_u16(u16_in0, u16_in1, u16_in2, u16_in3)         \
+    0.25f * (pdsp_f32_t)((pdsp_u32_t)(u16_in0) + (pdsp_u32_t)(u16_in1) + \
                          (pdsp_u32_t)(u16_in2) + (pdsp_u32_t)(u16_in3))
 
 /**
- * @brief (macro) Mean from eight 16bit values. Use to average 4 ADC values.
+ * @brief (macro) Mean from eight 16bit values. Use to average 8 ADC values.
  * @param u16_in0 Sample 0.
  * @param u16_in1 Sample 1.
  * @param u16_in2 Sample 2.
@@ -542,11 +540,11 @@ typedef struct pdsp_macro_log32_tag
  * @param u16_in6 Sample 6.
  * @param u16_in7 Sample 7.
  */
-#define pdsp_macro_mean8_u16(u16_in0, u16_in1, u16_in2, u16_in3, u16_in4,      \
-                             u16_in5, u16_in6, u16_in7)                        \
-    0.125f * (pdsp_f32_t)((pdsp_u32_t)(u16_in0) + (pdsp_u32_t)(u16_in1) +      \
-                          (pdsp_u32_t)(u16_in2) + (pdsp_u32_t)(u16_in3) +      \
-                          (pdsp_u32_t)(u16_in4) + (pdsp_u32_t)(u16_in5) +      \
+#define pdsp_macro_mean8_u16(u16_in0, u16_in1, u16_in2, u16_in3, u16_in4, \
+                             u16_in5, u16_in6, u16_in7)                   \
+    0.125f * (pdsp_f32_t)((pdsp_u32_t)(u16_in0) + (pdsp_u32_t)(u16_in1) + \
+                          (pdsp_u32_t)(u16_in2) + (pdsp_u32_t)(u16_in3) + \
+                          (pdsp_u32_t)(u16_in4) + (pdsp_u32_t)(u16_in5) + \
                           (pdsp_u32_t)(u16_in6) + (pdsp_u32_t)(u16_in7))
 
 /**
@@ -554,10 +552,10 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Queue data struct pdsp_macro_queue_t.
  * @param size Size of the array.
  */
-#define pdsp_macro_queue_init(s_data, size)                                    \
-    (s_data).i16_size = (size);                                                \
-    (s_data).i16_count = 0;                                                    \
-    (s_data).i16_head = (s_data).i16_size - 1;                                 \
+#define pdsp_macro_queue_init(s_data, size)    \
+    (s_data).i16_size = (size);                \
+    (s_data).i16_count = 0;                    \
+    (s_data).i16_head = (s_data).i16_size - 1; \
     (s_data).i16_tail = 0
 
 /**
@@ -571,31 +569,31 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Queue data struct pdsp_macro_queue_t.
  * @return pdsp_bool_t PDSP_TRUE if queue is not full, PDSP_FALSE otherwise.
  */
-#define pdsp_macro_queue_is_not_full(s_data)                                   \
+#define pdsp_macro_queue_is_not_full(s_data) \
     ((s_data).i16_count < (s_data).i16_size)
 
 /**
  * @brief (macro) Advance the head of the queue.
  * @param s_data Queue data struct pdsp_macro_queue_t.
  */
-#define pdsp_macro_queue_advance_head(s_data)                                  \
-    (s_data).i16_head++;                                                       \
-    if ((s_data).i16_head >= (s_data).i16_size)                                \
-    {                                                                          \
-        (s_data).i16_head = 0;                                                 \
-    }                                                                          \
+#define pdsp_macro_queue_advance_head(s_data)   \
+    (s_data).i16_head++;                        \
+    if ((s_data).i16_head >= (s_data).i16_size) \
+    {                                           \
+        (s_data).i16_head = 0;                  \
+    }                                           \
     (s_data).i16_count++
 
 /**
  * @brief (macro) Advance the tail of the queue.
  * @param s_data Queue data struct pdsp_macro_queue_t.
  */
-#define pdsp_macro_queue_advance_tail(s_data)                                  \
-    (s_data).i16_tail++;                                                       \
-    if ((s_data).i16_tail >= (s_data).i16_size)                                \
-    {                                                                          \
-        (s_data).i16_tail = 0;                                                 \
-    }                                                                          \
+#define pdsp_macro_queue_advance_tail(s_data)   \
+    (s_data).i16_tail++;                        \
+    if ((s_data).i16_tail >= (s_data).i16_size) \
+    {                                           \
+        (s_data).i16_tail = 0;                  \
+    }                                           \
     (s_data).i16_count--
 
 /**
@@ -604,13 +602,13 @@ typedef struct pdsp_macro_log32_tag
  * @param a_data Queue data array.
  * @param in Data to push to the queue.
  */
-#define pdsp_macro_queue_push(s_data, a_data, in)                              \
-    (s_data).i16_head++;                                                       \
-    if ((s_data).i16_head >= (s_data).i16_size)                                \
-    {                                                                          \
-        (s_data).i16_head = 0;                                                 \
-    }                                                                          \
-    (s_data).i16_count++;                                                      \
+#define pdsp_macro_queue_push(s_data, a_data, in) \
+    (s_data).i16_head++;                          \
+    if ((s_data).i16_head >= (s_data).i16_size)   \
+    {                                             \
+        (s_data).i16_head = 0;                    \
+    }                                             \
+    (s_data).i16_count++;                         \
     (a_data)[(s_data).i16_head] = (in)
 
 /**
@@ -618,13 +616,13 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Pointer to the queue struct pdsp_macro_queue_t.
  * @param a_data Queue data array.
  */
-#define pdsp_macro_queue_pop(s_data, a_data)                                   \
-    (a_data)[(s_data).i16_tail];                                               \
-    (s_data).i16_tail++;                                                       \
-    if ((s_data).i16_tail >= (s_data).i16_size)                                \
-    {                                                                          \
-        (s_data).i16_tail = 0;                                                 \
-    }                                                                          \
+#define pdsp_macro_queue_pop(s_data, a_data)    \
+    (a_data)[(s_data).i16_tail];                \
+    (s_data).i16_tail++;                        \
+    if ((s_data).i16_tail >= (s_data).i16_size) \
+    {                                           \
+        (s_data).i16_tail = 0;                  \
+    }                                           \
     (s_data).i16_count--
 
 /** @} util */
@@ -638,9 +636,9 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Signal data struct pdsp_macro_ain_t.
  * @param raw Raw input signal.
  */
-#define pdsp_macro_ain(s_data, raw)                                            \
-    (((((raw) * (s_data).f32_gain) + (s_data).f32_offset) *                    \
-      (s_data).f32_ovr_dis) +                                                  \
+#define pdsp_macro_ain(s_data, raw)                         \
+    (((((raw) * (s_data).f32_gain) + (s_data).f32_offset) * \
+      (s_data).f32_ovr_dis) +                               \
      (s_data).f32_ovr_value)
 
 /**
@@ -649,9 +647,9 @@ typedef struct pdsp_macro_log32_tag
  * @param raw0 Raw input signal.
  * @param raw1 Raw input signal.
  */
-#define pdsp_macro_ain2(s_data, raw0, raw1)                                    \
-    ((((((raw0) + (raw1)) * (s_data).f32_gain) + (s_data).f32_offset) *        \
-      (s_data).f32_ovr_dis) +                                                  \
+#define pdsp_macro_ain2(s_data, raw0, raw1)                             \
+    ((((((raw0) + (raw1)) * (s_data).f32_gain) + (s_data).f32_offset) * \
+      (s_data).f32_ovr_dis) +                                           \
      (s_data).f32_ovr_value)
 
 /**
@@ -662,10 +660,10 @@ typedef struct pdsp_macro_log32_tag
  * @param raw2 Raw input signal.
  * @param raw3 Raw input signal.
  */
-#define pdsp_macro_ain4(s_data, raw0, raw1, raw2, raw3)                        \
-    ((((((raw0) + (raw1) + (raw2) + (raw3)) * (s_data).f32_gain) +             \
-       (s_data).f32_offset) *                                                  \
-      (s_data).f32_ovr_dis) +                                                  \
+#define pdsp_macro_ain4(s_data, raw0, raw1, raw2, raw3)            \
+    ((((((raw0) + (raw1) + (raw2) + (raw3)) * (s_data).f32_gain) + \
+       (s_data).f32_offset) *                                      \
+      (s_data).f32_ovr_dis) +                                      \
      (s_data).f32_ovr_value)
 
 /**
@@ -691,9 +689,9 @@ typedef struct pdsp_macro_log32_tag
  * @brief (macro) Initialize / Clear min-max struct.
  * @param s_data Min-max state variable struct pdsp_macro_minmax_var_t.
  */
-#define pdsp_macro_minmax_clear(s_data)                                        \
-    (s_data).f32_min = PDSP_POS_INF;                                           \
-    (s_data).f32_max = PDSP_NEG_INF;                                           \
+#define pdsp_macro_minmax_clear(s_data) \
+    (s_data).f32_min = PDSP_POS_INF;    \
+    (s_data).f32_max = PDSP_NEG_INF;    \
     (s_data).f32_delta = 0.0f
 
 /**
@@ -701,9 +699,9 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Min-max state variable struct pdsp_macro_minmax_var_t.
  * @param f32_in Filter input.
  */
-#define pdsp_macro_minmax(s_data, f32_in)                                      \
-    (s_data).f32_min = pdsp_minf((s_data).f32_min, (f32_in));                  \
-    (s_data).f32_max = pdsp_maxf((s_data).f32_max, (f32_in));                  \
+#define pdsp_macro_minmax(s_data, f32_in)                     \
+    (s_data).f32_min = pdsp_minf((s_data).f32_min, (f32_in)); \
+    (s_data).f32_max = pdsp_maxf((s_data).f32_max, (f32_in)); \
     (s_data).f32_delta = (s_data).f32_max - (s_data).f32_min
 
 /**
@@ -716,7 +714,7 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_ts Sampling time of the filter.
  * @param f32_fc Corner frequency of the filter.
  */
-#define pdsp_macro_expavg_c2d(s_data, f32_ts, f32_fc)                          \
+#define pdsp_macro_expavg_c2d(s_data, f32_ts, f32_fc) \
     (s_data).f32_tau = 2.0f * PDSP_PI_F * (f32_ts) * (f32_fc)
 
 /**
@@ -730,7 +728,7 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Filter state variable struct pdsp_macro_expavg_var_t.
  * @param in Filter input.
  */
-#define pdsp_macro_expavg_calc(s_data, in)                                     \
+#define pdsp_macro_expavg_calc(s_data, in) \
     (s_data).f32_x1 += (s_data).f32_tau * ((in) - (s_data).f32_x1)
 
 /**
@@ -745,9 +743,9 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-#define pdsp_macro_df21(s_data, f32_in)                                        \
-    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;         \
-    (s_data).f32_x1 =                                                          \
+#define pdsp_macro_df21(s_data, f32_in)                                \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1; \
+    (s_data).f32_x1 =                                                  \
         ((f32_in) * (s_data).f32_b1) + ((s_data).f32_out * (s_data).f32_a1)
 
 /**
@@ -757,7 +755,7 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-#define pdsp_macro_df21_pre(s_data, f32_in)                                    \
+#define pdsp_macro_df21_pre(s_data, f32_in) \
     (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1
 
 /**
@@ -766,16 +764,16 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Filter data memory struct pdsp_macro_1p1z_inv_t.
  * @param f32_in Filter input signal.
  */
-#define pdsp_macro_df21_post(s_data, f32_in)                                   \
-    (s_data).f32_x1 =                                                          \
+#define pdsp_macro_df21_post(s_data, f32_in) \
+    (s_data).f32_x1 =                        \
         ((f32_in) * (s_data).f32_b1) + ((s_data).f32_out * (s_data).f32_a1)
 
 /**
  * @brief (macro) Initialize / Clear DF22 biquad filter struct.
  * @param s_data Filter state variable struct pdsp_macro_2p2z_inv_t.
  */
-#define pdsp_macro_df22_clear(s_data)                                          \
-    (s_data).f32_x1 = 0.0f;                                                    \
+#define pdsp_macro_df22_clear(s_data) \
+    (s_data).f32_x1 = 0.0f;           \
     (s_data).f32_x2 = 0.0f
 
 /**
@@ -784,11 +782,11 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-#define pdsp_macro_df22(s_data, f32_in)                                        \
-    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;         \
-    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
-                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
-    (s_data).f32_x2 =                                                          \
+#define pdsp_macro_df22(s_data, f32_in)                                       \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;        \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                          \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2; \
+    (s_data).f32_x2 =                                                         \
         ((f32_in) * (s_data).f32_b2) + ((s_data).f32_out * (s_data).f32_a2)
 
 /**
@@ -798,7 +796,7 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-#define pdsp_macro_df22_pre(s_data, f32_in)                                    \
+#define pdsp_macro_df22_pre(s_data, f32_in) \
     (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1
 
 /**
@@ -807,19 +805,19 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Filter data memory struct pdsp_macro_2p2z_inv_t.
  * @param f32_in Filter input signal.
  */
-#define pdsp_macro_df22_post(s_data, f32_in)                                   \
-    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
-                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
-    (s_data).f32_x2 =                                                          \
+#define pdsp_macro_df22_post(s_data, f32_in)                                  \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                          \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2; \
+    (s_data).f32_x2 =                                                         \
         ((f32_in) * (s_data).f32_b2) + ((s_data).f32_out * (s_data).f32_a2)
 
 /**
  * @brief (macro) Initialize / Clear DF23 filter struct.
  * @param s_data Filter state variable struct pdsp_macro_3p3z_inv_t.
  */
-#define pdsp_macro_df23_clear(s_data)                                          \
-    (s_data).f32_x1 = 0.0f;                                                    \
-    (s_data).f32_x2 = 0.0f;                                                    \
+#define pdsp_macro_df23_clear(s_data) \
+    (s_data).f32_x1 = 0.0f;           \
+    (s_data).f32_x2 = 0.0f;           \
     (s_data).f32_x3 = 0.0f
 
 /**
@@ -828,13 +826,13 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-#define pdsp_macro_df23(s_data, f32_in)                                        \
-    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;         \
-    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
-                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
-    (s_data).f32_x2 = ((f32_in) * (s_data).f32_b2) +                           \
-                      ((s_data).f32_out * (s_data).f32_a2) + (s_data).f32_x3;  \
-    (s_data).f32_x3 =                                                          \
+#define pdsp_macro_df23(s_data, f32_in)                                       \
+    (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1;        \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                          \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2; \
+    (s_data).f32_x2 = ((f32_in) * (s_data).f32_b2) +                          \
+                      ((s_data).f32_out * (s_data).f32_a2) + (s_data).f32_x3; \
+    (s_data).f32_x3 =                                                         \
         ((f32_in) * (s_data).f32_b3) + ((s_data).f32_out * (s_data).f32_a3)
 
 /**
@@ -844,7 +842,7 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_in Filter input signal.
  * @returns pdsp_f32_t Filter output.
  */
-#define pdsp_macro_df23_pre(s_data, f32_in)                                    \
+#define pdsp_macro_df23_pre(s_data, f32_in) \
     (s_data).f32_out = ((f32_in) * (s_data).f32_b0) + (s_data).f32_x1
 
 /**
@@ -853,20 +851,20 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Filter data memory struct pdsp_macro_3p3z_inv_t.
  * @param f32_in Filter input signal.
  */
-#define pdsp_macro_df23_post(s_data, f32_in)                                   \
-    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                           \
-                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2;  \
-    (s_data).f32_x2 = ((f32_in) * (s_data).f32_b2) +                           \
-                      ((s_data).f32_out * (s_data).f32_a2) + (s_data).f32_x3;  \
-    (s_data).f32_x3 =                                                          \
+#define pdsp_macro_df23_post(s_data, f32_in)                                  \
+    (s_data).f32_x1 = ((f32_in) * (s_data).f32_b1) +                          \
+                      ((s_data).f32_out * (s_data).f32_a1) + (s_data).f32_x2; \
+    (s_data).f32_x2 = ((f32_in) * (s_data).f32_b2) +                          \
+                      ((s_data).f32_out * (s_data).f32_a2) + (s_data).f32_x3; \
+    (s_data).f32_x3 =                                                         \
         ((f32_in) * (s_data).f32_b3) + ((s_data).f32_out * (s_data).f32_a3)
 
 /**
  * @brief (macro) Initialize / Clear median filter struct.
  * @param s_data Filter state variable struct pdsp_macro_med3_var_t.
  */
-#define pdsp_macro_med3_clear(s_data)                                          \
-    (s_data).f32_x1 = 0.0f;                                                    \
+#define pdsp_macro_med3_clear(s_data) \
+    (s_data).f32_x1 = 0.0f;           \
     (s_data).f32_x2 = 0.0f
 
 /**
@@ -874,12 +872,11 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Filter state memory struct pdsp_macro_med3_var_t.
  * @param f32_in Filter input signal.
  */
-#define pdsp_macro_med3(s_data, f32_in)                                        \
-    (s_data).f32_out =                                                         \
-        (((s_data).f32_x2 + (s_data).f32_x1 + (f32_in)) -                      \
-         pdsp_minf((s_data).f32_x2, pdsp_minf((s_data).f32_x1, (f32_in))) -    \
-         pdsp_maxf((s_data).f32_x2, pdsp_maxf((s_data).f32_x1, (f32_in))));    \
-    (s_data).f32_x2 = (s_data).f32_x1;                                         \
+#define pdsp_macro_med3(s_data, f32_in)                                              \
+    (s_data).f32_out =                                                               \
+        pdsp_maxf(pdsp_minf((s_data).f32_x2, (s_data).f32_x1),                       \
+                  pdsp_minf(pdsp_maxf((s_data).f32_x2, (s_data).f32_x1), (f32_in))); \
+    (s_data).f32_x2 = (s_data).f32_x1;                                               \
     (s_data).f32_x1 = (f32_in)
 
 /**
@@ -889,12 +886,12 @@ typedef struct pdsp_macro_log32_tag
  * @param i16_win_size Number of samples in the window. i16_win_size <=
  * queue size.
  */
-#define pdsp_macro_rollavg_init(s_data, size, i16_win_size)                    \
-    (s_data).f32_sum = 0.0f;                                                   \
-    (s_data).s_queue.i16_size = (size);                                        \
-    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                    \
-    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;                 \
-    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size);    \
+#define pdsp_macro_rollavg_init(s_data, size, i16_win_size)                 \
+    (s_data).f32_sum = 0.0f;                                                \
+    (s_data).s_queue.i16_size = (size);                                     \
+    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                 \
+    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;              \
+    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size); \
     (s_data).f32_win_size_inv = pdsp_divf(1.0f, (pdsp_f32_t)(i16_win_size))
 
 /**
@@ -903,19 +900,19 @@ typedef struct pdsp_macro_log32_tag
  * @param a_data Filter data array.
  * @param f32_in Rolling sum input signal.
  */
-#define pdsp_macro_rollavg(s_data, a_data, f32_in)                             \
-    (s_data).f32_sum -= (a_data)[(s_data).s_queue.i16_tail];                   \
-    (s_data).s_queue.i16_tail++;                                               \
-    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size)                \
-    {                                                                          \
-        (s_data).s_queue.i16_tail = 0;                                         \
-    }                                                                          \
-    (s_data).f32_sum += (f32_in) * (s_data).f32_win_size_inv;                  \
-    (s_data).s_queue.i16_head++;                                               \
-    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size)                \
-    {                                                                          \
-        (s_data).s_queue.i16_head = 0;                                         \
-    }                                                                          \
+#define pdsp_macro_rollavg(s_data, a_data, f32_in)              \
+    (s_data).f32_sum -= (a_data)[(s_data).s_queue.i16_tail];    \
+    (s_data).s_queue.i16_tail++;                                \
+    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size) \
+    {                                                           \
+        (s_data).s_queue.i16_tail = 0;                          \
+    }                                                           \
+    (s_data).f32_sum += (f32_in) * (s_data).f32_win_size_inv;   \
+    (s_data).s_queue.i16_head++;                                \
+    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size) \
+    {                                                           \
+        (s_data).s_queue.i16_head = 0;                          \
+    }                                                           \
     (a_data)[(s_data).s_queue.i16_head] = (f32_in) * (s_data).f32_win_size_inv
 
 /**
@@ -925,14 +922,14 @@ typedef struct pdsp_macro_log32_tag
  * @param i16_win_size Number of samples in the window. i16_win_size <=
  * queue size.
  */
-#define pdsp_macro_rollavg3_init(s_data, size, i16_win_size)                   \
-    (s_data).f32_sum0 = 0.0f;                                                  \
-    (s_data).f32_sum1 = 0.0f;                                                  \
-    (s_data).f32_sum2 = 0.0f;                                                  \
-    (s_data).s_queue.i16_size = (size);                                        \
-    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                    \
-    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;                 \
-    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size);    \
+#define pdsp_macro_rollavg3_init(s_data, size, i16_win_size)                \
+    (s_data).f32_sum0 = 0.0f;                                               \
+    (s_data).f32_sum1 = 0.0f;                                               \
+    (s_data).f32_sum2 = 0.0f;                                               \
+    (s_data).s_queue.i16_size = (size);                                     \
+    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                 \
+    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;              \
+    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size); \
     (s_data).f32_win_size_inv = pdsp_divf(1.0f, (pdsp_f32_t)(i16_win_size))
 
 /**
@@ -943,28 +940,28 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_in1 Rolling sum input signal.
  * @param f32_in2 Rolling sum input signal.
  */
-#define pdsp_macro_rollavg3(s_data, a_data, f32_in0, f32_in1, f32_in2)         \
-    (s_data).f32_sum0 -= (a_data)[(s_data).s_queue.i16_tail][0];               \
-    (s_data).f32_sum1 -= (a_data)[(s_data).s_queue.i16_tail][1];               \
-    (s_data).f32_sum2 -= (a_data)[(s_data).s_queue.i16_tail][2];               \
-    (s_data).s_queue.i16_tail++;                                               \
-    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size)                \
-    {                                                                          \
-        (s_data).s_queue.i16_tail = 0;                                         \
-    }                                                                          \
-    (s_data).f32_sum0 += (f32_in0) * (s_data).f32_win_size_inv;                \
-    (s_data).f32_sum1 += (f32_in1) * (s_data).f32_win_size_inv;                \
-    (s_data).f32_sum2 += (f32_in2) * (s_data).f32_win_size_inv;                \
-    (s_data).s_queue.i16_head++;                                               \
-    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size)                \
-    {                                                                          \
-        (s_data).s_queue.i16_head = 0;                                         \
-    }                                                                          \
-    (a_data)[(s_data).s_queue.i16_head][0] =                                   \
-        (f32_in0) * (s_data).f32_win_size_inv;                                 \
-    (a_data)[(s_data).s_queue.i16_head][1] =                                   \
-        (f32_in1) * (s_data).f32_win_size_inv;                                 \
-    (a_data)[(s_data).s_queue.i16_head][2] =                                   \
+#define pdsp_macro_rollavg3(s_data, a_data, f32_in0, f32_in1, f32_in2) \
+    (s_data).f32_sum0 -= (a_data)[(s_data).s_queue.i16_tail][0];       \
+    (s_data).f32_sum1 -= (a_data)[(s_data).s_queue.i16_tail][1];       \
+    (s_data).f32_sum2 -= (a_data)[(s_data).s_queue.i16_tail][2];       \
+    (s_data).s_queue.i16_tail++;                                       \
+    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size)        \
+    {                                                                  \
+        (s_data).s_queue.i16_tail = 0;                                 \
+    }                                                                  \
+    (s_data).f32_sum0 += (f32_in0) * (s_data).f32_win_size_inv;        \
+    (s_data).f32_sum1 += (f32_in1) * (s_data).f32_win_size_inv;        \
+    (s_data).f32_sum2 += (f32_in2) * (s_data).f32_win_size_inv;        \
+    (s_data).s_queue.i16_head++;                                       \
+    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size)        \
+    {                                                                  \
+        (s_data).s_queue.i16_head = 0;                                 \
+    }                                                                  \
+    (a_data)[(s_data).s_queue.i16_head][0] =                           \
+        (f32_in0) * (s_data).f32_win_size_inv;                         \
+    (a_data)[(s_data).s_queue.i16_head][1] =                           \
+        (f32_in1) * (s_data).f32_win_size_inv;                         \
+    (a_data)[(s_data).s_queue.i16_head][2] =                           \
         (f32_in2) * (s_data).f32_win_size_inv
 
 /**
@@ -974,14 +971,14 @@ typedef struct pdsp_macro_log32_tag
  * @param i16_win_size Number of samples in the window. i16_win_size <=
  * queue size.
  */
-#define pdsp_macro_rollvap_init(s_data, size, i16_win_size)                    \
-    (s_data).f32_sum0 = 0.0f;                                                  \
-    (s_data).f32_sum1 = 0.0f;                                                  \
-    (s_data).f32_sum2 = 0.0f;                                                  \
-    (s_data).s_queue.i16_size = (size);                                        \
-    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                    \
-    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;                 \
-    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size);    \
+#define pdsp_macro_rollvap_init(s_data, size, i16_win_size)                 \
+    (s_data).f32_sum0 = 0.0f;                                               \
+    (s_data).f32_sum1 = 0.0f;                                               \
+    (s_data).f32_sum2 = 0.0f;                                               \
+    (s_data).s_queue.i16_size = (size);                                     \
+    (s_data).s_queue.i16_count = (s_data).s_queue.i16_size;                 \
+    (s_data).s_queue.i16_head = (s_data).s_queue.i16_size - 1;              \
+    (s_data).s_queue.i16_tail = (s_data).s_queue.i16_size - (i16_win_size); \
     (s_data).f32_win_size_inv = pdsp_divf(1.0f, (pdsp_f32_t)(i16_win_size))
 
 /**
@@ -992,38 +989,38 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_volt Rolling sum input signal (voltage).
  * @param f32_curr Rolling sum input signal (current).
  */
-#define pdsp_macro_rollvap(s_data, a_data, f32_volt, f32_curr)                 \
-    (s_data).f32_sum0 -= (a_data)[(s_data).s_queue.i16_tail][0];               \
-    (s_data).f32_sum1 -= (a_data)[(s_data).s_queue.i16_tail][1];               \
-    (s_data).f32_sum2 -= (a_data)[(s_data).s_queue.i16_tail][2];               \
-    (s_data).s_queue.i16_tail++;                                               \
-    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size)                \
-    {                                                                          \
-        (s_data).s_queue.i16_tail = 0;                                         \
-    }                                                                          \
-    (s_data).f32_sum0 += (f32_volt) * (f32_volt) * (s_data).f32_win_size_inv;  \
-    (s_data).f32_sum1 += (f32_curr) * (f32_curr) * (s_data).f32_win_size_inv;  \
-    (s_data).f32_sum2 += (f32_volt) * (f32_curr) * (s_data).f32_win_size_inv;  \
-    (s_data).s_queue.i16_head++;                                               \
-    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size)                \
-    {                                                                          \
-        (s_data).s_queue.i16_head = 0;                                         \
-    }                                                                          \
-    (a_data)[(s_data).s_queue.i16_head][0] =                                   \
-        (f32_volt) * (f32_volt) * (s_data).f32_win_size_inv;                   \
-    (a_data)[(s_data).s_queue.i16_head][1] =                                   \
-        (f32_curr) * (f32_curr) * (s_data).f32_win_size_inv;                   \
-    (a_data)[(s_data).s_queue.i16_head][2] =                                   \
+#define pdsp_macro_rollvap(s_data, a_data, f32_volt, f32_curr)                \
+    (s_data).f32_sum0 -= (a_data)[(s_data).s_queue.i16_tail][0];              \
+    (s_data).f32_sum1 -= (a_data)[(s_data).s_queue.i16_tail][1];              \
+    (s_data).f32_sum2 -= (a_data)[(s_data).s_queue.i16_tail][2];              \
+    (s_data).s_queue.i16_tail++;                                              \
+    if ((s_data).s_queue.i16_tail >= (s_data).s_queue.i16_size)               \
+    {                                                                         \
+        (s_data).s_queue.i16_tail = 0;                                        \
+    }                                                                         \
+    (s_data).f32_sum0 += (f32_volt) * (f32_volt) * (s_data).f32_win_size_inv; \
+    (s_data).f32_sum1 += (f32_curr) * (f32_curr) * (s_data).f32_win_size_inv; \
+    (s_data).f32_sum2 += (f32_volt) * (f32_curr) * (s_data).f32_win_size_inv; \
+    (s_data).s_queue.i16_head++;                                              \
+    if ((s_data).s_queue.i16_head >= (s_data).s_queue.i16_size)               \
+    {                                                                         \
+        (s_data).s_queue.i16_head = 0;                                        \
+    }                                                                         \
+    (a_data)[(s_data).s_queue.i16_head][0] =                                  \
+        (f32_volt) * (f32_volt) * (s_data).f32_win_size_inv;                  \
+    (a_data)[(s_data).s_queue.i16_head][1] =                                  \
+        (f32_curr) * (f32_curr) * (s_data).f32_win_size_inv;                  \
+    (a_data)[(s_data).s_queue.i16_head][2] =                                  \
         (f32_volt) * (f32_curr) * (s_data).f32_win_size_inv
 
 /**
  * @brief (macro) Initialize / clear pi controller struct.
  * @param s_data Controller data struct.
  */
-#define pdsp_macro_pi_clear(s_data)                                            \
-    (s_data).i16_active = 0U;                                                  \
-    (s_data).i16_param_idx = 0U;                                               \
-    (s_data).f32_x0 = 0.0f;                                                    \
+#define pdsp_macro_pi_clear(s_data) \
+    (s_data).i16_active = 0U;       \
+    (s_data).i16_param_idx = 0U;    \
+    (s_data).f32_x0 = 0.0f;         \
     (s_data).f32_x1 = 0.0f;
 
 /**
@@ -1032,15 +1029,15 @@ typedef struct pdsp_macro_log32_tag
  * @param as_param Controller parameter struct.
  * @param f32_error Controller error signal input.
  */
-#define pdsp_macro_pi(s_data, as_param, f32_error)                             \
-    (s_data).f32_x0 +=                                                         \
-        ((f32_error) * (as_param)[s_data.i16_param_idx].f32_ki +               \
-         (s_data).f32_x1 * (as_param)[(s_data).i16_param_idx].f32_ks);         \
-    (s_data).f32_sum =                                                         \
-        (f32_error) * (as_param)[(s_data).i16_param_idx].f32_kp +              \
-        (s_data).f32_x0;                                                       \
-    (s_data).f32_out = pdsp_maxf(                                              \
-        (s_data).f32_min, pdsp_minf((s_data).f32_max, (s_data).f32_sum));      \
+#define pdsp_macro_pi(s_data, as_param, f32_error)                        \
+    (s_data).f32_x0 +=                                                    \
+        ((f32_error) * (as_param)[s_data.i16_param_idx].f32_ki +          \
+         (s_data).f32_x1 * (as_param)[(s_data).i16_param_idx].f32_ks);    \
+    (s_data).f32_sum =                                                    \
+        (f32_error) * (as_param)[(s_data).i16_param_idx].f32_kp +         \
+        (s_data).f32_x0;                                                  \
+    (s_data).f32_out = pdsp_maxf(                                         \
+        (s_data).f32_min, pdsp_minf((s_data).f32_max, (s_data).f32_sum)); \
     (s_data).f32_x1 = (s_data).f32_out - (s_data).f32_sum
 
 /**
@@ -1050,21 +1047,21 @@ typedef struct pdsp_macro_log32_tag
  * @param f32_error Error array [2] signal input.
  * @returns pdsp_f32_t Controller output.
  */
-#define pdsp_macro_pi2(s_data, as_param, f32_error)                            \
-    (s_data).i16_active = 0;                                                   \
-    (s_data).i16_active +=                                                     \
-        ((f32_error)[0] * (as_param)[s_data.i16_param_idx][0].f32_ka) >        \
-        ((f32_error)[1] * (as_param)[s_data.i16_param_idx][1].f32_ka);         \
-    (s_data).f32_x0 +=                                                         \
-        ((f32_error)[(s_data).i16_active] *                                    \
-             (as_param)[s_data.i16_param_idx][(s_data).i16_active].f32_ki +    \
-         (s_data).f32_x1 *                                                     \
-             (as_param)[s_data.i16_param_idx][ps_var->i16_active].f32_ks);     \
-    (s_data).f32_sum = (f32_error[(s_data).i16_active]) *                      \
-                           (as_param)[(s_data).i16_param_idx].f32_kp +         \
-                       (s_data).f32_x0;                                        \
-    (s_data).f32_out = pdsp_maxf(                                              \
-        (s_data).f32_min, pdsp_minf((s_data).f32_max, (s_data).f32_sum));      \
+#define pdsp_macro_pi2(s_data, as_param, f32_error)                         \
+    (s_data).i16_active = 0;                                                \
+    (s_data).i16_active +=                                                  \
+        ((f32_error)[0] * (as_param)[s_data.i16_param_idx][0].f32_ka) >     \
+        ((f32_error)[1] * (as_param)[s_data.i16_param_idx][1].f32_ka);      \
+    (s_data).f32_x0 +=                                                      \
+        ((f32_error)[(s_data).i16_active] *                                 \
+             (as_param)[s_data.i16_param_idx][(s_data).i16_active].f32_ki + \
+         (s_data).f32_x1 *                                                  \
+             (as_param)[s_data.i16_param_idx][ps_var->i16_active].f32_ks);  \
+    (s_data).f32_sum = (f32_error[(s_data).i16_active]) *                   \
+                           (as_param)[(s_data).i16_param_idx].f32_kp +      \
+                       (s_data).f32_x0;                                     \
+    (s_data).f32_out = pdsp_maxf(                                           \
+        (s_data).f32_min, pdsp_minf((s_data).f32_max, (s_data).f32_sum));   \
     (s_data).f32_x1 = (s_data).f32_out - (s_data).f32_sum
 
 /**
@@ -1072,17 +1069,17 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Controller data struct.
  * @param f32_out Set controller output value.
  */
-#define pdsp_macro_pi_set(s_data, f32_out)                                     \
-    (s_data).f32_x0 =                                                          \
-        pdsp_maxf((s_data).f32_min, pdsp_minf((s_data).f32_max, (f32_out)));   \
+#define pdsp_macro_pi_set(s_data, f32_out)                                   \
+    (s_data).f32_x0 =                                                        \
+        pdsp_maxf((s_data).f32_min, pdsp_minf((s_data).f32_max, (f32_out))); \
     (s_data).f32_x1 = 0.0f
 
 /**
  * @brief (macro) Initialize set point processor struct.
  * @param s_data Set point state memory struct.
  */
-#define pdsp_macro_setp_init(s_data)                                           \
-    (s_data).f32_x1 = 0.0f;                                                    \
+#define pdsp_macro_setp_init(s_data) \
+    (s_data).f32_x1 = 0.0f;          \
     (s_data).f32_dest = 0.0f
 
 /**
@@ -1103,9 +1100,9 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Set point state memory struct.
  * @returns pdsp_f32_t Set point output.
  */
-#define pdsp_macro_setp_exp(s_data)                                            \
-    (s_data).f32_x1 =                                                          \
-        (s_data).f32_x1 +                                                      \
+#define pdsp_macro_setp_exp(s_data) \
+    (s_data).f32_x1 =               \
+        (s_data).f32_x1 +           \
         (s_data).f32_step * ((s_data).f32_dest - (s_data).f32_x1)
 
 /**
@@ -1114,8 +1111,8 @@ typedef struct pdsp_macro_log32_tag
  * @param dest Set point destination.
  * @returns pdsp_status_t PDSP_OK
  */
-#define pdsp_macro_setp_set_dest(s_data, dest)                                 \
-    (s_data).f32_dest =                                                        \
+#define pdsp_macro_setp_set_dest(s_data, dest) \
+    (s_data).f32_dest =                        \
         pdsp_maxf(pdsp_minf((dest), (s_data).f32_max), (s_data).f32_min)
 
 /**
@@ -1131,8 +1128,8 @@ typedef struct pdsp_macro_log32_tag
  * @param value Set point value to step to.
  * @returns pdsp_f32_t Set point output.
  */
-#define pdsp_macro_setp_reset(s_data, value)                                   \
-    (s_data).f32_x1 =                                                          \
+#define pdsp_macro_setp_reset(s_data, value) \
+    (s_data).f32_x1 =                        \
         pdsp_maxf(pdsp_minf((value), (s_data).f32_max), (s_data).f32_min)
 
 /**
@@ -1141,23 +1138,23 @@ typedef struct pdsp_macro_log32_tag
  * @param tol Tolerance for detection.
  * @returns pdsp_bool_t
  */
-#define pdsp_macro_setp_reached(s_data, tol)                                   \
+#define pdsp_macro_setp_reached(s_data, tol) \
     (pdsp_bool_t)(pdsp_absf((s_data).f32_x1 - (s_data).f32_dest) < (tol))
 
 /**
  * @brief Clear all data in the SFRA struct.
  * @param s_data SFRA data struct.
  */
-#define pdsp_macro_sfra_clear(s_data)                                          \
-    (s_data).b_running = PDSP_FALSE;                                           \
-    (s_data).f32_sin_val = 0.0f;                                               \
-    (s_data).f32_cos_val = 0.0f;                                               \
-    (s_data).f32_phase = 0.0f;                                                 \
-    (s_data).u16_cycle_cnt = 0U;                                               \
-    (s_data).u16_bode_cnt = 0U;                                                \
-    (s_data).f32_avg_in_sin = 0.0f;                                            \
-    (s_data).f32_avg_in_cos = 0.0f;                                            \
-    (s_data).f32_avg_out_sin = 0.0f;                                           \
+#define pdsp_macro_sfra_clear(s_data) \
+    (s_data).b_running = PDSP_FALSE;  \
+    (s_data).f32_sin_val = 0.0f;      \
+    (s_data).f32_cos_val = 0.0f;      \
+    (s_data).f32_phase = 0.0f;        \
+    (s_data).u16_cycle_cnt = 0U;      \
+    (s_data).u16_bode_cnt = 0U;       \
+    (s_data).f32_avg_in_sin = 0.0f;   \
+    (s_data).f32_avg_in_cos = 0.0f;   \
+    (s_data).f32_avg_out_sin = 0.0f;  \
     (s_data).f32_avg_out_cos = 0.0f
 
 /**
@@ -1173,57 +1170,57 @@ typedef struct pdsp_macro_log32_tag
  * @param af32_step ARray of time steps for measurement points. [size]
  * @param af32_result Array of complex results array. [size][4]
  */
-#define pdsp_macro_sfra_process(s_data, af32_step, af32_result)                \
-    if ((s_data).b_running == PDSP_TRUE)                                       \
-    {                                                                          \
-        (s_data).f32_avg_in_sin +=                                             \
-            (s_data).f32_avg_tau *                                             \
-            ((*(s_data).f32_input * (s_data).f32_sin_val) -                    \
-             (s_data).f32_avg_in_sin);                                         \
-        (s_data).f32_avg_in_cos +=                                             \
-            (s_data).f32_avg_tau *                                             \
-            ((*(s_data).f32_input * (s_data).f32_cos_val) -                    \
-             (s_data).f32_avg_in_cos);                                         \
-        (s_data).f32_avg_out_sin +=                                            \
-            (s_data).f32_avg_tau *                                             \
-            ((*(s_data).f32_output * (s_data).f32_sin_val) -                   \
-             (s_data).f32_avg_in_sin);                                         \
-        (s_data).f32_avg_out_cos +=                                            \
-            (s_data).f32_avg_tau *                                             \
-            ((*(s_data).f32_output * (s_data).f32_cos_val) -                   \
-             (s_data).f32_avg_in_cos);                                         \
-        (s_data).f32_sin_val =                                                 \
-            pdsp_sinf((s_data).f32_phase) * (s_data).f32_inj_gain;             \
-        (s_data).f32_cos_val =                                                 \
-            pdsp_cosf((s_data).f32_phase) * (s_data).f32_inj_gain;             \
-        *(s_data).f32_inject += (s_data).f32_sin_val;                          \
-        (s_data).f32_phase += (af32_step)[(s_data).u16_bode_cnt];              \
-        if ((s_data).f32_phase > PDSP_2_PI_F)                                  \
-        {                                                                      \
-            (s_data).f32_phase = 0.0f;                                         \
-            (s_data).u16_cycle_cnt++;                                          \
-            if ((s_data).u16_cycle_cnt > (s_data).f32_avg_cyc)                 \
-            {                                                                  \
-                (af32_result)[(s_data).u16_bode_cnt][0] =                      \
-                    (s_data).f32_avg_in_sin;                                   \
-                (s_data).f32_avg_in_sin = 0.0f;                                \
-                (af32_result)[(s_data).u16_bode_cnt][1] =                      \
-                    (s_data).f32_avg_in_cos;                                   \
-                (s_data).f32_avg_in_cos = 0.0f;                                \
-                (af32_result)[(s_data).u16_bode_cnt][2] =                      \
-                    (s_data).f32_avg_out_sin;                                  \
-                (s_data).f32_avg_out_sin = 0.0f;                               \
-                (af32_result)[(s_data).u16_bode_cnt][3] =                      \
-                    (s_data).f32_avg_out_cos;                                  \
-                (s_data).f32_avg_out_cos = 0.0f;                               \
-                (s_data).u16_bode_cnt++;                                       \
-            }                                                                  \
-            if ((s_data).u16_bode_cnt >= (s_data).ps_bode->u16_bode_size)      \
-            {                                                                  \
-                (s_data).u16_bode_cnt = 0;                                     \
-                (s_data).b_running = PDSP_FALSE;                               \
-            }                                                                  \
-        }                                                                      \
+#define pdsp_macro_sfra_process(s_data, af32_step, af32_result)           \
+    if ((s_data).b_running == PDSP_TRUE)                                  \
+    {                                                                     \
+        (s_data).f32_avg_in_sin +=                                        \
+            (s_data).f32_avg_tau *                                        \
+            ((*(s_data).f32_input * (s_data).f32_sin_val) -               \
+             (s_data).f32_avg_in_sin);                                    \
+        (s_data).f32_avg_in_cos +=                                        \
+            (s_data).f32_avg_tau *                                        \
+            ((*(s_data).f32_input * (s_data).f32_cos_val) -               \
+             (s_data).f32_avg_in_cos);                                    \
+        (s_data).f32_avg_out_sin +=                                       \
+            (s_data).f32_avg_tau *                                        \
+            ((*(s_data).f32_output * (s_data).f32_sin_val) -              \
+             (s_data).f32_avg_in_sin);                                    \
+        (s_data).f32_avg_out_cos +=                                       \
+            (s_data).f32_avg_tau *                                        \
+            ((*(s_data).f32_output * (s_data).f32_cos_val) -              \
+             (s_data).f32_avg_in_cos);                                    \
+        (s_data).f32_sin_val =                                            \
+            pdsp_sinf((s_data).f32_phase) * (s_data).f32_inj_gain;        \
+        (s_data).f32_cos_val =                                            \
+            pdsp_cosf((s_data).f32_phase) * (s_data).f32_inj_gain;        \
+        *(s_data).f32_inject += (s_data).f32_sin_val;                     \
+        (s_data).f32_phase += (af32_step)[(s_data).u16_bode_cnt];         \
+        if ((s_data).f32_phase > PDSP_2_PI_F)                             \
+        {                                                                 \
+            (s_data).f32_phase = 0.0f;                                    \
+            (s_data).u16_cycle_cnt++;                                     \
+            if ((s_data).u16_cycle_cnt > (s_data).f32_avg_cyc)            \
+            {                                                             \
+                (af32_result)[(s_data).u16_bode_cnt][0] =                 \
+                    (s_data).f32_avg_in_sin;                              \
+                (s_data).f32_avg_in_sin = 0.0f;                           \
+                (af32_result)[(s_data).u16_bode_cnt][1] =                 \
+                    (s_data).f32_avg_in_cos;                              \
+                (s_data).f32_avg_in_cos = 0.0f;                           \
+                (af32_result)[(s_data).u16_bode_cnt][2] =                 \
+                    (s_data).f32_avg_out_sin;                             \
+                (s_data).f32_avg_out_sin = 0.0f;                          \
+                (af32_result)[(s_data).u16_bode_cnt][3] =                 \
+                    (s_data).f32_avg_out_cos;                             \
+                (s_data).f32_avg_out_cos = 0.0f;                          \
+                (s_data).u16_bode_cnt++;                                  \
+            }                                                             \
+            if ((s_data).u16_bode_cnt >= (s_data).ps_bode->u16_bode_size) \
+            {                                                             \
+                (s_data).u16_bode_cnt = 0;                                \
+                (s_data).b_running = PDSP_FALSE;                          \
+            }                                                             \
+        }                                                                 \
     }
 
 /**
@@ -1231,14 +1228,14 @@ typedef struct pdsp_macro_log32_tag
  * @param s_data Logger data struct.
  * @param size_shift Size as a left shift number. Equal to 2^size
  */
-#define pdsp_macro_log32_init(s_data, size_shift)                              \
-    (s_data).u16_size_half = (1 << ((size_shift)-1));                          \
-    (s_data).u16_size_shift = (size_shift);                                    \
-    (s_data).u16_size_mask = (1 << (size_shift)) - 1U;                         \
-    (s_data).u16_index = 0U;                                                   \
-    (s_data).u16_index_add = 1U;                                               \
-    (s_data).u16_index_add_read = 1U;                                          \
-    (s_data).u16_count = 0U;                                                   \
+#define pdsp_macro_log32_init(s_data, size_shift)      \
+    (s_data).u16_size_half = (1 << ((size_shift)-1));  \
+    (s_data).u16_size_shift = (size_shift);            \
+    (s_data).u16_size_mask = (1 << (size_shift)) - 1U; \
+    (s_data).u16_index = 0U;                           \
+    (s_data).u16_index_add = 1U;                       \
+    (s_data).u16_index_add_read = 1U;                  \
+    (s_data).u16_count = 0U;                           \
     (s_data).u16_count_add = 0U
 
 /**
@@ -1251,13 +1248,13 @@ typedef struct pdsp_macro_log32_tag
  * @param trig_idx Trigger index from data pointer array.
  * @param trig_level Trigger level.
  */
-#define pdsp_macro_log32_setup(s_data, ch1_idx, ch2_idx, ch3_idx, ch4_idx,     \
-                               trig_idx, trig_level)                           \
-    (s_data).u16_ch1_index = (ch1_idx);                                        \
-    (s_data).u16_ch2_index = (ch2_idx);                                        \
-    (s_data).u16_ch3_index = (ch3_idx);                                        \
-    (s_data).u16_ch4_index = (ch4_idx);                                        \
-    (s_data).u16_trig_index = (trig_idx);                                      \
+#define pdsp_macro_log32_setup(s_data, ch1_idx, ch2_idx, ch3_idx, ch4_idx, \
+                               trig_idx, trig_level)                       \
+    (s_data).u16_ch1_index = (ch1_idx);                                    \
+    (s_data).u16_ch2_index = (ch2_idx);                                    \
+    (s_data).u16_ch3_index = (ch3_idx);                                    \
+    (s_data).u16_ch4_index = (ch4_idx);                                    \
+    (s_data).u16_trig_index = (trig_idx);                                  \
     (s_data).f32_trig_level = (trig_level)
 
 /**
@@ -1266,30 +1263,30 @@ typedef struct pdsp_macro_log32_tag
  * @param apf32_source Source array of source pointers.
  * @param af32_data Size of the logging data array.
  */
-#define pdsp_macro_log32_run(s_data, apf32_source, af32_data)                  \
-    if ((s_data).u16_index_add == 1U)                                          \
-    {                                                                          \
-        af32_data[(s_data).u16_index][0] =                                     \
-            *apf32_source[(s_data).u16_ch1_index];                             \
-        af32_data[(s_data).u16_index][1] =                                     \
-            *apf32_source[(s_data).u16_ch2_index];                             \
-        af32_data[(s_data).u16_index][2] =                                     \
-            *apf32_source[(s_data).u16_ch3_index];                             \
-        af32_data[(s_data).u16_index][3] =                                     \
-            *apf32_source[(s_data).u16_ch4_index];                             \
-        (s_data).u16_index += (s_data).u16_index_add;                          \
-        (s_data).u16_index &= (s_data).u16_size_mask;                          \
-        (s_data).u16_count += (s_data).u16_count_add;                          \
-        if ((s_data).u16_count > (s_data).u16_size_half)                       \
-        {                                                                      \
-            (s_data).u16_index_add = 0U;                                       \
-            (s_data).u16_count_add = 0U;                                       \
-        }                                                                      \
-        else if (*apf32_source[(s_data).u16_trig_index] >                      \
-                 (s_data).f32_trig_level)                                      \
-        {                                                                      \
-            (s_data).u16_count_add = 1U;                                       \
-        }                                                                      \
+#define pdsp_macro_log32_run(s_data, apf32_source, af32_data) \
+    if ((s_data).u16_index_add == 1U)                         \
+    {                                                         \
+        af32_data[(s_data).u16_index][0] =                    \
+            *apf32_source[(s_data).u16_ch1_index];            \
+        af32_data[(s_data).u16_index][1] =                    \
+            *apf32_source[(s_data).u16_ch2_index];            \
+        af32_data[(s_data).u16_index][2] =                    \
+            *apf32_source[(s_data).u16_ch3_index];            \
+        af32_data[(s_data).u16_index][3] =                    \
+            *apf32_source[(s_data).u16_ch4_index];            \
+        (s_data).u16_index += (s_data).u16_index_add;         \
+        (s_data).u16_index &= (s_data).u16_size_mask;         \
+        (s_data).u16_count += (s_data).u16_count_add;         \
+        if ((s_data).u16_count > (s_data).u16_size_half)      \
+        {                                                     \
+            (s_data).u16_index_add = 0U;                      \
+            (s_data).u16_count_add = 0U;                      \
+        }                                                     \
+        else if (*apf32_source[(s_data).u16_trig_index] >     \
+                 (s_data).f32_trig_level)                     \
+        {                                                     \
+            (s_data).u16_count_add = 1U;                      \
+        }                                                     \
     }
 
 /** @} signal */

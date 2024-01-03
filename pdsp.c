@@ -455,6 +455,16 @@ pdsp_extern pdsp_f32_t pdsp_interpolate_2d(const pdsp_f32_t af32_x[],
                     af32_y[u32_idx_hi - 1U], af32_y[u32_idx_hi]);
 }
 
+pdsp_extern pdsp_f32_t pdsp_lookup(const pdsp_f32_t af32_y[],
+                                   pdsp_f32_t f32_size,
+                                   pdsp_f32_t f32_x_gain,
+                                   pdsp_f32_t f32_x_offset,
+                                   pdsp_f32_t f32_x)
+{
+    PDSP_ASSERT((af32_y != NULL) && f32_size);
+    return af32_y[(pdsp_i16_t)pdsp_maxf(pdsp_minf(f32_x * f32_x_gain + f32_x_offset, f32_size), 0)];
+}
+
 pdsp_extern void pdsp_array_set_f32(pdsp_f32_t af32_array[], pdsp_size_t s_size,
                                     pdsp_f32_t f32_value)
 {
@@ -740,6 +750,15 @@ pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in)
     }
 
     return ps_data->u16_state;
+}
+
+pdsp_extern void pdsp_backlash_init(pdsp_backlash_t *ps_data,
+                                    pdsp_f32_t f32_backlash_half,
+                                    pdsp_f32_t f32_state)
+{
+    PDSP_ASSERT(ps_data != NULL);
+    ps_data->f32_backlash_half = f32_backlash_half;
+    ps_data->f32_state = f32_state;
 }
 
 pdsp_extern pdsp_f32_t pdsp_backlash(pdsp_backlash_t *ps_data, pdsp_f32_t f32_in)
@@ -1590,9 +1609,12 @@ pdsp_extern pdsp_f32_t pdsp_med3(pdsp_med3_var_t *ps_var, pdsp_f32_t f32_in)
 {
     static pdsp_f32_t out;
     PDSP_ASSERT(ps_var != NULL);
-    out = ((ps_var->f32_x2 + ps_var->f32_x1 + f32_in) -
-           pdsp_minf(ps_var->f32_x2, pdsp_minf(ps_var->f32_x1, f32_in)) -
-           pdsp_maxf(ps_var->f32_x2, pdsp_maxf(ps_var->f32_x1, f32_in)));
+    // out = ((ps_var->f32_x2 + ps_var->f32_x1 + f32_in) -
+    //        pdsp_minf(ps_var->f32_x2, pdsp_minf(ps_var->f32_x1, f32_in)) -
+    //        pdsp_maxf(ps_var->f32_x2, pdsp_maxf(ps_var->f32_x1, f32_in)));
+    /* faster */
+    out = pdsp_maxf(pdsp_minf(ps_var->f32_x2, ps_var->f32_x1),
+                    pdsp_minf(pdsp_maxf(ps_var->f32_x2, ps_var->f32_x1), f32_in));
     /* store history x[k-2] = x[k-1] */
     ps_var->f32_x2 = ps_var->f32_x1;
     /* store history x[k-1] = x[k] */

@@ -1,0 +1,27 @@
+var group__floatmath =
+[
+    [ "PDSP_2_PI_3_F", "group__floatmath.html#gaf2ba04b86cbdda18e53ae42b24a8f19d", null ],
+    [ "PDSP_2_PI_F", "group__floatmath.html#ga1f41ba1a4e90fd7f4dffa7480d4941b8", null ],
+    [ "PDSP_2_PI_INV_F", "group__floatmath.html#ga7aed3ea3449b27e00f123d0bb02681bf", null ],
+    [ "PDSP_3V3_12BIT_F", "group__floatmath.html#gaa6543df7b17479019239b838e12dfd1c", null ],
+    [ "PDSP_4_PI_3_F", "group__floatmath.html#gac88573e6ae838c986718e50e1b9d2ae7", null ],
+    [ "PDSP_ABS_ZERO_F", "group__floatmath.html#ga76e276592d0446e0760ec06c8ceb954b", null ],
+    [ "pdsp_absf", "group__floatmath.html#ga601dad33c352e53b8d45819033898b9a", null ],
+    [ "pdsp_cosf", "group__floatmath.html#ga6394167264f3a369f77079089b334511", null ],
+    [ "pdsp_cospuf", "group__floatmath.html#ga94b02288e2841b93e7c6a97907db0b30", null ],
+    [ "pdsp_divf", "group__floatmath.html#ga4e82f77ff6e3c8e1d959a1ae68ac5def", null ],
+    [ "pdsp_maxf", "group__floatmath.html#gab92d9709f21f359474625fd84d4acb4d", null ],
+    [ "pdsp_minf", "group__floatmath.html#gab216c420c54c85a2e434365572fa5d5e", null ],
+    [ "PDSP_NAN", "group__floatmath.html#gaa446ab2c49a9df008cab6fe17a2a92b2", null ],
+    [ "PDSP_NEG_INF", "group__floatmath.html#ga635a2d0e938d7f6ca8e08161f9813339", null ],
+    [ "PDSP_NULL", "group__floatmath.html#ga72452194bfa05814bf1372ce034beb96", null ],
+    [ "PDSP_PI_2_F", "group__floatmath.html#ga74e9e6c8808c77f94090588d08d9a8dd", null ],
+    [ "PDSP_PI_4_F", "group__floatmath.html#ga5f94baaa17967b23fbd1b9b8f65dc601", null ],
+    [ "PDSP_PI_F", "group__floatmath.html#ga8acf3cbd0a7039001ae415c9510c06c0", null ],
+    [ "PDSP_POS_INF", "group__floatmath.html#gabc2e860b9b00c0863a5650909c2332e7", null ],
+    [ "pdsp_sinf", "group__floatmath.html#ga57c3f989a2442dc6e422b95ca554d4e1", null ],
+    [ "pdsp_sinpuf", "group__floatmath.html#ga90657f0582c4b8d54547ed327e92ade2", null ],
+    [ "PDSP_SQRT1_2_F", "group__floatmath.html#gafb8b8f7e99c5b3991d644486041a97ec", null ],
+    [ "PDSP_SQRT2_F", "group__floatmath.html#gac97ddd75d443317a8cba063fe9507541", null ],
+    [ "pdsp_sqrtf", "group__floatmath.html#gadbf36e5a4b5037857c9023b2edbee1e2", null ]
+];

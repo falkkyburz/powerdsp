@@ -1,0 +1,2658 @@
+
+./build/pdsp.o:     file format pe-x86-64
+./build/pdsp.o
+architecture: i386:x86-64, flags 0x00000039:
+HAS_RELOC, HAS_DEBUG, HAS_SYMS, HAS_LOCALS
+start address 0x0000000000000000
+
+Characteristics 0x4
+	line numbers stripped
+
+Time/Date		Thu Jan 01 01:00:00 1970
+Magic			0000
+MajorLinkerVersion	0
+MinorLinkerVersion	0
+SizeOfCode		0000000000000000
+SizeOfInitializedData	0000000000000000
+SizeOfUninitializedData	0000000000000000
+AddressOfEntryPoint	0000000000000000
+BaseOfCode		0000000000000000
+ImageBase		0000000000000000
+SectionAlignment	00000000
+FileAlignment		00000000
+MajorOSystemVersion	0
+MinorOSystemVersion	0
+MajorImageVersion	0
+MinorImageVersion	0
+MajorSubsystemVersion	0
+MinorSubsystemVersion	0
+Win32Version		00000000
+SizeOfImage		00000000
+SizeOfHeaders		00000000
+CheckSum		00000000
+Subsystem		00000000	(unspecified)
+DllCharacteristics	00000000
+SizeOfStackReserve	0000000000000000
+SizeOfStackCommit	0000000000000000
+SizeOfHeapReserve	0000000000000000
+SizeOfHeapCommit	0000000000000000
+LoaderFlags		00000000
+NumberOfRvaAndSizes	00000000
+
+The Data Directory
+Entry 0 0000000000000000 00000000 Export Directory [.edata (or where ever we found it)]
+Entry 1 0000000000000000 00000000 Import Directory [parts of .idata]
+Entry 2 0000000000000000 00000000 Resource Directory [.rsrc]
+Entry 3 0000000000000000 00000000 Exception Directory [.pdata]
+Entry 4 0000000000000000 00000000 Security Directory
+Entry 5 0000000000000000 00000000 Base Relocation Directory [.reloc]
+Entry 6 0000000000000000 00000000 Debug Directory
+Entry 7 0000000000000000 00000000 Description Directory
+Entry 8 0000000000000000 00000000 Special Directory
+Entry 9 0000000000000000 00000000 Thread Storage Directory [.tls]
+Entry a 0000000000000000 00000000 Load Configuration Directory
+Entry b 0000000000000000 00000000 Bound Import Directory
+Entry c 0000000000000000 00000000 Import Address Table Directory
+Entry d 0000000000000000 00000000 Delay Import Directory
+Entry e 0000000000000000 00000000 CLR Runtime Header
+Entry f 0000000000000000 00000000 Reserved
+
+The Function Table (interpreted .pdata section contents)
+vma:			BeginAddress	 EndAddress	  UnwindData
+ 0000000000000000:	0000000000000000 0000000000000054 0000000000000000
+ 000000000000000c:	0000000000000054 000000000000009c 000000000000000c
+ 0000000000000018:	000000000000009c 0000000000000118 0000000000000018
+ 0000000000000024:	0000000000000118 00000000000001bd 0000000000000024
+ 0000000000000030:	00000000000001bd 0000000000000204 0000000000000030
+ 000000000000003c:	0000000000000204 00000000000003fa 000000000000003c
+ 0000000000000048:	00000000000003fa 00000000000004b8 0000000000000048
+ 0000000000000054:	00000000000004b8 00000000000005a3 0000000000000054
+ 0000000000000060:	00000000000005a3 000000000000070c 0000000000000060
+ 000000000000006c:	000000000000070c 000000000000077c 000000000000006c
+ 0000000000000078:	000000000000077c 000000000000083e 0000000000000078
+ 0000000000000084:	000000000000083e 000000000000095e 0000000000000084
+ 0000000000000090:	000000000000095e 0000000000000b48 0000000000000090
+ 000000000000009c:	0000000000000b48 0000000000000e5f 000000000000009c
+ 00000000000000a8:	0000000000000e5f 0000000000000f1b 00000000000000a8
+ 00000000000000b4:	0000000000000f1b 0000000000000f9d 00000000000000b4
+ 00000000000000c0:	0000000000000f9d 0000000000001053 00000000000000bc
+ 00000000000000cc:	0000000000001053 0000000000001151 00000000000000c8
+ 00000000000000d8:	0000000000001151 00000000000011f6 00000000000000d4
+ 00000000000000e4:	00000000000011f6 0000000000001278 00000000000000e0
+ 00000000000000f0:	0000000000001278 00000000000012f6 00000000000000ec
+ 00000000000000fc:	00000000000012f6 00000000000013a7 00000000000000f8
+ 0000000000000108:	00000000000013a7 000000000000144d 0000000000000104
+ 0000000000000114:	000000000000144d 0000000000001569 0000000000000110
+ 0000000000000120:	0000000000001569 000000000000169c 000000000000011c
+ 000000000000012c:	000000000000169c 00000000000016dc 0000000000000128
+ 0000000000000138:	00000000000016dc 0000000000001714 0000000000000134
+ 0000000000000144:	0000000000001714 000000000000178a 000000000000013c
+ 0000000000000150:	000000000000178a 00000000000017cc 0000000000000148
+ 000000000000015c:	00000000000017cc 0000000000001813 0000000000000154
+ 0000000000000168:	0000000000001813 00000000000018ed 000000000000015c
+ 0000000000000174:	00000000000018ed 000000000000193a 0000000000000168
+ 0000000000000180:	000000000000193a 0000000000001a51 0000000000000174
+ 000000000000018c:	0000000000001a51 0000000000001a9b 0000000000000180
+ 0000000000000198:	0000000000001a9b 0000000000001b89 000000000000018c
+ 00000000000001a4:	0000000000001b89 0000000000001bd8 0000000000000198
+ 00000000000001b0:	0000000000001bd8 0000000000001da6 00000000000001a4
+ 00000000000001bc:	0000000000001da6 0000000000001e04 00000000000001b0
+ 00000000000001c8:	0000000000001e04 0000000000001eb0 00000000000001bc
+ 00000000000001d4:	0000000000001eb0 0000000000001f2e 00000000000001c8
+ 00000000000001e0:	0000000000001f2e 0000000000002019 00000000000001d4
+ 00000000000001ec:	0000000000002019 000000000000209f 00000000000001e0
+ 00000000000001f8:	000000000000209f 0000000000002174 00000000000001ec
+ 0000000000000204:	0000000000002174 000000000000223c 00000000000001f8
+ 0000000000000210:	000000000000223c 00000000000022ef 0000000000000204
+ 000000000000021c:	00000000000022ef 0000000000002380 0000000000000210
+ 0000000000000228:	0000000000002380 000000000000241d 000000000000021c
+ 0000000000000234:	000000000000241d 00000000000024bf 0000000000000228
+ 0000000000000240:	00000000000024bf 0000000000002557 0000000000000234
+ 000000000000024c:	0000000000002557 00000000000025b8 0000000000000240
+ 0000000000000258:	00000000000025b8 0000000000002615 000000000000024c
+ 0000000000000264:	0000000000002615 0000000000002662 0000000000000258
+ 0000000000000270:	0000000000002662 00000000000026b1 0000000000000264
+ 000000000000027c:	00000000000026b1 000000000000270d 0000000000000270
+ 0000000000000288:	000000000000270d 0000000000002786 000000000000027c
+ 0000000000000294:	0000000000002786 00000000000027d0 0000000000000288
+ 00000000000002a0:	00000000000027d0 000000000000286a 0000000000000294
+ 00000000000002ac:	000000000000286a 00000000000028ee 00000000000002a0
+ 00000000000002b8:	00000000000028ee 0000000000002926 00000000000002ac
+ 00000000000002c4:	0000000000002926 00000000000029cf 00000000000002b4
+ 00000000000002d0:	00000000000029cf 0000000000002ab8 00000000000002c0
+ 00000000000002dc:	0000000000002ab8 0000000000002b20 00000000000002cc
+ 00000000000002e8:	0000000000002b20 0000000000002b75 00000000000002d8
+ 00000000000002f4:	0000000000002b75 0000000000002bd2 00000000000002e4
+ 0000000000000300:	0000000000002bd2 0000000000002c5c 00000000000002f0
+ 000000000000030c:	0000000000002c5c 0000000000002cea 00000000000002fc
+ 0000000000000318:	0000000000002cea 0000000000002d53 0000000000000308
+ 0000000000000324:	0000000000002d53 0000000000002dc1 0000000000000314
+ 0000000000000330:	0000000000002dc1 0000000000002e2b 0000000000000320
+ 000000000000033c:	0000000000002e2b 0000000000002e9b 000000000000032c
+ 0000000000000348:	0000000000002e9b 0000000000002f08 0000000000000338
+ 0000000000000354:	0000000000002f08 0000000000002f70 0000000000000344
+ 0000000000000360:	0000000000002f70 0000000000002fdc 0000000000000350
+ 000000000000036c:	0000000000002fdc 0000000000003046 000000000000035c
+ 0000000000000378:	0000000000003046 00000000000030b6 0000000000000368
+ 0000000000000384:	00000000000030b6 0000000000003123 0000000000000374
+ 0000000000000390:	0000000000003123 0000000000003249 0000000000000380
+ 000000000000039c:	0000000000003249 000000000000328f 000000000000038c
+ 00000000000003a8:	000000000000328f 0000000000003311 0000000000000394
+ 00000000000003b4:	0000000000003311 0000000000003329 00000000000003a0
+ 00000000000003c0:	0000000000003329 000000000000333d 00000000000003a8
+ 00000000000003cc:	000000000000333d 000000000000334f 00000000000003b0
+ 00000000000003d8:	000000000000334f 0000000000003361 00000000000003b8
+ 00000000000003e4:	0000000000003361 0000000000003376 00000000000003c0
+ 00000000000003f0:	0000000000003376 000000000000338b 00000000000003c8
+ 00000000000003fc:	000000000000338b 0000000000003445 00000000000003d0
+ 0000000000000408:	0000000000003445 00000000000034ad 00000000000003dc
+ 0000000000000414:	00000000000034ad 0000000000003503 00000000000003e8
+ 0000000000000420:	0000000000003503 0000000000003546 00000000000003f4
+ 000000000000042c:	0000000000003546 000000000000359c 0000000000000400
+ 0000000000000438:	000000000000359c 00000000000035de 000000000000040c
+ 0000000000000444:	00000000000035de 0000000000003602 0000000000000414
+ 0000000000000450:	0000000000003602 0000000000003669 000000000000041c
+ 000000000000045c:	0000000000003669 0000000000003709 0000000000000428
+ 0000000000000468:	0000000000003709 0000000000003744 0000000000000434
+ 0000000000000474:	0000000000003744 000000000000379c 000000000000043c
+ 0000000000000480:	000000000000379c 00000000000037e1 0000000000000448
+ 000000000000048c:	00000000000037e1 0000000000003858 0000000000000454
+ 0000000000000498:	0000000000003858 00000000000038d8 0000000000000460
+ 00000000000004a4:	00000000000038d8 00000000000039b0 0000000000000468
+ 00000000000004b0:	00000000000039b0 0000000000003b84 0000000000000474
+ 00000000000004bc:	0000000000003b84 0000000000003ecd 0000000000000480
+ 00000000000004c8:	0000000000003ecd 0000000000003f12 000000000000048c
+ 00000000000004d4:	0000000000003f12 0000000000003fbb 0000000000000498
+ 00000000000004e0:	0000000000003fbb 0000000000004031 00000000000004a4
+ 00000000000004ec:	0000000000004031 00000000000040ad 00000000000004b0
+ 00000000000004f8:	00000000000040ad 00000000000040ff 00000000000004bc
+ 0000000000000504:	00000000000040ff 00000000000041e9 00000000000004c8
+ 0000000000000510:	00000000000041e9 000000000000425f 00000000000004d4
+ 000000000000051c:	000000000000425f 000000000000431c 00000000000004e0
+ 0000000000000528:	000000000000431c 000000000000437b 00000000000004ec
+ 0000000000000534:	000000000000437b 00000000000044a6 00000000000004f8
+ 0000000000000540:	00000000000044a6 000000000000451c 0000000000000504
+ 000000000000054c:	000000000000451c 000000000000461a 0000000000000510
+ 0000000000000558:	000000000000461a 000000000000466c 000000000000051c
+ 0000000000000564:	000000000000466c 000000000000473c 0000000000000528
+ 0000000000000570:	000000000000473c 000000000000489a 0000000000000534
+ 000000000000057c:	000000000000489a 0000000000004942 0000000000000540
+ 0000000000000588:	0000000000004942 0000000000004991 000000000000054c
+ 0000000000000594:	0000000000004991 00000000000049ee 0000000000000558
+ 00000000000005a0:	00000000000049ee 0000000000004a3d 0000000000000564
+ 00000000000005ac:	0000000000004a3d 0000000000004ab2 0000000000000570
+ 00000000000005b8:	0000000000004ab2 0000000000004b02 000000000000057c
+ 00000000000005c4:	0000000000004b02 0000000000004c2a 0000000000000588
+ 00000000000005d0:	0000000000004c2a 0000000000004ca3 0000000000000594
+ 00000000000005dc:	0000000000004ca3 0000000000004dd1 00000000000005a0
+ 00000000000005e8:	0000000000004dd1 0000000000004ef1 00000000000005ac
+ 00000000000005f4:	0000000000004ef1 0000000000004f6a 00000000000005b8
+ 0000000000000600:	0000000000004f6a 00000000000050b5 00000000000005c4
+ 000000000000060c:	00000000000050b5 0000000000005144 00000000000005d0
+ 0000000000000618:	0000000000005144 00000000000051d8 00000000000005dc
+ 0000000000000624:	00000000000051d8 0000000000005259 00000000000005e8
+ 0000000000000630:	0000000000005259 00000000000053c3 00000000000005f4
+ 000000000000063c:	00000000000053c3 000000000000560a 0000000000000600
+ 0000000000000648:	000000000000560a 0000000000005913 000000000000060c
+ 0000000000000654:	0000000000005913 00000000000059b3 0000000000000618
+ 0000000000000660:	00000000000059b3 0000000000005a17 0000000000000624
+ 000000000000066c:	0000000000005a17 0000000000005af1 0000000000000630
+ 0000000000000678:	0000000000005af1 0000000000005b90 0000000000000640
+ 0000000000000684:	0000000000005b90 0000000000005c22 000000000000064c
+ 0000000000000690:	0000000000005c22 0000000000005c88 000000000000065c
+ 000000000000069c:	0000000000005c88 0000000000005d1f 0000000000000668
+ 00000000000006a8:	0000000000005d1f 0000000000005d99 0000000000000678
+ 00000000000006b4:	0000000000005d99 0000000000005e45 0000000000000684
+ 00000000000006c0:	0000000000005e45 0000000000006011 0000000000000690
+ 00000000000006cc:	0000000000006011 00000000000060a3 000000000000069c
+ 00000000000006d8:	00000000000060a3 0000000000006155 00000000000006ac
+ 00000000000006e4:	0000000000006155 00000000000061cb 00000000000006bc
+ 00000000000006f0:	00000000000061cb 0000000000006214 00000000000006c8
+ 00000000000006fc:	0000000000006214 00000000000062a3 00000000000006d4
+ 0000000000000708:	00000000000062a3 000000000000632a 00000000000006e0
+ 0000000000000714:	000000000000632a 0000000000006443 00000000000006ec
+ 0000000000000720:	0000000000006443 0000000000006744 00000000000006f8
+ 000000000000072c:	0000000000006744 0000000000006891 0000000000000704
+ 0000000000000738:	0000000000006891 0000000000006bcc 0000000000000710
+ 0000000000000744:	0000000000006bcc 0000000000006d74 000000000000071c
+ 0000000000000750:	0000000000006d74 00000000000072e5 0000000000000728
+ 000000000000075c:	00000000000072e5 000000000000749a 0000000000000734
+ 0000000000000768:	000000000000749a 00000000000078f5 0000000000000740
+ 0000000000000774:	00000000000078f5 00000000000079a6 000000000000074c
+ 0000000000000780:	00000000000079a6 0000000000007b24 0000000000000758
+ 000000000000078c:	0000000000007b24 0000000000007c1d 0000000000000764
+ 0000000000000798:	0000000000007c1d 0000000000007c78 0000000000000770
+ 00000000000007a4:	0000000000007c78 0000000000007cc6 000000000000077c
+ 00000000000007b0:	0000000000007cc6 0000000000007d43 0000000000000788
+ 00000000000007bc:	0000000000007d43 0000000000007f97 0000000000000794
+ 00000000000007c8:	0000000000007f97 000000000000801e 00000000000007a0
+ 00000000000007d4:	000000000000801e 000000000000823c 00000000000007ac
+ 00000000000007e0:	000000000000823c 000000000000833e 00000000000007b8
+
+Dump of .xdata
+ 0000000000000000 (rva: 00000000): 0000000000000000 - 0000000000000054
+	Version: 1, Flags: none
+	Nbr codes: 4, Prologue size: 0x0b, Frame offset: 0x3, Frame reg: rbp
+	  pc+0x0b: FPReg: rbp = rsp + 0x30 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x38
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 000000000000000c (rva: 0000000c): 0000000000000054 - 000000000000009c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000018 (rva: 00000018): 000000000000009c - 0000000000000118
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000024 (rva: 00000024): 0000000000000118 - 00000000000001bd
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000030 (rva: 00000030): 00000000000001bd - 0000000000000204
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000003c (rva: 0000003c): 0000000000000204 - 00000000000003fa
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000048 (rva: 00000048): 00000000000003fa - 00000000000004b8
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000054 (rva: 00000054): 00000000000004b8 - 00000000000005a3
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000060 (rva: 00000060): 00000000000005a3 - 000000000000070c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000006c (rva: 0000006c): 000000000000070c - 000000000000077c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000078 (rva: 00000078): 000000000000077c - 000000000000083e
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000084 (rva: 00000084): 000000000000083e - 000000000000095e
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000090 (rva: 00000090): 000000000000095e - 0000000000000b48
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000009c (rva: 0000009c): 0000000000000b48 - 0000000000000e5f
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000a8 (rva: 000000a8): 0000000000000e5f - 0000000000000f1b
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000b4 (rva: 000000b4): 0000000000000f1b - 0000000000000f9d
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000bc (rva: 000000bc): 0000000000000f9d - 0000000000001053
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000c8 (rva: 000000c8): 0000000000001053 - 0000000000001151
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x40
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000d4 (rva: 000000d4): 0000000000001151 - 00000000000011f6
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000e0 (rva: 000000e0): 00000000000011f6 - 0000000000001278
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000ec (rva: 000000ec): 0000000000001278 - 00000000000012f6
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000000f8 (rva: 000000f8): 00000000000012f6 - 00000000000013a7
+	Version: 1, Flags: none
+	Nbr codes: 4, Prologue size: 0x0b, Frame offset: 0x3, Frame reg: rbp
+	  pc+0x0b: FPReg: rbp = rsp + 0x30 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x38
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 0000000000000104 (rva: 00000104): 00000000000013a7 - 000000000000144d
+	Version: 1, Flags: none
+	Nbr codes: 4, Prologue size: 0x0b, Frame offset: 0x3, Frame reg: rbp
+	  pc+0x0b: FPReg: rbp = rsp + 0x30 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x38
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 0000000000000110 (rva: 00000110): 000000000000144d - 0000000000001569
+	Version: 1, Flags: none
+	Nbr codes: 4, Prologue size: 0x0b, Frame offset: 0x4, Frame reg: rbp
+	  pc+0x0b: FPReg: rbp = rsp + 0x40 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x48
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 000000000000011c (rva: 0000011c): 0000000000001569 - 000000000000169c
+	Version: 1, Flags: none
+	Nbr codes: 4, Prologue size: 0x0b, Frame offset: 0x4, Frame reg: rbp
+	  pc+0x0b: FPReg: rbp = rsp + 0x40 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x48
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 0000000000000128 (rva: 00000128): 000000000000169c - 00000000000016dc
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000134 (rva: 00000134): 00000000000016dc - 0000000000001714
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000013c (rva: 0000013c): 0000000000001714 - 000000000000178a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000148 (rva: 00000148): 000000000000178a - 00000000000017cc
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000154 (rva: 00000154): 00000000000017cc - 0000000000001813
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000015c (rva: 0000015c): 0000000000001813 - 00000000000018ed
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000168 (rva: 00000168): 00000000000018ed - 000000000000193a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000174 (rva: 00000174): 000000000000193a - 0000000000001a51
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000180 (rva: 00000180): 0000000000001a51 - 0000000000001a9b
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000018c (rva: 0000018c): 0000000000001a9b - 0000000000001b89
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000198 (rva: 00000198): 0000000000001b89 - 0000000000001bd8
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001a4 (rva: 000001a4): 0000000000001bd8 - 0000000000001da6
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001b0 (rva: 000001b0): 0000000000001da6 - 0000000000001e04
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001bc (rva: 000001bc): 0000000000001e04 - 0000000000001eb0
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001c8 (rva: 000001c8): 0000000000001eb0 - 0000000000001f2e
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001d4 (rva: 000001d4): 0000000000001f2e - 0000000000002019
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001e0 (rva: 000001e0): 0000000000002019 - 000000000000209f
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001ec (rva: 000001ec): 000000000000209f - 0000000000002174
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000001f8 (rva: 000001f8): 0000000000002174 - 000000000000223c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000204 (rva: 00000204): 000000000000223c - 00000000000022ef
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000210 (rva: 00000210): 00000000000022ef - 0000000000002380
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000021c (rva: 0000021c): 0000000000002380 - 000000000000241d
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000228 (rva: 00000228): 000000000000241d - 00000000000024bf
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000234 (rva: 00000234): 00000000000024bf - 0000000000002557
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000240 (rva: 00000240): 0000000000002557 - 00000000000025b8
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000024c (rva: 0000024c): 00000000000025b8 - 0000000000002615
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000258 (rva: 00000258): 0000000000002615 - 0000000000002662
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000264 (rva: 00000264): 0000000000002662 - 00000000000026b1
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000270 (rva: 00000270): 00000000000026b1 - 000000000000270d
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000027c (rva: 0000027c): 000000000000270d - 0000000000002786
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000288 (rva: 00000288): 0000000000002786 - 00000000000027d0
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000294 (rva: 00000294): 00000000000027d0 - 000000000000286a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002a0 (rva: 000002a0): 000000000000286a - 00000000000028ee
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002ac (rva: 000002ac): 00000000000028ee - 0000000000002926
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002b4 (rva: 000002b4): 0000000000002926 - 00000000000029cf
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002c0 (rva: 000002c0): 00000000000029cf - 0000000000002ab8
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002cc (rva: 000002cc): 0000000000002ab8 - 0000000000002b20
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002d8 (rva: 000002d8): 0000000000002b20 - 0000000000002b75
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002e4 (rva: 000002e4): 0000000000002b75 - 0000000000002bd2
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002f0 (rva: 000002f0): 0000000000002bd2 - 0000000000002c5c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000002fc (rva: 000002fc): 0000000000002c5c - 0000000000002cea
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000308 (rva: 00000308): 0000000000002cea - 0000000000002d53
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000314 (rva: 00000314): 0000000000002d53 - 0000000000002dc1
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000320 (rva: 00000320): 0000000000002dc1 - 0000000000002e2b
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000032c (rva: 0000032c): 0000000000002e2b - 0000000000002e9b
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000338 (rva: 00000338): 0000000000002e9b - 0000000000002f08
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000344 (rva: 00000344): 0000000000002f08 - 0000000000002f70
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000350 (rva: 00000350): 0000000000002f70 - 0000000000002fdc
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000035c (rva: 0000035c): 0000000000002fdc - 0000000000003046
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000368 (rva: 00000368): 0000000000003046 - 00000000000030b6
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000374 (rva: 00000374): 00000000000030b6 - 0000000000003123
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000380 (rva: 00000380): 0000000000003123 - 0000000000003249
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000038c (rva: 0000038c): 0000000000003249 - 000000000000328f
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000394 (rva: 00000394): 000000000000328f - 0000000000003311
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003a0 (rva: 000003a0): 0000000000003311 - 0000000000003329
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003a8 (rva: 000003a8): 0000000000003329 - 000000000000333d
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003b0 (rva: 000003b0): 000000000000333d - 000000000000334f
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003b8 (rva: 000003b8): 000000000000334f - 0000000000003361
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003c0 (rva: 000003c0): 0000000000003361 - 0000000000003376
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003c8 (rva: 000003c8): 0000000000003376 - 000000000000338b
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003d0 (rva: 000003d0): 000000000000338b - 0000000000003445
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003dc (rva: 000003dc): 0000000000003445 - 00000000000034ad
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003e8 (rva: 000003e8): 00000000000034ad - 0000000000003503
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000003f4 (rva: 000003f4): 0000000000003503 - 0000000000003546
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000400 (rva: 00000400): 0000000000003546 - 000000000000359c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000040c (rva: 0000040c): 000000000000359c - 00000000000035de
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000414 (rva: 00000414): 00000000000035de - 0000000000003602
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000041c (rva: 0000041c): 0000000000003602 - 0000000000003669
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000428 (rva: 00000428): 0000000000003669 - 0000000000003709
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000434 (rva: 00000434): 0000000000003709 - 0000000000003744
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000043c (rva: 0000043c): 0000000000003744 - 000000000000379c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000448 (rva: 00000448): 000000000000379c - 00000000000037e1
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000454 (rva: 00000454): 00000000000037e1 - 0000000000003858
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000460 (rva: 00000460): 0000000000003858 - 00000000000038d8
+	Version: 1, Flags: none
+	Nbr codes: 2, Prologue size: 0x04, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000468 (rva: 00000468): 00000000000038d8 - 00000000000039b0
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x10
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000474 (rva: 00000474): 00000000000039b0 - 0000000000003b84
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x10
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000480 (rva: 00000480): 0000000000003b84 - 0000000000003ecd
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x10
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000048c (rva: 0000048c): 0000000000003ecd - 0000000000003f12
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000498 (rva: 00000498): 0000000000003f12 - 0000000000003fbb
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004a4 (rva: 000004a4): 0000000000003fbb - 0000000000004031
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004b0 (rva: 000004b0): 0000000000004031 - 00000000000040ad
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004bc (rva: 000004bc): 00000000000040ad - 00000000000040ff
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004c8 (rva: 000004c8): 00000000000040ff - 00000000000041e9
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004d4 (rva: 000004d4): 00000000000041e9 - 000000000000425f
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004e0 (rva: 000004e0): 000000000000425f - 000000000000431c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004ec (rva: 000004ec): 000000000000431c - 000000000000437b
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000004f8 (rva: 000004f8): 000000000000437b - 00000000000044a6
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000504 (rva: 00000504): 00000000000044a6 - 000000000000451c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000510 (rva: 00000510): 000000000000451c - 000000000000461a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000051c (rva: 0000051c): 000000000000461a - 000000000000466c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000528 (rva: 00000528): 000000000000466c - 000000000000473c
+	Version: 1, Flags: none
+	Nbr codes: 4, Prologue size: 0x0b, Frame offset: 0x2, Frame reg: rbp
+	  pc+0x0b: FPReg: rbp = rsp + 0x20 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x28
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 0000000000000534 (rva: 00000534): 000000000000473c - 000000000000489a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000540 (rva: 00000540): 000000000000489a - 0000000000004942
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000054c (rva: 0000054c): 0000000000004942 - 0000000000004991
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000558 (rva: 00000558): 0000000000004991 - 00000000000049ee
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000564 (rva: 00000564): 00000000000049ee - 0000000000004a3d
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000570 (rva: 00000570): 0000000000004a3d - 0000000000004ab2
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000057c (rva: 0000057c): 0000000000004ab2 - 0000000000004b02
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000588 (rva: 00000588): 0000000000004b02 - 0000000000004c2a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000594 (rva: 00000594): 0000000000004c2a - 0000000000004ca3
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005a0 (rva: 000005a0): 0000000000004ca3 - 0000000000004dd1
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005ac (rva: 000005ac): 0000000000004dd1 - 0000000000004ef1
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005b8 (rva: 000005b8): 0000000000004ef1 - 0000000000004f6a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005c4 (rva: 000005c4): 0000000000004f6a - 00000000000050b5
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005d0 (rva: 000005d0): 00000000000050b5 - 0000000000005144
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005dc (rva: 000005dc): 0000000000005144 - 00000000000051d8
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005e8 (rva: 000005e8): 00000000000051d8 - 0000000000005259
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000005f4 (rva: 000005f4): 0000000000005259 - 00000000000053c3
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000600 (rva: 00000600): 00000000000053c3 - 000000000000560a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000060c (rva: 0000060c): 000000000000560a - 0000000000005913
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000618 (rva: 00000618): 0000000000005913 - 00000000000059b3
+	Version: 1, Flags: none
+	Nbr codes: 4, Prologue size: 0x0b, Frame offset: 0x2, Frame reg: rbp
+	  pc+0x0b: FPReg: rbp = rsp + 0x20 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x28
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 0000000000000624 (rva: 00000624): 00000000000059b3 - 0000000000005a17
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000630 (rva: 00000630): 0000000000005a17 - 0000000000005af1
+	Version: 1, Flags: none
+	Nbr codes: 6, Prologue size: 0x0f, Frame offset: 0x2, Frame reg: rbp
+	  pc+0x0f: save xmm6 at rsp + 0x20
+	  pc+0x0b: FPReg: rbp = rsp + 0x20 (info = 0x0)
+	  pc+0x06: alloc small area: rsp = rsp - 0x38
+	  pc+0x02: push rbx
+	  pc+0x01: push rbp
+ 0000000000000640 (rva: 00000640): 0000000000005af1 - 0000000000005b90
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000064c (rva: 0000064c): 0000000000005b90 - 0000000000005c22
+	Version: 1, Flags: none
+	Nbr codes: 5, Prologue size: 0x0c, Frame offset: 0x2, Frame reg: rbp
+	  pc+0x0c: FPReg: rbp = rsp + 0x20 (info = 0x0)
+	  pc+0x07: alloc small area: rsp = rsp - 0x20
+	  pc+0x03: push rbx
+	  pc+0x02: push rsi
+	  pc+0x01: push rbp
+ 000000000000065c (rva: 0000065c): 0000000000005c22 - 0000000000005c88
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000668 (rva: 00000668): 0000000000005c88 - 0000000000005d1f
+	Version: 1, Flags: none
+	Nbr codes: 5, Prologue size: 0x0c, Frame offset: 0x2, Frame reg: rbp
+	  pc+0x0c: FPReg: rbp = rsp + 0x20 (info = 0x0)
+	  pc+0x07: alloc small area: rsp = rsp - 0x20
+	  pc+0x03: push rbx
+	  pc+0x02: push rsi
+	  pc+0x01: push rbp
+ 0000000000000678 (rva: 00000678): 0000000000005d1f - 0000000000005d99
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000684 (rva: 00000684): 0000000000005d99 - 0000000000005e45
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000690 (rva: 00000690): 0000000000005e45 - 0000000000006011
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000069c (rva: 0000069c): 0000000000006011 - 00000000000060a3
+	Version: 1, Flags: none
+	Nbr codes: 5, Prologue size: 0x0c, Frame offset: 0x2, Frame reg: rbp
+	  pc+0x0c: FPReg: rbp = rsp + 0x20 (info = 0x0)
+	  pc+0x07: alloc small area: rsp = rsp - 0x20
+	  pc+0x03: push rbx
+	  pc+0x02: push rsi
+	  pc+0x01: push rbp
+ 00000000000006ac (rva: 000006ac): 00000000000060a3 - 0000000000006155
+	Version: 1, Flags: none
+	Nbr codes: 5, Prologue size: 0x0e, Frame offset: 0x2, Frame reg: rbp
+	  pc+0x0e: save xmm6 at rsp + 0x20
+	  pc+0x0a: FPReg: rbp = rsp + 0x20 (info = 0x0)
+	  pc+0x05: alloc small area: rsp = rsp - 0x30
+	  pc+0x01: push rbp
+ 00000000000006bc (rva: 000006bc): 0000000000006155 - 00000000000061cb
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000006c8 (rva: 000006c8): 00000000000061cb - 0000000000006214
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000006d4 (rva: 000006d4): 0000000000006214 - 00000000000062a3
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000006e0 (rva: 000006e0): 00000000000062a3 - 000000000000632a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000006ec (rva: 000006ec): 000000000000632a - 0000000000006443
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000006f8 (rva: 000006f8): 0000000000006443 - 0000000000006744
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000704 (rva: 00000704): 0000000000006744 - 0000000000006891
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000710 (rva: 00000710): 0000000000006891 - 0000000000006bcc
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000071c (rva: 0000071c): 0000000000006bcc - 0000000000006d74
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000728 (rva: 00000728): 0000000000006d74 - 00000000000072e5
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000734 (rva: 00000734): 00000000000072e5 - 000000000000749a
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000740 (rva: 00000740): 000000000000749a - 00000000000078f5
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000074c (rva: 0000074c): 00000000000078f5 - 00000000000079a6
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000758 (rva: 00000758): 00000000000079a6 - 0000000000007b24
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000764 (rva: 00000764): 0000000000007b24 - 0000000000007c1d
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000770 (rva: 00000770): 0000000000007c1d - 0000000000007c78
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 000000000000077c (rva: 0000077c): 0000000000007c78 - 0000000000007cc6
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000788 (rva: 00000788): 0000000000007cc6 - 0000000000007d43
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 0000000000000794 (rva: 00000794): 0000000000007d43 - 0000000000007f97
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x30
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000007a0 (rva: 000007a0): 0000000000007f97 - 000000000000801e
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000007ac (rva: 000007ac): 000000000000801e - 000000000000823c
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+ 00000000000007b8 (rva: 000007b8): 000000000000823c - 000000000000833e
+	Version: 1, Flags: none
+	Nbr codes: 3, Prologue size: 0x08, Frame offset: 0x0, Frame reg: rbp
+	  pc+0x08: alloc small area: rsp = rsp - 0x20
+	  pc+0x04: FPReg: rbp = rsp + 0x0 (info = 0x0)
+	  pc+0x01: push rbp
+
+Sections:
+Idx Name          Size      VMA               LMA               File off  Algn
+  0 .text         00008340  0000000000000000  0000000000000000  0000012c  2**4
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+  1 .data         00000060  0000000000000000  0000000000000000  0000846c  2**5
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          000000a0  0000000000000000  0000000000000000  00000000  2**4
+                  ALLOC
+  3 .xdata        000007c4  0000000000000000  0000000000000000  000084cc  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  4 .pdata        000007ec  0000000000000000  0000000000000000  00008c90  2**2
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+  5 .rdata        000000e0  0000000000000000  0000000000000000  0000947c  2**5
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  6 .rdata$zzz    00000030  0000000000000000  0000000000000000  0000955c  2**4
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+SYMBOL TABLE:
+[  0](sec -2)(fl 0x00)(ty    0)(scl 103) (nx 1) 0x0000000000000000 pdsp.c
+File 
+[  2](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x0000000000000000 printf
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 0
+[  4](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000000 pdsp_mask_i16
+[  5](sec  2)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000000 pdsp_base16_map
+[  6](sec  2)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000020 pdsp_base64_map
+[  7](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000054 pdsp_stopwatch_start
+[  8](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000009c pdsp_stopwatch_stop
+[  9](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000118 pdsp_call_i16_func
+[ 10](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000001bd pdsp_srec_encode
+[ 11](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000204 pdsp_i16_to_string
+[ 12](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000003fa pdsp_u8_to_base16
+[ 13](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000004b8 pdsp_u16_to_base16
+[ 14](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000005a3 pdsp_u32_to_base16
+[ 15](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000070c pdsp_u64_to_base16
+[ 16](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000077c pdsp_u16_to_base64
+[ 17](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000083e pdsp_u32_to_base64
+[ 18](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000095e pdsp_u64_to_base64
+[ 19](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000b48 pdsp_u16_to_base16_alt
+[ 20](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000000 ch_nibble.22
+[ 21](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000e5f pdsp_u64_to_base16_alt
+[ 22](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000f1b pdsp_map
+[ 23](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000f9d pdsp_map_idx
+[ 24](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001053 pdsp_interpolate_2d
+[ 25](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001151 pdsp_lookup
+[ 26](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000011f6 pdsp_array_set_f32
+[ 27](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001278 pdsp_array_set_i16
+[ 28](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000012f6 pdsp_array_apply_f32
+[ 29](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000013a7 pdsp_array_apply_i16
+[ 30](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000144d pdsp_array_linspace_f32
+[ 31](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001569 pdsp_array_logspace_f32
+[ 32](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000169c pdsp_hysteresis_value_clear
+[ 33](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000016dc pdsp_hysteresis_value_init
+[ 34](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001714 pdsp_hysteresis_value
+[ 35](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000178a pdsp_hysteresis_list_clear
+[ 36](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000017cc pdsp_hysteresis_list_init
+[ 37](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001813 pdsp_hysteresis_list
+[ 38](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000018ed pdsp_debounce_clear
+[ 39](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000193a pdsp_debounce
+[ 40](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001a51 pdsp_debounce_cnt_clear
+[ 41](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001a9b pdsp_debounce_cnt
+[ 42](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001b89 pdsp_robust_clear
+[ 43](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001bd8 pdsp_robust
+[ 44](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001da6 pdsp_backlash_init
+[ 45](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001e04 pdsp_backlash
+[ 46](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001eb0 pdsp_edge_delay_init
+[ 47](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000001f2e pdsp_edge_delay
+[ 48](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002019 pdsp_monoflop_init
+[ 49](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000209f pdsp_monoflop
+[ 50](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002174 pdsp_monoflop_rtr
+[ 51](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000223c pdsp_monoflop_rtr_det
+[ 52](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000022ef pdsp_pulse_init
+[ 53](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002380 pdsp_pulse
+[ 54](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000241d pdsp_bit_write_u16
+[ 55](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000024bf pdsp_bit_write_u32
+[ 56](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002557 pdsp_bit_read_u16
+[ 57](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000025b8 pdsp_bit_read_u32
+[ 58](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002615 pdsp_mask_set
+[ 59](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002662 pdsp_mask_clear
+[ 60](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000026b1 pdsp_mask_get
+[ 61](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000270d pdsp_signal_write_f32
+[ 62](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002786 pdsp_signal_read_f32
+[ 63](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000027d0 pdsp_signal_write_u16
+[ 64](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000286a pdsp_signal_read_u16
+[ 65](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000028ee pdsp_mean2w_f32
+[ 66](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002926 pdsp_mean4_u16
+[ 67](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000029cf pdsp_mean8_u16
+[ 68](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002ab8 pdsp_queue_init
+[ 69](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002b20 pdsp_queue_is_not_empty
+[ 70](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002b75 pdsp_queue_is_not_full
+[ 71](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002bd2 pdsp_queue_advance_head
+[ 72](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002c5c pdsp_queue_advance_tail
+[ 73](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002cea pdsp_queue_push_ch
+[ 74](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002d53 pdsp_queue_push_i16
+[ 75](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002dc1 pdsp_queue_push_i32
+[ 76](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002e2b pdsp_queue_push_f32
+[ 77](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002e9b pdsp_queue_push_u64
+[ 78](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002f08 pdsp_queue_pop_ch
+[ 79](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002f70 pdsp_queue_pop_i16
+[ 80](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000002fdc pdsp_queue_pop_i32
+[ 81](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003046 pdsp_queue_pop_f32
+[ 82](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000030b6 pdsp_queue_pop_u64
+[ 83](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003123 pdsp_llc_init
+[ 84](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003249 pdsp_llc_run
+[ 85](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000328f pdsp_llc_set_values
+[ 86](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003311 pdsp_llc_set_ev_ready
+[ 87](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003329 pdsp_llc_get_se_ready
+[ 88](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000333d pdsp_llc_get_plug_detected
+[ 89](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000334f pdsp_llc_get_cp_duty_state
+[ 90](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003361 pdsp_llc_get_s2_normal_status
+[ 91](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003376 pdsp_llc_get_s2_ventilation_status
+[ 92](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000338b pdsp_ain
+[ 93](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003445 pdsp_ain_ovr
+[ 94](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000034ad pdsp_ain_ovr_enable
+[ 95](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003503 pdsp_ain_ovr_disable
+[ 96](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003546 pdsp_ain_ovr_inject
+[ 97](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000359c pdsp_ain_calibrate_gain
+[ 98](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000035de pdsp_ain_calibrate_offset
+[ 99](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003602 pdsp_minmax_clear
+[100](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003669 pdsp_minmax
+[101](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003709 pdsp_expavg_c2d
+[102](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003744 pdsp_expavg_init
+[103](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000379c pdsp_expavg_clear
+[104](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000037e1 pdsp_expavg
+[105](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003858 pdsp_smoothstep
+[106](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000038d8 pdsp_1p1z_c2d
+[107](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000039b0 pdsp_2p2z_c2d
+[108](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003b84 pdsp_3p3z_c2d
+[109](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003ecd pdsp_df21_clear
+[110](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003f12 pdsp_df21
+[111](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000003fbb pdsp_df21_pre
+[112](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004031 pdsp_df21_post
+[113](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000040ad pdsp_df22_clear
+[114](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000040ff pdsp_df22
+[115](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000041e9 pdsp_df22_pre
+[116](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000425f pdsp_df22_post
+[117](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000431c pdsp_df23_clear
+[118](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000437b pdsp_df23
+[119](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000044a6 pdsp_df23_pre
+[120](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000451c pdsp_df23_post
+[121](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000461a pdsp_med3_clear
+[122](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000466c pdsp_med3
+[123](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000004 out.21
+[124](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000473c pdsp_rollsum_init
+[125](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000008 ps_queue.20
+[126](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000010 ps_queue_var.19
+[127](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000018 ps_roll_var.18
+[128](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000489a pdsp_rollsum
+[129](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004942 pdsp_rollavg_init
+[130](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004991 pdsp_rollavg
+[131](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000049ee pdsp_rollrms_init
+[132](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004a3d pdsp_rollrms
+[133](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004ab2 pdsp_delayrf_bool_clear
+[134](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004b02 pdsp_delayrf_bool
+[135](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000020 ps_var.17
+[136](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004c2a pdsp_abc_dq_clear
+[137](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004ca3 pdsp_abc_dq_pos
+[138](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004dd1 pdsp_abc_dq_neg
+[139](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004ef1 pdsp_dq0_abc_init
+[140](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000004f6a pdsp_dq0_abc
+[141](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000050b5 pdsp_1p1z_pi_c2d
+[142](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005144 pdsp_pi_b2d
+[143](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000051d8 pdsp_pi_clear
+[144](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000028 ps_var.16
+[145](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005259 pdsp_pi
+[146](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000030 ps_var.15
+[147](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000038 ps_param.14
+[148](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000040 f32_sum.13
+[149](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000044 f32_out.12
+[150](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000053c3 pdsp_pi2
+[151](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000048 ps_var.11
+[152](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000050 ps_param.10
+[153](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000058 f32_sum.9
+[154](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x000000000000005c f32_out.8
+[155](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000560a pdsp_pi4
+[156](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000060 ps_var.7
+[157](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000068 ps_param.6
+[158](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000070 f32_sum.5
+[159](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000074 f32_out.4
+[160](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005913 pdsp_pi_set
+[161](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000059b3 pdsp_setp_init
+[162](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005a17 pdsp_setp_ramp
+[163](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000078 ps_var.3
+[164](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005af1 pdsp_setp_exp
+[165](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000080 ps_var.2
+[166](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005b90 pdsp_setp_set_dest
+[167](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005c22 pdsp_setp_step
+[168](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005c88 pdsp_setp_reset
+[169](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005d1f pdsp_setp_reached
+[170](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005d99 pdsp_setp_smooth_init
+[171](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000005e45 pdsp_setp_smooth
+[172](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000088 ps_var.1
+[173](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006011 pdsp_setp_smooth_set_dest
+[174](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000060a3 pdsp_setp_smooth_set_time
+[175](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006155 pdsp_setp_smooth_reached
+[176](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000061cb pdsp_saw_init
+[177](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006214 pdsp_saw
+[178](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000062a3 pdsp_saw_shift
+[179](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000632a pdsp_dpll_1ph_notch_init
+[180](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006443 pdsp_dpll_1ph_notch
+[181](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006744 pdsp_dpll_1ph_sogi_init
+[182](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006891 pdsp_dpll_1ph_sogi
+[183](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006bcc pdsp_dpll_1ph_sogi_fll_init
+[184](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000006d74 pdsp_dpll_1ph_sogi_fll
+[185](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000072e5 pdsp_dpll_3ph_ddsrf_init
+[186](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000749a pdsp_dpll_3ph_ddsrf
+[187](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000078f5 pdsp_dpll_3ph_srf_init
+[188](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x00000000000079a6 pdsp_dpll_3ph_srf
+[189](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000007b24 pdsp_sfra_clear
+[190](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000007c1d pdsp_sfra_start
+[191](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000007c78 pdsp_sfra_running
+[192](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000007cc6 pdsp_sfra_inject
+[193](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000007d43 pdsp_sfra_process
+[194](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000007f97 pdsp_fault_init
+[195](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000801e pdsp_fault_check
+[196](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000090 ps_var.0
+[197](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x000000000000823c pdsp_aout
+[198](sec  1)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .text
+AUX scnlen 0x833e nreloc 654 nlnno 0
+[200](sec  2)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .data
+AUX scnlen 0x60 nreloc 0 nlnno 0
+[202](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .bss
+AUX scnlen 0x98 nreloc 0 nlnno 0
+[204](sec  4)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .xdata
+AUX scnlen 0x7c4 nreloc 0 nlnno 0
+[206](sec  5)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .pdata
+AUX scnlen 0x7ec nreloc 507 nlnno 0
+[208](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .rdata
+AUX scnlen 0xd4 nreloc 0 nlnno 0
+[210](sec  7)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .rdata$zzz
+AUX scnlen 0x2b nreloc 0 nlnno 0
+[212](sec  0)(fl 0x00)(ty    0)(scl   2) (nx 0) 0x0000000000000000 __imp___acrt_iob_func
+[213](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 __mingw_vfprintf
+[214](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fmaxf
+[215](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fminf
+[216](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 powf
+[217](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 sqrtf
+[218](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fmax
+[219](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fmin
+[220](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 sinf
+[221](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 cosf
+
+
+RELOCATION RECORDS FOR [.text]:
+OFFSET           TYPE              VALUE
+000000000000002f IMAGE_REL_AMD64_REL32  __imp___acrt_iob_func
+0000000000000043 IMAGE_REL_AMD64_REL32  __mingw_vfprintf
+0000000000000073 IMAGE_REL_AMD64_REL32  .rdata
+000000000000007d IMAGE_REL_AMD64_REL32  .rdata
+00000000000000c7 IMAGE_REL_AMD64_REL32  .rdata
+00000000000000d1 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000151 IMAGE_REL_AMD64_REL32  .rdata
+000000000000015b IMAGE_REL_AMD64_REL32  .rdata
+00000000000001e4 IMAGE_REL_AMD64_REL32  .rdata
+00000000000001ee IMAGE_REL_AMD64_REL32  .rdata
+0000000000000236 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000240 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000429 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000433 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000465 IMAGE_REL_AMD64_REL32  .data
+0000000000000498 IMAGE_REL_AMD64_REL32  .data
+00000000000004da IMAGE_REL_AMD64_REL32  .rdata
+00000000000004e4 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000512 IMAGE_REL_AMD64_REL32  .data
+000000000000053e IMAGE_REL_AMD64_REL32  .data
+000000000000056a IMAGE_REL_AMD64_REL32  .data
+000000000000058f IMAGE_REL_AMD64_REL32  .data
+00000000000005c2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000005cc IMAGE_REL_AMD64_REL32  .rdata
+00000000000005f1 IMAGE_REL_AMD64_REL32  .data
+0000000000000617 IMAGE_REL_AMD64_REL32  .data
+000000000000063d IMAGE_REL_AMD64_REL32  .data
+0000000000000663 IMAGE_REL_AMD64_REL32  .data
+0000000000000689 IMAGE_REL_AMD64_REL32  .data
+00000000000006af IMAGE_REL_AMD64_REL32  .data
+00000000000006d5 IMAGE_REL_AMD64_REL32  .data
+00000000000006f8 IMAGE_REL_AMD64_REL32  .data
+000000000000072c IMAGE_REL_AMD64_REL32  .rdata
+0000000000000736 IMAGE_REL_AMD64_REL32  .rdata
+000000000000079e IMAGE_REL_AMD64_REL32  .rdata
+00000000000007a8 IMAGE_REL_AMD64_REL32  .rdata
+00000000000007d6 IMAGE_REL_AMD64_REL32  .data
+0000000000000802 IMAGE_REL_AMD64_REL32  .data
+000000000000082a IMAGE_REL_AMD64_REL32  .data
+000000000000085d IMAGE_REL_AMD64_REL32  .rdata
+0000000000000867 IMAGE_REL_AMD64_REL32  .rdata
+000000000000088c IMAGE_REL_AMD64_REL32  .data
+00000000000008b2 IMAGE_REL_AMD64_REL32  .data
+00000000000008d8 IMAGE_REL_AMD64_REL32  .data
+00000000000008fe IMAGE_REL_AMD64_REL32  .data
+0000000000000924 IMAGE_REL_AMD64_REL32  .data
+000000000000094a IMAGE_REL_AMD64_REL32  .data
+000000000000097e IMAGE_REL_AMD64_REL32  .rdata
+0000000000000988 IMAGE_REL_AMD64_REL32  .rdata
+00000000000009ae IMAGE_REL_AMD64_REL32  .data
+00000000000009d5 IMAGE_REL_AMD64_REL32  .data
+00000000000009fc IMAGE_REL_AMD64_REL32  .data
+0000000000000a23 IMAGE_REL_AMD64_REL32  .data
+0000000000000a4a IMAGE_REL_AMD64_REL32  .data
+0000000000000a71 IMAGE_REL_AMD64_REL32  .data
+0000000000000a98 IMAGE_REL_AMD64_REL32  .data
+0000000000000abf IMAGE_REL_AMD64_REL32  .data
+0000000000000ae6 IMAGE_REL_AMD64_REL32  .data
+0000000000000b0d IMAGE_REL_AMD64_REL32  .data
+0000000000000b34 IMAGE_REL_AMD64_REL32  .data
+0000000000000b72 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000b7c IMAGE_REL_AMD64_REL32  .rdata
+0000000000000baf IMAGE_REL_AMD64_REL32  .bss
+0000000000000bb6 IMAGE_REL_AMD64_REL32  .bss
+0000000000000bcd IMAGE_REL_AMD64_REL32  .bss
+0000000000000bf1 IMAGE_REL_AMD64_REL32  .bss
+0000000000000bf8 IMAGE_REL_AMD64_REL32  .bss
+0000000000000c0f IMAGE_REL_AMD64_REL32  .bss
+0000000000000c33 IMAGE_REL_AMD64_REL32  .bss
+0000000000000c3a IMAGE_REL_AMD64_REL32  .bss
+0000000000000c51 IMAGE_REL_AMD64_REL32  .bss
+0000000000000c71 IMAGE_REL_AMD64_REL32  .bss
+0000000000000c78 IMAGE_REL_AMD64_REL32  .bss
+0000000000000c8f IMAGE_REL_AMD64_REL32  .bss
+0000000000000cc8 IMAGE_REL_AMD64_REL32  .bss
+0000000000000ccf IMAGE_REL_AMD64_REL32  .bss
+0000000000000ce6 IMAGE_REL_AMD64_REL32  .bss
+0000000000000d0a IMAGE_REL_AMD64_REL32  .bss
+0000000000000d11 IMAGE_REL_AMD64_REL32  .bss
+0000000000000d28 IMAGE_REL_AMD64_REL32  .bss
+0000000000000d48 IMAGE_REL_AMD64_REL32  .bss
+0000000000000d4f IMAGE_REL_AMD64_REL32  .bss
+0000000000000d66 IMAGE_REL_AMD64_REL32  .bss
+0000000000000d9e IMAGE_REL_AMD64_REL32  .bss
+0000000000000da5 IMAGE_REL_AMD64_REL32  .bss
+0000000000000dbc IMAGE_REL_AMD64_REL32  .bss
+0000000000000ddc IMAGE_REL_AMD64_REL32  .bss
+0000000000000de3 IMAGE_REL_AMD64_REL32  .bss
+0000000000000dfa IMAGE_REL_AMD64_REL32  .bss
+0000000000000e20 IMAGE_REL_AMD64_REL32  .bss
+0000000000000e27 IMAGE_REL_AMD64_REL32  .bss
+0000000000000e3e IMAGE_REL_AMD64_REL32  .bss
+0000000000000e7f IMAGE_REL_AMD64_REL32  .rdata
+0000000000000e89 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000f60 IMAGE_REL_AMD64_REL32  .rdata
+0000000000000fc9 IMAGE_REL_AMD64_REL32  fmaxf
+0000000000000fdd IMAGE_REL_AMD64_REL32  fminf
+000000000000100d IMAGE_REL_AMD64_REL32  .rdata
+0000000000001090 IMAGE_REL_AMD64_REL32  .rdata
+000000000000109a IMAGE_REL_AMD64_REL32  .rdata
+0000000000001190 IMAGE_REL_AMD64_REL32  .rdata
+000000000000119a IMAGE_REL_AMD64_REL32  .rdata
+00000000000011c0 IMAGE_REL_AMD64_REL32  fminf
+00000000000011d1 IMAGE_REL_AMD64_REL32  fmaxf
+0000000000001229 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001233 IMAGE_REL_AMD64_REL32  .rdata
+00000000000012ad IMAGE_REL_AMD64_REL32  .rdata
+00000000000012b7 IMAGE_REL_AMD64_REL32  .rdata
+000000000000133c IMAGE_REL_AMD64_REL32  .rdata
+0000000000001346 IMAGE_REL_AMD64_REL32  .rdata
+00000000000013ed IMAGE_REL_AMD64_REL32  .rdata
+00000000000013f7 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001486 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001490 IMAGE_REL_AMD64_REL32  .rdata
+00000000000014d8 IMAGE_REL_AMD64_REL32  .rdata
+00000000000015a2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000015ac IMAGE_REL_AMD64_REL32  .rdata
+00000000000015f4 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001670 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001679 IMAGE_REL_AMD64_REL32  powf
+00000000000016b8 IMAGE_REL_AMD64_REL32  .rdata
+00000000000016c2 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001735 IMAGE_REL_AMD64_REL32  .rdata
+000000000000173f IMAGE_REL_AMD64_REL32  .rdata
+00000000000017a6 IMAGE_REL_AMD64_REL32  .rdata
+00000000000017b0 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001834 IMAGE_REL_AMD64_REL32  .rdata
+000000000000183e IMAGE_REL_AMD64_REL32  .rdata
+0000000000001909 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001913 IMAGE_REL_AMD64_REL32  .rdata
+000000000000195b IMAGE_REL_AMD64_REL32  .rdata
+0000000000001965 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001a6d IMAGE_REL_AMD64_REL32  .rdata
+0000000000001a77 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001abc IMAGE_REL_AMD64_REL32  .rdata
+0000000000001ac6 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001ba5 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001baf IMAGE_REL_AMD64_REL32  .rdata
+0000000000001bf9 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001c03 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001dcc IMAGE_REL_AMD64_REL32  .rdata
+0000000000001dd6 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001e25 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001e2f IMAGE_REL_AMD64_REL32  .rdata
+0000000000001e61 IMAGE_REL_AMD64_REL32  fmaxf
+0000000000001e92 IMAGE_REL_AMD64_REL32  fminf
+0000000000001ee4 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001eee IMAGE_REL_AMD64_REL32  .rdata
+0000000000001f50 IMAGE_REL_AMD64_REL32  .rdata
+0000000000001f5a IMAGE_REL_AMD64_REL32  .rdata
+000000000000204d IMAGE_REL_AMD64_REL32  .rdata
+0000000000002057 IMAGE_REL_AMD64_REL32  .rdata
+00000000000020c0 IMAGE_REL_AMD64_REL32  .rdata
+00000000000020ca IMAGE_REL_AMD64_REL32  .rdata
+0000000000002195 IMAGE_REL_AMD64_REL32  .rdata
+000000000000219f IMAGE_REL_AMD64_REL32  .rdata
+000000000000225d IMAGE_REL_AMD64_REL32  .rdata
+0000000000002267 IMAGE_REL_AMD64_REL32  .rdata
+000000000000232a IMAGE_REL_AMD64_REL32  .rdata
+0000000000002334 IMAGE_REL_AMD64_REL32  .rdata
+000000000000239c IMAGE_REL_AMD64_REL32  .rdata
+00000000000023a6 IMAGE_REL_AMD64_REL32  .rdata
+000000000000244e IMAGE_REL_AMD64_REL32  .rdata
+0000000000002458 IMAGE_REL_AMD64_REL32  .rdata
+00000000000024f0 IMAGE_REL_AMD64_REL32  .rdata
+00000000000024fa IMAGE_REL_AMD64_REL32  .rdata
+0000000000002580 IMAGE_REL_AMD64_REL32  .rdata
+000000000000258a IMAGE_REL_AMD64_REL32  .rdata
+00000000000025e1 IMAGE_REL_AMD64_REL32  .rdata
+00000000000025eb IMAGE_REL_AMD64_REL32  .rdata
+0000000000002634 IMAGE_REL_AMD64_REL32  .rdata
+000000000000263e IMAGE_REL_AMD64_REL32  .rdata
+0000000000002681 IMAGE_REL_AMD64_REL32  .rdata
+000000000000268b IMAGE_REL_AMD64_REL32  .rdata
+00000000000026d4 IMAGE_REL_AMD64_REL32  .rdata
+00000000000026de IMAGE_REL_AMD64_REL32  .rdata
+0000000000002732 IMAGE_REL_AMD64_REL32  .rdata
+000000000000273c IMAGE_REL_AMD64_REL32  .rdata
+0000000000002805 IMAGE_REL_AMD64_REL32  .rdata
+000000000000280f IMAGE_REL_AMD64_REL32  .rdata
+0000000000002836 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002898 IMAGE_REL_AMD64_REL32  .rdata
+00000000000028a2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000028de IMAGE_REL_AMD64_REL32  .rdata
+0000000000002912 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002942 IMAGE_REL_AMD64_REL32  .rdata
+000000000000294c IMAGE_REL_AMD64_REL32  .rdata
+00000000000029c1 IMAGE_REL_AMD64_REL32  .rdata
+00000000000029eb IMAGE_REL_AMD64_REL32  .rdata
+00000000000029f5 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002aaa IMAGE_REL_AMD64_REL32  .rdata
+0000000000002ad4 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002ade IMAGE_REL_AMD64_REL32  .rdata
+0000000000002b48 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002b52 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002b9d IMAGE_REL_AMD64_REL32  .rdata
+0000000000002ba7 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002bfa IMAGE_REL_AMD64_REL32  .rdata
+0000000000002c04 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002c84 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002c8e IMAGE_REL_AMD64_REL32  .rdata
+0000000000002d0b IMAGE_REL_AMD64_REL32  .rdata
+0000000000002d15 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002d75 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002d7f IMAGE_REL_AMD64_REL32  .rdata
+0000000000002de0 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002dea IMAGE_REL_AMD64_REL32  .rdata
+0000000000002e4c IMAGE_REL_AMD64_REL32  .rdata
+0000000000002e56 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002ebb IMAGE_REL_AMD64_REL32  .rdata
+0000000000002ec5 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002f24 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002f2e IMAGE_REL_AMD64_REL32  .rdata
+0000000000002f8c IMAGE_REL_AMD64_REL32  .rdata
+0000000000002f96 IMAGE_REL_AMD64_REL32  .rdata
+0000000000002ff8 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003002 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003062 IMAGE_REL_AMD64_REL32  .rdata
+000000000000306c IMAGE_REL_AMD64_REL32  .rdata
+00000000000030d2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000030dc IMAGE_REL_AMD64_REL32  .rdata
+00000000000033ac IMAGE_REL_AMD64_REL32  .rdata
+00000000000033b6 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003466 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003470 IMAGE_REL_AMD64_REL32  .rdata
+00000000000034ce IMAGE_REL_AMD64_REL32  .rdata
+00000000000034d8 IMAGE_REL_AMD64_REL32  .rdata
+000000000000351f IMAGE_REL_AMD64_REL32  .rdata
+0000000000003529 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003567 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003571 IMAGE_REL_AMD64_REL32  .rdata
+000000000000361e IMAGE_REL_AMD64_REL32  .rdata
+0000000000003628 IMAGE_REL_AMD64_REL32  .rdata
+000000000000363c IMAGE_REL_AMD64_REL32  .rdata
+000000000000364c IMAGE_REL_AMD64_REL32  .rdata
+000000000000368a IMAGE_REL_AMD64_REL32  .rdata
+0000000000003694 IMAGE_REL_AMD64_REL32  .rdata
+00000000000036b3 IMAGE_REL_AMD64_REL32  fminf
+00000000000036d5 IMAGE_REL_AMD64_REL32  fmaxf
+000000000000372b IMAGE_REL_AMD64_REL32  .rdata
+0000000000003765 IMAGE_REL_AMD64_REL32  .rdata
+000000000000376f IMAGE_REL_AMD64_REL32  .rdata
+00000000000037b8 IMAGE_REL_AMD64_REL32  .rdata
+00000000000037c2 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003802 IMAGE_REL_AMD64_REL32  .rdata
+000000000000380c IMAGE_REL_AMD64_REL32  .rdata
+000000000000388b IMAGE_REL_AMD64_REL32  .rdata
+00000000000038ca IMAGE_REL_AMD64_REL32  .rdata
+00000000000038f1 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003921 IMAGE_REL_AMD64_REL32  .rdata
+00000000000039c9 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003a19 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003b9d IMAGE_REL_AMD64_REL32  .rdata
+0000000000003c16 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003c7e IMAGE_REL_AMD64_REL32  .rdata
+0000000000003cc1 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003ce8 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003d2b IMAGE_REL_AMD64_REL32  .rdata
+0000000000003da7 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003deb IMAGE_REL_AMD64_REL32  .rdata
+0000000000003e12 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003e56 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003ee9 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003ef3 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003f3e IMAGE_REL_AMD64_REL32  .rdata
+0000000000003f48 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003fe7 IMAGE_REL_AMD64_REL32  .rdata
+0000000000003ff1 IMAGE_REL_AMD64_REL32  .rdata
+000000000000405d IMAGE_REL_AMD64_REL32  .rdata
+0000000000004067 IMAGE_REL_AMD64_REL32  .rdata
+00000000000040c9 IMAGE_REL_AMD64_REL32  .rdata
+00000000000040d3 IMAGE_REL_AMD64_REL32  .rdata
+000000000000412b IMAGE_REL_AMD64_REL32  .rdata
+0000000000004135 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004215 IMAGE_REL_AMD64_REL32  .rdata
+000000000000421f IMAGE_REL_AMD64_REL32  .rdata
+000000000000428b IMAGE_REL_AMD64_REL32  .rdata
+0000000000004295 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004338 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004342 IMAGE_REL_AMD64_REL32  .rdata
+00000000000043a7 IMAGE_REL_AMD64_REL32  .rdata
+00000000000043b1 IMAGE_REL_AMD64_REL32  .rdata
+00000000000044d2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000044dc IMAGE_REL_AMD64_REL32  .rdata
+0000000000004548 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004552 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004636 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004640 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004690 IMAGE_REL_AMD64_REL32  .rdata
+000000000000469a IMAGE_REL_AMD64_REL32  .rdata
+00000000000046bd IMAGE_REL_AMD64_REL32  fmaxf
+00000000000046d1 IMAGE_REL_AMD64_REL32  fminf
+00000000000046f0 IMAGE_REL_AMD64_REL32  fminf
+0000000000004701 IMAGE_REL_AMD64_REL32  fmaxf
+000000000000470b IMAGE_REL_AMD64_REL32  .bss
+0000000000004731 IMAGE_REL_AMD64_REL32  .bss
+000000000000475e IMAGE_REL_AMD64_REL32  .rdata
+0000000000004768 IMAGE_REL_AMD64_REL32  .rdata
+000000000000477f IMAGE_REL_AMD64_REL32  .bss
+0000000000004786 IMAGE_REL_AMD64_REL32  .bss
+0000000000004790 IMAGE_REL_AMD64_REL32  .bss
+000000000000479e IMAGE_REL_AMD64_REL32  .bss
+00000000000047a5 IMAGE_REL_AMD64_REL32  .bss
+00000000000047b4 IMAGE_REL_AMD64_REL32  .bss
+00000000000047bb IMAGE_REL_AMD64_REL32  .bss
+00000000000047ca IMAGE_REL_AMD64_REL32  .bss
+00000000000047d8 IMAGE_REL_AMD64_REL32  .bss
+00000000000047e2 IMAGE_REL_AMD64_REL32  .bss
+00000000000047f3 IMAGE_REL_AMD64_REL32  .bss
+0000000000004806 IMAGE_REL_AMD64_REL32  .bss
+000000000000481d IMAGE_REL_AMD64_REL32  .bss
+0000000000004825 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004837 IMAGE_REL_AMD64_REL32  .bss
+0000000000004844 IMAGE_REL_AMD64_REL32  .bss
+0000000000004858 IMAGE_REL_AMD64_REL32  .bss
+0000000000004860 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004870 IMAGE_REL_AMD64_REL32  .bss
+000000000000487f IMAGE_REL_AMD64_REL32  .bss
+00000000000048bb IMAGE_REL_AMD64_REL32  .rdata
+00000000000048c5 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004964 IMAGE_REL_AMD64_REL32  .rdata
+000000000000496e IMAGE_REL_AMD64_REL32  .rdata
+00000000000049b2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000049bc IMAGE_REL_AMD64_REL32  .rdata
+0000000000004a10 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004a1a IMAGE_REL_AMD64_REL32  .rdata
+0000000000004a5e IMAGE_REL_AMD64_REL32  .rdata
+0000000000004a68 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004aa8 IMAGE_REL_AMD64_REL32  sqrtf
+0000000000004ace IMAGE_REL_AMD64_REL32  .rdata
+0000000000004ad8 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004b2f IMAGE_REL_AMD64_REL32  .rdata
+0000000000004b39 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004b4f IMAGE_REL_AMD64_REL32  .bss
+0000000000004b56 IMAGE_REL_AMD64_REL32  .bss
+0000000000004b6d IMAGE_REL_AMD64_REL32  .bss
+0000000000004b7f IMAGE_REL_AMD64_REL32  .bss
+0000000000004b9b IMAGE_REL_AMD64_REL32  .bss
+0000000000004ba5 IMAGE_REL_AMD64_REL32  .bss
+0000000000004bb4 IMAGE_REL_AMD64_REL32  .bss
+0000000000004bcd IMAGE_REL_AMD64_REL32  .bss
+0000000000004bdf IMAGE_REL_AMD64_REL32  .bss
+0000000000004bf7 IMAGE_REL_AMD64_REL32  .bss
+0000000000004c01 IMAGE_REL_AMD64_REL32  .bss
+0000000000004c10 IMAGE_REL_AMD64_REL32  .bss
+0000000000004c1d IMAGE_REL_AMD64_REL32  .bss
+0000000000004c46 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004c50 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004cce IMAGE_REL_AMD64_REL32  .rdata
+0000000000004cd8 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004cf5 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004d10 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004d31 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004d58 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004da0 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004dfc IMAGE_REL_AMD64_REL32  .rdata
+0000000000004e06 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004e23 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004e3e IMAGE_REL_AMD64_REL32  .rdata
+0000000000004e5f IMAGE_REL_AMD64_REL32  .rdata
+0000000000004e86 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004f0d IMAGE_REL_AMD64_REL32  .rdata
+0000000000004f17 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004f95 IMAGE_REL_AMD64_REL32  .rdata
+0000000000004f9f IMAGE_REL_AMD64_REL32  .rdata
+0000000000005000 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005021 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005036 IMAGE_REL_AMD64_REL32  .rdata
+000000000000504b IMAGE_REL_AMD64_REL32  .rdata
+000000000000506c IMAGE_REL_AMD64_REL32  .rdata
+0000000000005081 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005099 IMAGE_REL_AMD64_REL32  .rdata
+00000000000050e0 IMAGE_REL_AMD64_REL32  .rdata
+00000000000050ea IMAGE_REL_AMD64_REL32  .rdata
+000000000000511c IMAGE_REL_AMD64_REL32  .rdata
+0000000000005170 IMAGE_REL_AMD64_REL32  .rdata
+000000000000517a IMAGE_REL_AMD64_REL32  .rdata
+00000000000051f4 IMAGE_REL_AMD64_REL32  .rdata
+00000000000051fe IMAGE_REL_AMD64_REL32  .rdata
+0000000000005215 IMAGE_REL_AMD64_REL32  .bss
+000000000000521c IMAGE_REL_AMD64_REL32  .bss
+0000000000005228 IMAGE_REL_AMD64_REL32  .bss
+0000000000005235 IMAGE_REL_AMD64_REL32  .bss
+0000000000005245 IMAGE_REL_AMD64_REL32  .bss
+0000000000005293 IMAGE_REL_AMD64_REL32  .rdata
+000000000000529d IMAGE_REL_AMD64_REL32  .rdata
+00000000000052b4 IMAGE_REL_AMD64_REL32  .bss
+00000000000052c2 IMAGE_REL_AMD64_REL32  .bss
+00000000000052d8 IMAGE_REL_AMD64_REL32  .bss
+00000000000052df IMAGE_REL_AMD64_REL32  .bss
+00000000000052eb IMAGE_REL_AMD64_REL32  .bss
+00000000000052ff IMAGE_REL_AMD64_REL32  .bss
+000000000000530b IMAGE_REL_AMD64_REL32  .bss
+000000000000531f IMAGE_REL_AMD64_REL32  .bss
+000000000000532f IMAGE_REL_AMD64_REL32  .bss
+0000000000005342 IMAGE_REL_AMD64_REL32  .bss
+0000000000005353 IMAGE_REL_AMD64_REL32  .bss
+0000000000005359 IMAGE_REL_AMD64_REL32  .bss
+000000000000536e IMAGE_REL_AMD64_REL32  fminf
+0000000000005387 IMAGE_REL_AMD64_REL32  fmaxf
+0000000000005391 IMAGE_REL_AMD64_REL32  .bss
+0000000000005399 IMAGE_REL_AMD64_REL32  .bss
+00000000000053a1 IMAGE_REL_AMD64_REL32  .bss
+00000000000053a8 IMAGE_REL_AMD64_REL32  .bss
+00000000000053b9 IMAGE_REL_AMD64_REL32  .bss
+00000000000053fc IMAGE_REL_AMD64_REL32  .rdata
+0000000000005406 IMAGE_REL_AMD64_REL32  .rdata
+000000000000541d IMAGE_REL_AMD64_REL32  .bss
+000000000000542b IMAGE_REL_AMD64_REL32  .bss
+0000000000005441 IMAGE_REL_AMD64_REL32  .bss
+0000000000005448 IMAGE_REL_AMD64_REL32  .bss
+0000000000005454 IMAGE_REL_AMD64_REL32  .bss
+0000000000005468 IMAGE_REL_AMD64_REL32  .bss
+0000000000005484 IMAGE_REL_AMD64_REL32  .bss
+00000000000054a3 IMAGE_REL_AMD64_REL32  .bss
+00000000000054ad IMAGE_REL_AMD64_REL32  .bss
+00000000000054b9 IMAGE_REL_AMD64_REL32  .bss
+00000000000054da IMAGE_REL_AMD64_REL32  .bss
+00000000000054e1 IMAGE_REL_AMD64_REL32  .bss
+00000000000054ff IMAGE_REL_AMD64_REL32  .bss
+000000000000550b IMAGE_REL_AMD64_REL32  .bss
+0000000000005512 IMAGE_REL_AMD64_REL32  .bss
+0000000000005534 IMAGE_REL_AMD64_REL32  .bss
+0000000000005544 IMAGE_REL_AMD64_REL32  .bss
+0000000000005565 IMAGE_REL_AMD64_REL32  .bss
+000000000000556c IMAGE_REL_AMD64_REL32  .bss
+0000000000005589 IMAGE_REL_AMD64_REL32  .bss
+000000000000559a IMAGE_REL_AMD64_REL32  .bss
+00000000000055a0 IMAGE_REL_AMD64_REL32  .bss
+00000000000055b5 IMAGE_REL_AMD64_REL32  fminf
+00000000000055ce IMAGE_REL_AMD64_REL32  fmaxf
+00000000000055d8 IMAGE_REL_AMD64_REL32  .bss
+00000000000055e0 IMAGE_REL_AMD64_REL32  .bss
+00000000000055e8 IMAGE_REL_AMD64_REL32  .bss
+00000000000055ef IMAGE_REL_AMD64_REL32  .bss
+0000000000005600 IMAGE_REL_AMD64_REL32  .bss
+0000000000005643 IMAGE_REL_AMD64_REL32  .rdata
+000000000000564d IMAGE_REL_AMD64_REL32  .rdata
+0000000000005664 IMAGE_REL_AMD64_REL32  .bss
+0000000000005672 IMAGE_REL_AMD64_REL32  .bss
+0000000000005688 IMAGE_REL_AMD64_REL32  .bss
+000000000000568f IMAGE_REL_AMD64_REL32  .bss
+000000000000569b IMAGE_REL_AMD64_REL32  .bss
+00000000000056af IMAGE_REL_AMD64_REL32  .bss
+00000000000056cb IMAGE_REL_AMD64_REL32  .bss
+00000000000056ea IMAGE_REL_AMD64_REL32  .bss
+00000000000056f4 IMAGE_REL_AMD64_REL32  .bss
+000000000000570c IMAGE_REL_AMD64_REL32  .bss
+000000000000572c IMAGE_REL_AMD64_REL32  .bss
+000000000000574b IMAGE_REL_AMD64_REL32  .bss
+0000000000005755 IMAGE_REL_AMD64_REL32  .bss
+000000000000576d IMAGE_REL_AMD64_REL32  .bss
+000000000000578d IMAGE_REL_AMD64_REL32  .bss
+00000000000057ac IMAGE_REL_AMD64_REL32  .bss
+00000000000057b6 IMAGE_REL_AMD64_REL32  .bss
+00000000000057c2 IMAGE_REL_AMD64_REL32  .bss
+00000000000057e3 IMAGE_REL_AMD64_REL32  .bss
+00000000000057ea IMAGE_REL_AMD64_REL32  .bss
+0000000000005808 IMAGE_REL_AMD64_REL32  .bss
+0000000000005814 IMAGE_REL_AMD64_REL32  .bss
+000000000000581b IMAGE_REL_AMD64_REL32  .bss
+000000000000583d IMAGE_REL_AMD64_REL32  .bss
+000000000000584d IMAGE_REL_AMD64_REL32  .bss
+000000000000586e IMAGE_REL_AMD64_REL32  .bss
+0000000000005875 IMAGE_REL_AMD64_REL32  .bss
+0000000000005892 IMAGE_REL_AMD64_REL32  .bss
+00000000000058a3 IMAGE_REL_AMD64_REL32  .bss
+00000000000058a9 IMAGE_REL_AMD64_REL32  .bss
+00000000000058be IMAGE_REL_AMD64_REL32  fminf
+00000000000058d7 IMAGE_REL_AMD64_REL32  fmaxf
+00000000000058e1 IMAGE_REL_AMD64_REL32  .bss
+00000000000058e9 IMAGE_REL_AMD64_REL32  .bss
+00000000000058f1 IMAGE_REL_AMD64_REL32  .bss
+00000000000058f8 IMAGE_REL_AMD64_REL32  .bss
+0000000000005909 IMAGE_REL_AMD64_REL32  .bss
+0000000000005944 IMAGE_REL_AMD64_REL32  .rdata
+000000000000594e IMAGE_REL_AMD64_REL32  .rdata
+000000000000596e IMAGE_REL_AMD64_REL32  fminf
+000000000000598f IMAGE_REL_AMD64_REL32  fmaxf
+00000000000059db IMAGE_REL_AMD64_REL32  .rdata
+00000000000059e5 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005a46 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005a50 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005a66 IMAGE_REL_AMD64_REL32  .bss
+0000000000005a6d IMAGE_REL_AMD64_REL32  .bss
+0000000000005a82 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005a97 IMAGE_REL_AMD64_REL32  .bss
+0000000000005aa3 IMAGE_REL_AMD64_REL32  .bss
+0000000000005ab7 IMAGE_REL_AMD64_REL32  fminf
+0000000000005ac8 IMAGE_REL_AMD64_REL32  fmaxf
+0000000000005acf IMAGE_REL_AMD64_REL32  .bss
+0000000000005ade IMAGE_REL_AMD64_REL32  .bss
+0000000000005b19 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005b23 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005b39 IMAGE_REL_AMD64_REL32  .bss
+0000000000005b40 IMAGE_REL_AMD64_REL32  .bss
+0000000000005b54 IMAGE_REL_AMD64_REL32  .bss
+0000000000005b60 IMAGE_REL_AMD64_REL32  .bss
+0000000000005b73 IMAGE_REL_AMD64_REL32  .bss
+0000000000005b82 IMAGE_REL_AMD64_REL32  .bss
+0000000000005bc1 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005bcb IMAGE_REL_AMD64_REL32  .rdata
+0000000000005bf2 IMAGE_REL_AMD64_REL32  fminf
+0000000000005c0a IMAGE_REL_AMD64_REL32  fmaxf
+0000000000005c4a IMAGE_REL_AMD64_REL32  .rdata
+0000000000005c54 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005cb9 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005cc3 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005cea IMAGE_REL_AMD64_REL32  fminf
+0000000000005d02 IMAGE_REL_AMD64_REL32  fmaxf
+0000000000005d4c IMAGE_REL_AMD64_REL32  .rdata
+0000000000005d56 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005d81 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005dc1 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005dcb IMAGE_REL_AMD64_REL32  .rdata
+0000000000005de2 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005df5 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005e6d IMAGE_REL_AMD64_REL32  .rdata
+0000000000005e77 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005e8d IMAGE_REL_AMD64_REL32  .bss
+0000000000005e94 IMAGE_REL_AMD64_REL32  .bss
+0000000000005ea0 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005ead IMAGE_REL_AMD64_REL32  .rdata
+0000000000005eb9 IMAGE_REL_AMD64_REL32  .bss
+0000000000005ec5 IMAGE_REL_AMD64_REL32  .bss
+0000000000005edb IMAGE_REL_AMD64_REL32  .bss
+0000000000005eea IMAGE_REL_AMD64_REL32  .bss
+0000000000005ef1 IMAGE_REL_AMD64_REL32  .bss
+0000000000005f02 IMAGE_REL_AMD64_REL32  .bss
+0000000000005f09 IMAGE_REL_AMD64_REL32  .bss
+0000000000005f1a IMAGE_REL_AMD64_REL32  .bss
+0000000000005f25 IMAGE_REL_AMD64_REL32  .bss
+0000000000005f34 IMAGE_REL_AMD64_REL32  .bss
+0000000000005f47 IMAGE_REL_AMD64_REL32  .rdata
+0000000000005f52 IMAGE_REL_AMD64_REL32  .bss
+0000000000005f62 IMAGE_REL_AMD64_REL32  .bss
+0000000000005f6d IMAGE_REL_AMD64_REL32  .bss
+0000000000005f91 IMAGE_REL_AMD64_REL32  fmax
+0000000000005f9e IMAGE_REL_AMD64_REL32  .rdata
+0000000000005fac IMAGE_REL_AMD64_REL32  fmin
+0000000000005fb3 IMAGE_REL_AMD64_REL32  .bss
+0000000000005fc2 IMAGE_REL_AMD64_REL32  .bss
+0000000000005fce IMAGE_REL_AMD64_REL32  .bss
+0000000000005fda IMAGE_REL_AMD64_REL32  .bss
+0000000000005fee IMAGE_REL_AMD64_REL32  .bss
+0000000000005ffa IMAGE_REL_AMD64_REL32  .bss
+0000000000006042 IMAGE_REL_AMD64_REL32  .rdata
+000000000000604c IMAGE_REL_AMD64_REL32  .rdata
+0000000000006073 IMAGE_REL_AMD64_REL32  fminf
+000000000000608b IMAGE_REL_AMD64_REL32  fmaxf
+00000000000060d6 IMAGE_REL_AMD64_REL32  .rdata
+00000000000060e0 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006126 IMAGE_REL_AMD64_REL32  fmax
+0000000000006182 IMAGE_REL_AMD64_REL32  .rdata
+000000000000618c IMAGE_REL_AMD64_REL32  .rdata
+00000000000061a7 IMAGE_REL_AMD64_REL32  .rdata
+00000000000061b3 IMAGE_REL_AMD64_REL32  .rdata
+00000000000061e7 IMAGE_REL_AMD64_REL32  .rdata
+00000000000061f1 IMAGE_REL_AMD64_REL32  .rdata
+000000000000623b IMAGE_REL_AMD64_REL32  .rdata
+0000000000006245 IMAGE_REL_AMD64_REL32  .rdata
+00000000000062c9 IMAGE_REL_AMD64_REL32  .rdata
+00000000000062d3 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006346 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006350 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006464 IMAGE_REL_AMD64_REL32  .rdata
+000000000000646e IMAGE_REL_AMD64_REL32  .rdata
+000000000000649d IMAGE_REL_AMD64_REL32  .rdata
+0000000000006531 IMAGE_REL_AMD64_REL32  .rdata
+00000000000066be IMAGE_REL_AMD64_REL32  .rdata
+00000000000066df IMAGE_REL_AMD64_REL32  .rdata
+00000000000066f2 IMAGE_REL_AMD64_REL32  .rdata
+000000000000670f IMAGE_REL_AMD64_REL32  sinf
+000000000000672a IMAGE_REL_AMD64_REL32  cosf
+0000000000006760 IMAGE_REL_AMD64_REL32  .rdata
+000000000000676a IMAGE_REL_AMD64_REL32  .rdata
+00000000000068b2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000068bc IMAGE_REL_AMD64_REL32  .rdata
+0000000000006b46 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006b67 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006b7a IMAGE_REL_AMD64_REL32  .rdata
+0000000000006b97 IMAGE_REL_AMD64_REL32  sinf
+0000000000006bb2 IMAGE_REL_AMD64_REL32  cosf
+0000000000006be8 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006bf2 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006d95 IMAGE_REL_AMD64_REL32  .rdata
+0000000000006d9f IMAGE_REL_AMD64_REL32  .rdata
+0000000000007041 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007062 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007075 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007092 IMAGE_REL_AMD64_REL32  sinf
+00000000000070ad IMAGE_REL_AMD64_REL32  cosf
+00000000000070ff IMAGE_REL_AMD64_REL32  .rdata
+000000000000716c IMAGE_REL_AMD64_REL32  .rdata
+00000000000071f2 IMAGE_REL_AMD64_REL32  .rdata
+00000000000071fe IMAGE_REL_AMD64_REL32  .rdata
+000000000000722b IMAGE_REL_AMD64_REL32  .rdata
+0000000000007242 IMAGE_REL_AMD64_REL32  .rdata
+000000000000726e IMAGE_REL_AMD64_REL32  .rdata
+0000000000007301 IMAGE_REL_AMD64_REL32  .rdata
+000000000000730b IMAGE_REL_AMD64_REL32  .rdata
+00000000000074c5 IMAGE_REL_AMD64_REL32  .rdata
+00000000000074cf IMAGE_REL_AMD64_REL32  .rdata
+0000000000007849 IMAGE_REL_AMD64_REL32  .rdata
+000000000000786a IMAGE_REL_AMD64_REL32  .rdata
+000000000000787d IMAGE_REL_AMD64_REL32  .rdata
+00000000000078b6 IMAGE_REL_AMD64_REL32  cosf
+00000000000078db IMAGE_REL_AMD64_REL32  sinf
+0000000000007911 IMAGE_REL_AMD64_REL32  .rdata
+000000000000791b IMAGE_REL_AMD64_REL32  .rdata
+00000000000079c7 IMAGE_REL_AMD64_REL32  .rdata
+00000000000079d1 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007a5e IMAGE_REL_AMD64_REL32  .rdata
+0000000000007a68 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007ac2 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007ae3 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007af6 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007b4c IMAGE_REL_AMD64_REL32  .rdata
+0000000000007b56 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007c45 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007c4f IMAGE_REL_AMD64_REL32  .rdata
+0000000000007ca0 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007caa IMAGE_REL_AMD64_REL32  .rdata
+0000000000007cee IMAGE_REL_AMD64_REL32  .rdata
+0000000000007cf8 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007d6b IMAGE_REL_AMD64_REL32  .rdata
+0000000000007d75 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007ebc IMAGE_REL_AMD64_REL32  sinf
+0000000000007ed7 IMAGE_REL_AMD64_REL32  cosf
+0000000000007f11 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007fd9 IMAGE_REL_AMD64_REL32  .rdata
+0000000000007fe3 IMAGE_REL_AMD64_REL32  .rdata
+0000000000008065 IMAGE_REL_AMD64_REL32  .rdata
+000000000000806f IMAGE_REL_AMD64_REL32  .rdata
+0000000000008085 IMAGE_REL_AMD64_REL32  .bss
+00000000000080a3 IMAGE_REL_AMD64_REL32  .bss
+00000000000080cf IMAGE_REL_AMD64_REL32  .bss
+00000000000080e4 IMAGE_REL_AMD64_REL32  .bss
+00000000000080f4 IMAGE_REL_AMD64_REL32  .bss
+0000000000008112 IMAGE_REL_AMD64_REL32  .bss
+0000000000008139 IMAGE_REL_AMD64_REL32  .bss
+0000000000008161 IMAGE_REL_AMD64_REL32  .bss
+0000000000008173 IMAGE_REL_AMD64_REL32  .bss
+000000000000818c IMAGE_REL_AMD64_REL32  .bss
+00000000000081a1 IMAGE_REL_AMD64_REL32  .bss
+00000000000081b1 IMAGE_REL_AMD64_REL32  .bss
+00000000000081cb IMAGE_REL_AMD64_REL32  .bss
+00000000000081d5 IMAGE_REL_AMD64_REL32  .bss
+00000000000081df IMAGE_REL_AMD64_REL32  .bss
+000000000000820d IMAGE_REL_AMD64_REL32  .bss
+000000000000821f IMAGE_REL_AMD64_REL32  .bss
+000000000000822f IMAGE_REL_AMD64_REL32  .bss
+0000000000008264 IMAGE_REL_AMD64_REL32  .rdata
+000000000000826e IMAGE_REL_AMD64_REL32  .rdata
+
+
+RELOCATION RECORDS FOR [.pdata]:
+OFFSET           TYPE              VALUE
+0000000000000000 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000004 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000008 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000000c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000010 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000014 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000018 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000001c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000020 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000024 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000028 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000002c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000030 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000034 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000038 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000003c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000040 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000044 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000048 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000004c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000050 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000054 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000058 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000005c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000060 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000064 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000068 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000006c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000070 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000074 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000078 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000007c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000080 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000084 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000088 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000008c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000090 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000094 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000098 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000009c IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000a0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000a4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000a8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000ac IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000b0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000b4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000b8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000bc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000c0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000c4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000c8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000cc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000d0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000d4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000d8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000dc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000e0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000e4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000e8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000ec IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000f0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000f4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000000f8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000000fc IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000100 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000104 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000108 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000010c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000110 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000114 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000118 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000011c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000120 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000124 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000128 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000012c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000130 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000134 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000138 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000013c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000140 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000144 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000148 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000014c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000150 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000154 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000158 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000015c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000160 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000164 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000168 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000016c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000170 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000174 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000178 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000017c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000180 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000184 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000188 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000018c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000190 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000194 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000198 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000019c IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001a0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001a4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001a8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001ac IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001b0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001b4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001b8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001bc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001c0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001c4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001c8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001cc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001d0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001d4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001d8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001dc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001e0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001e4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001e8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001ec IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001f0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001f4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000001f8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000001fc IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000200 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000204 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000208 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000020c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000210 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000214 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000218 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000021c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000220 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000224 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000228 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000022c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000230 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000234 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000238 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000023c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000240 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000244 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000248 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000024c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000250 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000254 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000258 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000025c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000260 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000264 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000268 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000026c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000270 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000274 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000278 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000027c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000280 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000284 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000288 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000028c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000290 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000294 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000298 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000029c IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002a0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002a4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002a8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002ac IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002b0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002b4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002b8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002bc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002c0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002c4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002c8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002cc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002d0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002d4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002d8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002dc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002e0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002e4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002e8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002ec IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002f0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000002f4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002f8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000002fc IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000300 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000304 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000308 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000030c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000310 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000314 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000318 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000031c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000320 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000324 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000328 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000032c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000330 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000334 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000338 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000033c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000340 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000344 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000348 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000034c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000350 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000354 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000358 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000035c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000360 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000364 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000368 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000036c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000370 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000374 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000378 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000037c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000380 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000384 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000388 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000038c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000390 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000394 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000398 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000039c IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003a0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003a4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003a8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003ac IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003b0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003b4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003b8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003bc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003c0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003c4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003c8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003cc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003d0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003d4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003d8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003dc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003e0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003e4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003e8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003ec IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003f0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003f4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000003f8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000003fc IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000400 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000404 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000408 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000040c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000410 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000414 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000418 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000041c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000420 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000424 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000428 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000042c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000430 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000434 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000438 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000043c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000440 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000444 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000448 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000044c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000450 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000454 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000458 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000045c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000460 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000464 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000468 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000046c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000470 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000474 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000478 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000047c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000480 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000484 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000488 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000048c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000490 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000494 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000498 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000049c IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004a0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004a4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004a8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004ac IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004b0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004b4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004b8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004bc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004c0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004c4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004c8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004cc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004d0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004d4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004d8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004dc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004e0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004e4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004e8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004ec IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004f0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004f4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000004f8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000004fc IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000500 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000504 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000508 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000050c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000510 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000514 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000518 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000051c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000520 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000524 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000528 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000052c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000530 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000534 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000538 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000053c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000540 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000544 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000548 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000054c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000550 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000554 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000558 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000055c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000560 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000564 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000568 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000056c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000570 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000574 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000578 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000057c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000580 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000584 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000588 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000058c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000590 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000594 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000598 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000059c IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005a0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005a4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005a8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005ac IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005b0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005b4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005b8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005bc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005c0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005c4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005c8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005cc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005d0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005d4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005d8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005dc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005e0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005e4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005e8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005ec IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005f0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000005f4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005f8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000005fc IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000600 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000604 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000608 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000060c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000610 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000614 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000618 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000061c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000620 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000624 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000628 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000062c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000630 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000634 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000638 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000063c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000640 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000644 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000648 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000064c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000650 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000654 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000658 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000065c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000660 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000664 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000668 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000066c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000670 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000674 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000678 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000067c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000680 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000684 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000688 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000068c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000690 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000694 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000698 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000069c IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006a0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006a4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006a8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006ac IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006b0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006b4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006b8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006bc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006c0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006c4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006c8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006cc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006d0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006d4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006d8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006dc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006e0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006e4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006e8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006ec IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006f0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006f4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000006f8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000006fc IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000700 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000704 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000708 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000070c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000710 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000714 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000718 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000071c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000720 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000724 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000728 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000072c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000730 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000734 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000738 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000073c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000740 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000744 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000748 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000074c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000750 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000754 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000758 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000075c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000760 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000764 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000768 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000076c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000770 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000774 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000778 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000077c IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000780 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000784 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000788 IMAGE_REL_AMD64_ADDR32NB  .xdata
+000000000000078c IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000790 IMAGE_REL_AMD64_ADDR32NB  .text
+0000000000000794 IMAGE_REL_AMD64_ADDR32NB  .xdata
+0000000000000798 IMAGE_REL_AMD64_ADDR32NB  .text
+000000000000079c IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007a0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000007a4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007a8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007ac IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000007b0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007b4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007b8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000007bc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007c0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007c4 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000007c8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007cc IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007d0 IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000007d4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007d8 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007dc IMAGE_REL_AMD64_ADDR32NB  .xdata
+00000000000007e0 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007e4 IMAGE_REL_AMD64_ADDR32NB  .text
+00000000000007e8 IMAGE_REL_AMD64_ADDR32NB  .xdata
+
+

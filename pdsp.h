@@ -1379,7 +1379,7 @@ pdsp_extern pdsp_u16_t pdsp_map_idx(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
  * monotonically increasing.
  * @param af32_y Y axis array. Size must be 2 or higher and must be the same as
  * x_arr.
- * @param u32_size Site of the x and y array.
+ * @param u32_size Size of the x and y array.
  * @param f32_x_in Interpolation input.
  * @returns pdsp_f32_t Interpolated value.
  */
@@ -1387,6 +1387,22 @@ pdsp_extern pdsp_f32_t pdsp_interpolate_2d(const pdsp_f32_t af32_x[],
                                            const pdsp_f32_t af32_y[],
                                            pdsp_u32_t u32_size,
                                            pdsp_f32_t f32_x_in);
+
+/**
+ * @brief Lookup table lookup.
+ * @param af32_y Y axis array. Size must be 2 or higher and must be the same as
+ * x_arr.
+ * @param f32_size Size of the y array.
+ * @param f32_x_gain Gain for index. idx = (int)(x * gain + offset)
+ * @param f32_x_offset Offset for index. idx = (int)(x * gain + offset)
+ * @param f32_x Lookup table input.
+ * @returns pdsp_f32_t Table value.
+ */
+pdsp_extern pdsp_f32_t pdsp_lookup(const pdsp_f32_t af32_y[],
+                                   pdsp_f32_t f32_size,
+                                   pdsp_f32_t f32_x_gain,
+                                   pdsp_f32_t f32_x_offset,
+                                   pdsp_f32_t f32_x);
 
 /**
  * @brief Set all elements in f32 array to given value.
@@ -1603,6 +1619,16 @@ pdsp_extern void pdsp_robust_clear(pdsp_robust_t *ps_data);
  * @return pdsp_u16_t State output.
  */
 pdsp_extern pdsp_u16_t pdsp_robust(pdsp_robust_t *ps_data, pdsp_f32_t f32_in);
+
+/**
+ * @brief Backlash initialization.
+ * @param ps_data Data struct.
+ * @param f32_backlash_half Half of the backlash to be introduced.
+ * @param f32_state State initialization.
+ */
+pdsp_extern void pdsp_backlash_init(pdsp_backlash_t *ps_data,
+                                    pdsp_f32_t f32_backlash_half,
+                                    pdsp_f32_t f32_state);
 
 /**
  * @brief Backlash function.

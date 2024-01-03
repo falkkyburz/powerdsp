@@ -39,5 +39,8 @@
                 "CHERE_INVOKING": "1"
             }
         }
-    }
+    },
+    "editor.fontFamily": "'DejaVu Sans Mono', 'Courier New', monospace",
+    "C_Cpp.default.compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",
+    "cmake.configureOnOpen": false
 }
