@@ -1340,6 +1340,42 @@ pdsp_extern pdsp_f32_t pdsp_ain_calibrate_offset(pdsp_f32_t f32_offset_old,
     return f32_offset_old + (f32_ref - f32_raw);
 }
 
+pdsp_extern pdsp_status pdsp_ain_calibrate(pdsp_f32_t f32_gain_pre,
+                       pdsp_f32_t f32_offset_pre,
+                       pdsp_f32_t f32_a_ref,
+                       pdsp_f32_t f32_a_disp,
+                       pdsp_f32_t f32_b_ref,
+                       pdsp_f32_t f32_b_disp,
+                       pdsp_f32_t* f32_gain,
+                       pdsp_f32_t* f32_offset)
+{
+    /* Sanitize inputs */
+    if ((f32_gain_pre == 0.0f) ||
+        (f32_a_disp == f32_b_disp) ||
+        (!isfinite(f32_gain_pre)) ||
+        (!isfinite(f32_offset_pre)) ||
+        (!isfinite(f32_a_ref)) ||
+        (!isfinite(f32_a_disp)) ||
+        (!isfinite(f32_b_ref)) ||
+        (!isfinite(f32_b_disp)) ||
+        (f32_gain == NULL) ||
+        (f32_offset == NULL)
+        ) return PDSP_OK;
+    
+    /* Calculate new gain */
+    *f32_gain = (
+        (f32_a_ref - f32_b_ref) / (f32_gain_pre * (f32_a_disp - f32_b_disp)));
+    
+    /* Calculate new offset */
+    *f32_offset = (
+        f32_a_ref - 
+        (f32_a_ref - f32_b_ref) / (f32_a_disp - f32_b_disp) * f32_a_disp - 
+        f32_offset_pre);
+
+    return PDSP_OK; 
+}
+
+
 pdsp_extern void pdsp_minmax_clear(pdsp_minmax_var_t *ps_var)
 {
     PDSP_ASSERT(ps_var != NULL);
