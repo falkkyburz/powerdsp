@@ -1343,7 +1343,7 @@ pdsp_extern pdsp_char_t *pdsp_u64_to_base16_alt(pdsp_u64_t u64_in,
                                                 pdsp_char_t *ach_out);
 
 /**
- * @brief Map a value from one range to another (Uses division).
+ * @brief Map a value from one range to another (Uses division, keeps slope).
  * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
  * to implement the mapping (interpolation). The output for (x1 - x0) == 0 is y
  * = (y1 - y0) * 0.5.
@@ -1355,6 +1355,22 @@ pdsp_extern pdsp_char_t *pdsp_u64_to_base16_alt(pdsp_u64_t u64_in,
  * @return pdsp_f32_t Ouput value.
  */
 pdsp_extern pdsp_f32_t pdsp_map(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
+                                pdsp_f32_t f32_in_hi, pdsp_f32_t f32_out_lo,
+                                pdsp_f32_t f32_out_hi);
+
+/**
+ * @brief Map a value from one range to another (Uses division, keeps value).
+ * @details It uses the formula y = (y1 - y0) / (x1 - x0) * (x - x0) + y0 to
+ * to implement the mapping (interpolation). The output for (x1 - x0) == 0 is y
+ * = (y1 - y0) * 0.5.
+ * @param f32_in Input value.
+ * @param f32_in_lo Input range low value.
+ * @param f32_in_hi Input range high value.
+ * @param f32_out_lo Output range low value.
+ * @param f32_out_hi Output range high value.
+ * @return pdsp_f32_t Ouput value.
+ */
+pdsp_extern pdsp_f32_t pdsp_mapv(pdsp_f32_t f32_in, pdsp_f32_t f32_in_lo,
                                 pdsp_f32_t f32_in_hi, pdsp_f32_t f32_out_lo,
                                 pdsp_f32_t f32_out_hi);
 
@@ -1505,7 +1521,7 @@ pdsp_extern void pdsp_hysteresis_value_init(pdsp_hyst_t *ps_data,
  * @details Changes to high state if input is greater than the high threshold.
  * Changes to low state if input is less than the low threshold. No action if
  * value is between the low and high threshold.
- * Oupput:      false   true
+ * Output:      false   true
  *                |<------|------- f32_high
  *              dn|       |up
  * f32_low -------|------>|
@@ -1632,7 +1648,7 @@ pdsp_extern void pdsp_backlash_init(pdsp_backlash_t *ps_data,
 
 /**
  * @brief Backlash function.
- * @details Introduces backlash or play into an analog value.
+ * @details Introduces backlash (or play) into an analog value.
  *       out  in
  * -------|---->----
  * ---------|---->--
@@ -2123,6 +2139,27 @@ pdsp_extern pdsp_f32_t pdsp_ain_calibrate_gain(pdsp_f32_t f32_gain_old,
 pdsp_extern pdsp_f32_t pdsp_ain_calibrate_offset(pdsp_f32_t f32_offset_old,
                                                  pdsp_f32_t f32_ref,
                                                  pdsp_f32_t f32_raw);
+
+/**
+ * @brief Two point calibration
+ * @param[in] f32_gain_pre Old gain that was used to calculate disp. value.
+ * @param[in] f32_offset_pre Old offset that was used to calculate disp. value.
+ * @param[in] f32_a_ref Reference value for point a.
+ * @param[in] f32_a_disp Display value for point a.
+ * @param[in] f32_b_ref Reference value for point b.
+ * @param[in] f32_b_disp Display value for point b.
+ * @param[out] f32_gain New gain.
+ * @param[out] f32_offset New offset
+ * @returns pdsp_status_t Success status.
+ */
+pdsp_extern pdsp_status_t pdsp_ain_calibrate(pdsp_f32_t f32_gain_pre,
+                       pdsp_f32_t f32_offset_pre,
+                       pdsp_f32_t f32_a_ref,
+                       pdsp_f32_t f32_a_disp,
+                       pdsp_f32_t f32_b_ref,
+                       pdsp_f32_t f32_b_disp,
+                       pdsp_f32_t* f32_gain,
+                       pdsp_f32_t* f32_offset);                                               
 
 /**
  * @brief Initialize / Clear min-max struct.

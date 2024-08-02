@@ -1340,7 +1340,7 @@ pdsp_extern pdsp_f32_t pdsp_ain_calibrate_offset(pdsp_f32_t f32_offset_old,
     return f32_offset_old + (f32_ref - f32_raw);
 }
 
-pdsp_extern pdsp_status pdsp_ain_calibrate(pdsp_f32_t f32_gain_pre,
+pdsp_extern pdsp_status_t pdsp_ain_calibrate(pdsp_f32_t f32_gain_pre,
                        pdsp_f32_t f32_offset_pre,
                        pdsp_f32_t f32_a_ref,
                        pdsp_f32_t f32_a_disp,

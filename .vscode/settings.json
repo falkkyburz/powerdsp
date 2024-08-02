@@ -25,7 +25,8 @@
         "pdsp.h": "c",
         "pdsp_inline.h": "c",
         "pdsp_macro.h": "c",
-        "pdsp_assert.h": "c"
+        "pdsp_assert.h": "c",
+        "stddef.h": "c"
     },
     "terminal.integrated.profiles.windows": {
         "MSYS2_MINGW64": {
